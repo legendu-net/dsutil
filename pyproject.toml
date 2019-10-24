@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "dsutil"
+version = "0.8.1"
+description = "A utils Python package for data scientists."
+authors = ["Benjamin Du <longendu@yahoo.com>"]
+
+[tool.poetry.scripts]
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+requests = ">=2.18.4"
+dateparser = ">=0.7.1"
+numpy = ">=1.14.2"
+pandas = ">=0.22.0"
+matplotlib = ">=3.0.0"
+bokeh = ">=1.1.0"
+holoviews = ">=1.12.0"
+loguru = ">=0.3.2"
+notifiers = ">=1.2.1"
+toml = ">=0.10.0"
+pylint = ">=2.4.2"
+yapf = ">=0.28.0"
+
+[tool.poetry.dev-dependencies]
+pytest = ">=3.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

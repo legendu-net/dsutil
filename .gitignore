@@ -1,0 +1,10 @@
+__pycache__/
+.ipynb_checkpoints/
+venv/
+target/
+dist/
+.coverage
+.mypy
+.mypy_cache
+*.crc
+*.egg-info/
