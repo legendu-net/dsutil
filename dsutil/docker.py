@@ -281,7 +281,9 @@ def _clone_repos_helper(
     print('\n\n')
     repos_name = repos_name.strip('/').replace(PREFIX, 'docker-')
     repos_url = REPO.format(repos_name)
-    run_cmd(['git', 'clone', '--depth=1', repos_url, path / repos_name], check=True)
+    run_cmd(
+        ['git', 'clone', '--depth=1', repos_url, path / repos_name], check=True
+    )
     dependencies.append(repos_name)
     if repos_url == repos_root:
         return

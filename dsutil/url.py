@@ -11,4 +11,3 @@ def format(url: str, text: str = '', type='html'):
         return f'<a href="{url}" target="_blank"> {text} </a>'
     if type == 'excel':
         return f'=HYPERLINK("{url}", "{text}")'
-
