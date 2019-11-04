@@ -184,6 +184,20 @@ def date6(_: str) -> str:
     return datetime.datetime.now().strftime('%y%m%d')
 
 
+def pull_images(path: Union[str, Path]):
+    """Pull a Docker image and all its dependent images.
+    :param path: The Docker image (and whose dependent images) to pull
+        or a path containing the cloned Git repositories.
+    """
+    if not isinstance(path, Path):
+        path = clone_repos(repos=path, repos_root='')
+    # pull Docker images
+    with (path / DEP).open() as fin:
+        dependencies = fin.readlines()
+    for dep in enumerate(dependencies):
+        run_cmd(['docker', 'pull', dep.strip().replace('docker-', PREFIX)], check=True)
+
+
 def build_images(
     path: Union[str, Path],
     no_cache: bool = False,
