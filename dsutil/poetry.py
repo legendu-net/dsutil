@@ -100,7 +100,7 @@ def build_package(dst_dir: str = '', pkg: str = '') -> None:
     if os.path.exists(DIST):
         shutil.rmtree(DIST)
     try:
-        logger.info('Checking code for errors...')
+        logger.info(f'Checking code for errors (pylint -E {pkg}) ...')
         with open(os.devnull, 'w') as devnull:
             sp.run(['pylint', '-E', pkg], check=True, stderr=devnull)
     except sp.CalledProcessError:
