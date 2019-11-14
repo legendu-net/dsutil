@@ -21,11 +21,11 @@ This is a Python pacakage that contains misc utils for Data Science.
 
 ## Installation
 
-You can install `dsutil` using the following command.
+You can download a copy of the latest release and install it using pip.
 ```
-pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.9.1/dsutil-0.9.1-py3-none-any.whl
+pip3 install --user -U dsutil-0.0.1-py3-none-any.whl
 ```
-or
+Or you can use the following script to download and install the latest version automatically.
 ```
-curl -sSL www.legendu.net/media/install_python_pkg_github.py | python3 - https://github.com/dclong/dsutil
+curl -sSL www.legendu.net/media/install_py_github.py | python3 - https://github.com/dclong/dsutil
 ```
