@@ -16,11 +16,12 @@ This is a Python pacakage that contains misc utils for Data Science.
     - html
     - misc
     
+## Requirements
+`dsutil` requires Python 3.6+. 
 
 ## Installation
 
-`dsutil` requires Python 3.6+. Download the latest 
-[release of dsutil](https://github.com/dclong/dsutil/releases) and use the following command to install it.
+You can install `dsutil` using the following command.
 ```
 pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.9.1/dsutil-0.9.1-py3-none-any.whl
 ```
