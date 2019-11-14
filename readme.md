@@ -25,3 +25,7 @@ You can install `dsutil` using the following command.
 ```
 pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.9.1/dsutil-0.9.1-py3-none-any.whl
 ```
+or
+```
+curl -sSL www.legendu.net/media/install_python_pkg_github.py | python3 - https://github.com/dclong/dsutil
+```
