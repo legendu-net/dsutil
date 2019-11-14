@@ -21,7 +21,9 @@ def _project_dir():
         if (path / TOML).is_file():
             return path
         path = path.parent
-    raise RuntimeError(f'The current work directory {Path.cwd()} is not a (subdirectory of a) Python Poetry project.')
+    raise RuntimeError(
+        f'The current work directory {Path.cwd()} is not a (subdirectory of a) Python Poetry project.'
+    )
 
 
 def _update_version_readme(ver: str, pkg: str):
