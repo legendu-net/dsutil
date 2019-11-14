@@ -15,6 +15,17 @@ README = 'readme.md'
 TOML = 'pyproject.toml'
 
 
+def _project_dir():
+    path = Path.cwd()
+    while path.parent != path:
+        if (path / TOML).is_file():
+            return path
+        path = path.parent
+    raise RuntimeError(
+        f'The current work directory {Path.cwd()} is not a (subdirectory of a) Python Poetry project.'
+    )
+
+
 def _update_version_readme(ver: str, pkg: str):
     """Update the version information in readme.
     :param ver: The new version.
@@ -63,6 +74,7 @@ def version(
         If empty, then the current version of the package is printed.
     :param pkg: The name of the package.
     """
+    os.chdir(_project_dir())
     if not pkg:
         pkg = Path.cwd().name
     if ver:
@@ -95,6 +107,7 @@ def build_package(dst_dir: str = '', pkg: str = '') -> None:
     :param dst_dir: The root directory of the project.
     :param pkg: The name of the package.
     """
+    os.chdir(_project_dir())
     if not pkg:
         pkg = Path.cwd().name
     if os.path.exists(DIST):
@@ -122,6 +135,7 @@ def install_package(options: List[str] = ()):
     """Install the built package.
     :param options: A list of options to pass to pip3.
     """
+    os.chdir(_project_dir())
     pkg = glob.glob('dist/*.whl')
     if not pkg:
         logger.error('No built package is found!')
