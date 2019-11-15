@@ -126,7 +126,7 @@ def _format_code(inplace: bool = False, proj_dir: Path = None):
         logger.warning('Please format the code (yapf -ir .)!')
 
 
-def build_package(dst_dir: Union[str, Path] = '', proj_dir: Path = None) -> None:
+def build_package(proj_dir: Path = None) -> None:
     """Build the package using poetry.
     :param dst_dir: The root directory of the project.
     :param proj_dir: The root directory of the Poetry project.
@@ -146,13 +146,6 @@ def build_package(dst_dir: Union[str, Path] = '', proj_dir: Path = None) -> None
     _format_code(proj_dir=proj_dir)
     logger.info('Building the package...')
     sp.run("cd '{proj_dir}' && poetry env use python3 && poetry build", shell=True, check=True)
-    if not dst_dir:
-        return
-    logger.info(f'Copying the built package to {dst_dir}...')
-    for path in Path(dst_dir).glob(f"{pkg}-*"):
-        path.unlink()
-    for path in proj_dir.glob("dist/*"):
-        shutil.copy2(path, dst_dir)
 
 
 def install_package(options: List[str] = (), proj_dir: Path = None):
