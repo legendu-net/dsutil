@@ -4,7 +4,8 @@ import os
 import re
 import shutil
 from typing import Iterable, Dict
-HOME = os.path.expanduser('~')
+from pathlib import Path
+HOME = Path.home()
 
 
 def copy_if_exists(src, dst=HOME) -> bool:
@@ -39,17 +40,15 @@ def link_if_exists(src, dst=HOME, target_is_directory=True) -> bool:
         return False
 
 
-def update_file(file: str, pattern: str, replace: str) -> None:
+def update_file(path: Path, pattern: str, replace: str) -> None:
     """Update a text file using regular expression substitution.
     :param file: The path to the text file to be updated.
     :param pattern: The pattern to substitute.
     :param replace: The text to replace the patterns to.
     """
-    with open(file, 'r') as fin:
-        text = fin.read()
+    text = path.read_text()
     text = re.sub(pattern, replace, text)
-    with open(file, 'w') as fout:
-        fout.write(text)
+    path.write_text(text)
 
 
 def count_path(paths: Iterable[str]) -> Dict[str, int]:
