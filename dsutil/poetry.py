@@ -9,7 +9,7 @@ from typing import List
 import subprocess as sp
 import toml
 from loguru import logger
-from .filesystem import update_file, poetry_project_dir
+from .filesystem import update_file
 DIST = 'dist'
 README = 'readme.md'
 TOML = 'pyproject.toml'
