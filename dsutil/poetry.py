@@ -58,7 +58,9 @@ def _update_version_toml(ver: str, proj_dir: Path) -> None:
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
-    update_file(proj_dir / TOML, r'version = .\d+\.\d+\.\d+.', f'version = "{ver}"')
+    update_file(
+        proj_dir / TOML, r'version = .\d+\.\d+\.\d+.', f'version = "{ver}"'
+    )
 
 
 def _update_version_init(ver: str, proj_dir: Path) -> None:
@@ -67,8 +69,8 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
     :param proj_dir: The root directory of the Poetry project.
     """
     pkg = _project_name(proj_dir)
-    update_file(proj_dir / pkg / "__init__.py",
-        r'__version__ = .\d+\.\d+\.\d+.',
+    update_file(
+        proj_dir / pkg / "__init__.py", r'__version__ = .\d+\.\d+\.\d+.',
         f'__version__ = "{ver}"'
     )
 
@@ -139,13 +141,21 @@ def build_package(proj_dir: Path = None) -> None:
     try:
         logger.info(f'Checking code for errors (pylint -E {pkg}) ...')
         with open(os.devnull, 'w') as devnull:
-            sp.run(['pylint', '-E', str(proj_dir / pkg)], check=True, stderr=devnull)
+            sp.run(
+                ['pylint', '-E', str(proj_dir / pkg)],
+                check=True,
+                stderr=devnull
+            )
     except sp.CalledProcessError:
         logger.error('Please fix errors in code before building the package!')
         return
     _format_code(proj_dir=proj_dir)
     logger.info('Building the package...')
-    sp.run("cd '{proj_dir}' && poetry env use python3 && poetry build", shell=True, check=True)
+    sp.run(
+        f"cd '{proj_dir}' && poetry env use python3 && poetry build",
+        shell=True,
+        check=True
+    )
 
 
 def install_package(options: List[str] = (), proj_dir: Path = None):
