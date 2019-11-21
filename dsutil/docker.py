@@ -45,7 +45,7 @@ def remove_containers(
 ) -> None:
     """Remove the specified Docker containers.
     :param id_: The id of the container to remove.
-    :param name: The name of the container to remove.
+    :param name: A (regex) pattern of names of containers to remove.
     :param exited: Whether to remove exited containers.
     """
     if id_:
@@ -78,7 +78,7 @@ def remove_containers(
 def remove_images(id_: str = '', name: str = '', tag: str = '') -> None:
     """Remove specified Docker images.
     :param id_: The id of the image to remove.
-    :param name: The name of the image to remove.
+    :param name: A (regex) pattern of names of images to remove.
     :param tag: Remove images whose tags containing specified tag.
     """
     if id_:
@@ -194,12 +194,11 @@ def pull_images(path: Union[str, Path]):
     # pull Docker images
     with (path / DEP).open() as fin:
         dependencies = fin.readlines()
-    for dep in dependencies:
-        run_cmd(
-            ['docker', 'pull',
-             dep.strip().replace('docker-', PREFIX)],
-            check=True
-        )
+    for idx, dep in enumerate(dependencies):
+        dep = dep.strip()
+        if idx == 0:
+            run_cmd(['docker', 'pull', _base_image(path / dep)], check=True)
+        run_cmd(['docker', 'pull', dep.replace('docker-', PREFIX)], check=True)
 
 
 def build_images(
