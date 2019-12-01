@@ -1,5 +1,1 @@
-image: dclong/gitpod-py3
-ports:
-  - port: 8000
-tasks:
-  - command: nvim --headless +"call dein#install()" +qall
+image: dclong/gitpod

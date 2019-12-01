@@ -194,12 +194,11 @@ def pull_images(path: Union[str, Path]):
     # pull Docker images
     with (path / DEP).open() as fin:
         dependencies = fin.readlines()
-    for dep in dependencies:
-        run_cmd(
-            ['docker', 'pull',
-             dep.strip().replace('docker-', PREFIX)],
-            check=True
-        )
+    for idx, dep in enumerate(dependencies):
+        dep = dep.strip()
+        if idx == 0:
+            run_cmd(['docker', 'pull', _base_image(path / dep)], check=True)
+        run_cmd(['docker', 'pull', dep.replace('docker-', PREFIX)], check=True)
 
 
 def build_images(
