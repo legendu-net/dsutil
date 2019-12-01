@@ -1,4 +1,1 @@
-image: dclong/jupyterhub-ds
-tasks:
-  - command: nvim --headless +"call dein#install()" +qall && xinstall svim -ic
-  - command: xinstall ipy3 -c && xinstall dsutil -ic
+image: dclong/gitpod

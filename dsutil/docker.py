@@ -205,13 +205,18 @@ def build_images(
     path: Union[str, Path],
     no_cache: bool = False,
     no_cache_from: str = '',
-    tag: str = 'latest',
+    tag_base: str = '',
+    tag_build: str = 'latest',
     push: bool = True,
 ) -> None:
     """Build Docker image for the specified repository/directory.
     Depdendency images are built first in order if any.
     :param path: The repository to build Docker images from
         or a path containing the pulled Git repositories.
+    :param no_cache: If True, no cache is used.
+    :param no_cache_from: Do not use cache from the specified repository/image.
+    :param tag_build: The tag of built images.
+    :param push: If True (default), push images to Docker Hub.
     """
     if not isinstance(path, Path):
         path = clone_repos(repos=path, repos_root='')
@@ -220,22 +225,27 @@ def build_images(
         dependencies = fin.readlines()
     for idx, dep in enumerate(dependencies):
         dep = dep.strip()
+        path_dep = path / dep
         if idx == 0:
             print('\n\n')
             # TODO: pull retry similar to push retry
-            run_cmd(['docker', 'pull', _base_image(path / dep)], check=True)
+            if tag_base:
+                update_base_tag(path_dep, tag=tag_base)
+            run_cmd(['docker', 'pull', _base_image(path_dep)], check=True)
+        else:
+            update_base_tag(path_dep, tag=tag_build)
         if dep == no_cache_from:
             no_cache = True
         print(f'\n\nBuilding {dep}...')
         cmd = [
-            'docker', 'build', '-t', f'{dep.replace("docker-", PREFIX)}:{tag}',
-            path / dep
+            'docker', 'build', '-t',
+            f'{dep.replace("docker-", PREFIX)}:{tag_build}', path_dep
         ]
         if no_cache:
             cmd.append('--no-cache')
         run_cmd(cmd, check=True)
     if push:
-        push_images(path=path, tag=tag, tag_tran_fun=date6)
+        push_images(path=path, tag=tag_build, tag_tran_fun=date6)
 
 
 def build_images_auto(no_cache: bool = False) -> None:
