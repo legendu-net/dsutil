@@ -49,8 +49,7 @@ def _update_version_readme(ver: str, proj_dir: Path) -> None:
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
-    pkg = _project_name(proj_dir)
-    update_file(proj_dir / README, rf'{pkg}-\d+\.\d+\.\d+', f'{pkg}-{ver}')
+    update_file(proj_dir / README, rf'\d+\.\d+\.\d+', f'{ver}')
 
 
 def _update_version_toml(ver: str, proj_dir: Path) -> None:
