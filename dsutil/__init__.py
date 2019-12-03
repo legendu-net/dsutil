@@ -1,5 +1,4 @@
 from . import collections
-from . import const
 from . import dataframe
 from . import datetime
 from . import docker
