@@ -72,7 +72,8 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
         for file in files:
             filepath = os.path.join(subdir, file)
             if filepath.endswith(".py"):
-                update_file(filepath, r'__version__ = .\d+\.\d+\.\d+.',
+                update_file(
+                    filepath, r'__version__ = .\d+\.\d+\.\d+.',
                     f'__version__ = "{ver}"'
                 )
 
