@@ -68,10 +68,13 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
     :param proj_dir: The root directory of the Poetry project.
     """
     pkg = _project_name(proj_dir)
-    update_file(
-        proj_dir / pkg / "__init__.py", r'__version__ = .\d+\.\d+\.\d+.',
-        f'__version__ = "{ver}"'
-    )
+    for subdir, _, files in os.walk(proj_dir / pkg):
+        for file in files:
+            filepath = os.path.join(subdir, file)
+            if filepath.endswith(".py"):
+                update_file(filepath, r'__version__ = .\d+\.\d+\.\d+.',
+                    f'__version__ = "{ver}"'
+                )
 
 
 def _update_version(ver: str, proj_dir: Path) -> None:
