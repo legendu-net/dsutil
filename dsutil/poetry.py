@@ -140,8 +140,8 @@ def build_package(proj_dir: Path = None) -> None:
     try:
         logger.info(f'Checking code for errors (pylint -E {pkg}) ...')
         with open(os.devnull, 'w') as devnull:
-            sp.run(
-                ['pylint', '-E', str(proj_dir / pkg)],
+            sp.run(f"cd {proj_dir} && pylint -E {pkg}",
+                shell=True,
                 check=True,
                 stderr=devnull
             )
