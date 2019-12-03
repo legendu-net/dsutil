@@ -70,10 +70,10 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
     pkg = _project_name(proj_dir)
     for subdir, _, files in os.walk(proj_dir / pkg):
         for file in files:
-            filepath = os.path.join(subdir, file)
-            if filepath.endswith(".py"):
+            path = Path(subdir, file)
+            if path.suffix == ".py":
                 update_file(
-                    filepath, r'__version__ = .\d+\.\d+\.\d+.',
+                    path, r'__version__ = .\d+\.\d+\.\d+.',
                     f'__version__ = "{ver}"'
                 )
 
