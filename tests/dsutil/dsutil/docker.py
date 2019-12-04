@@ -151,7 +151,9 @@ def _push_images_retry(image: str) -> float:
 
 
 def push_images(
-    path: Path, tag: str = 'latest', tag_tran_fun: Callable = lambda tag: tag
+    path: Path,
+    tag: str = 'latest',
+    tag_tran_fun: Callable = lambda tag: tag
 ) -> pd.DataFrame:
     """Push Docker images produced by building Git repositories in the specified path.
     :param path: A path containing the pulled Git repositories.

@@ -81,34 +81,37 @@ def remove_images(id_: str = '', name: str = '', tag: str = '') -> None:
     :param name: A (regex) pattern of names of images to remove.
     :param tag: Remove images whose tags containing specified tag.
     """
+    imgs = images()
     if id_:
-        run_cmd(['docker', 'rmi', id_])
+        _remove_images(imgs[imgs.id_.str.contains(id_)])
     if name:
-        run_cmd(['docker', 'rmi', name])
+        _remove_images(imgs[imgs.name.str.contains(name)])
     if tag:
-        imgs = images()
-        imgs = imgs[imgs.tag.str.contains(tag)]
-        print('\n', imgs, '\n')
-        if imgs.empty:
-            return
-        sys.stdout.flush()
-        sys.stderr.flush()
-        print('-' * 80)
-        choice = input(
-            'Do you want to remove the above images? (y - Yes, n - [No], i - interactive): '
-        )
-        for row in imgs.itertuples():
-            image_name = row.repository + ':' + row.tag
-            image = row.image_id if row.tag == '<none>' else image_name
-            if choice == 'y':
-                run_cmd(['docker', 'rmi', image])
-            elif choice == 'i':
-                choice_i = input(
-                    f'Do you want to remove the image "{image_name}"? (y - Yes, n - [No]):'
-                )
-                if choice_i == 'y':
-                    run_cmd(['docker', 'rmi', image])
+        _remove_images(imgs[imgs.tag.str.contains(tag)])
     print(images())
+
+
+def _remove_images(imgs):
+    if imgs.empty:
+        return
+    print('\n', imgs, '\n')
+    sys.stdout.flush()
+    sys.stderr.flush()
+    print('-' * 80)
+    choice = input(
+        'Do you want to remove the above images? (y - Yes, n - [No], i - interactive): '
+    )
+    for row in imgs.itertuples():
+        image_name = row.repository + ':' + row.tag
+        image = row.image_id if row.tag == '<none>' else image_name
+        if choice == 'y':
+            run_cmd(['docker', 'rmi', image])
+        elif choice == 'i':
+            choice_i = input(
+                f'Do you want to remove the image "{image_name}"? (y - Yes, n - [No]):'
+            )
+            if choice_i == 'y':
+                run_cmd(['docker', 'rmi', image])
 
 
 def containers() -> pd.DataFrame:
@@ -151,7 +154,9 @@ def _push_images_retry(image: str) -> float:
 
 
 def push_images(
-    path: Path, tag: str = 'latest', tag_tran_fun: Callable = lambda tag: tag
+    path: Path,
+    tag: str = 'latest',
+    tag_tran_fun: Callable = lambda tag: tag
 ) -> pd.DataFrame:
     """Push Docker images produced by building Git repositories in the specified path.
     :param path: A path containing the pulled Git repositories.
