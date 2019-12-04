@@ -83,9 +83,9 @@ def remove_images(id_: str = '', name: str = '', tag: str = '') -> None:
     """
     imgs = images()
     if id_:
-        _remove_images(imgs[imgs.id_.str.contains(id_)])
+        _remove_images(imgs[imgs.image_id.str.contains(id_)])
     if name:
-        _remove_images(imgs[imgs.name.str.contains(name)])
+        _remove_images(imgs[imgs.repository.str.contains(name)])
     if tag:
         _remove_images(imgs[imgs.tag.str.contains(tag)])
     print(images())
