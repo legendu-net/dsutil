@@ -211,7 +211,7 @@ def build_images(
     no_cache: bool = False,
     no_cache_from: str = '',
     tag_base: str = '',
-    tag_build: str = 'latest',
+    tag_build: str = 'test',
     push: bool = True,
 ) -> None:
     """Build Docker image for the specified repository/directory.
