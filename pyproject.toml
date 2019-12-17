@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dsutil"
-version = "0.9.11"
+version = "0.9.12"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 

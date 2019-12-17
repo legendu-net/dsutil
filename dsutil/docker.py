@@ -228,6 +228,8 @@ def build_images(
     # build Docker images
     with (path / DEP).open() as fin:
         dependencies = fin.readlines()
+    if not tag_build:
+        tag_build = "latest"
     for idx, dep in enumerate(dependencies):
         dep = dep.strip()
         path_dep = path / dep
