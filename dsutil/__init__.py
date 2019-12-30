@@ -5,6 +5,7 @@ from . import docker
 from . import git
 from . import misc
 from . import poetry
+from . import pdf
 from . import text
 from . import url
 
