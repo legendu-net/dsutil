@@ -14,6 +14,7 @@ loguru = ">=0.3.2"
 toml = ">=0.10.0"
 pylint = ">=2.4.0"
 yapf = ">=0.28.0"
+PyPDF2 = ">=1.26.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"

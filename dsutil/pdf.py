@@ -15,7 +15,9 @@ def extract_pages(file: str, subfiles: Mapping[str, Sequence[int]]) -> None:
     fin.close()
 
 
-def _extract_pages(reader: PdfFileReader, indexes: Sequence[int], output: str) -> None:
+def _extract_pages(
+    reader: PdfFileReader, indexes: Sequence[int], output: str
+) -> None:
     """A helper function for extract_pages.
     :param reader: A PdfFileReader object.
     :param indexes: Index (0-based) of pages to extract.
