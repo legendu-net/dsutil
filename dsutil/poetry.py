@@ -147,7 +147,7 @@ def build_package(proj_dir: Path = None) -> None:
         )
         with open(os.devnull, "w") as devnull:
             sp.run(
-                f"cd {proj_dir} && pylint -E {pkg}",
+                f"cd {proj_dir} && .venv/bin/python -m pylint -E {pkg}",
                 shell=True,
                 check=True,
                 stderr=devnull
