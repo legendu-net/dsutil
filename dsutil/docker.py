@@ -11,7 +11,6 @@ import subprocess as sp
 import pandas as pd
 from loguru import logger
 from . import shell
-
 REPO = 'https://github.com/dclong/{}.git'
 PREFIX = 'dclong/'
 DEP = 'dependencies.txt'
