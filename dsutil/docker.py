@@ -33,15 +33,13 @@ def run_cmd(cmd, shell: bool = False, check: bool = False) -> None:
 def remove() -> None:
     """Remove exited Docker containers and images without tags.
     """
-    remove_containers(exited=True)
+    remove_containers(status="^Exited|^Created")
     remove_images(tag='none')
     print(containers())
     print(images())
 
 
-def remove_containers(
-    id_: str = '', name: str = '', exited: bool = False
-) -> None:
+def remove_containers(id_: str = '', name: str = '', status: str = "") -> None:
     """Remove the specified Docker containers.
     :param id_: The id of the container to remove.
     :param name: A (regex) pattern of names of containers to remove.
@@ -51,9 +49,9 @@ def remove_containers(
         run_cmd(['docker', 'rm', id_])
     if name:
         run_cmd(['docker', 'rm', name])
-    if exited:
+    if status:
         conts = containers()
-        conts = conts[conts.status.str.contains('Exit')]
+        conts = conts[conts.status.str.contains(status)]
         if conts.empty:
             return
         print('\n', conts, '\n')
