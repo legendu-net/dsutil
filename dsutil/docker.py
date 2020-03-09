@@ -39,7 +39,9 @@ def remove(choice: str = "") -> None:
     print(images())
 
 
-def remove_containers(id_: str = '', name: str = '', status: str = "", choice: str = '') -> None:
+def remove_containers(
+    id_: str = '', name: str = '', status: str = "", choice: str = ''
+) -> None:
     """Remove the specified Docker containers.
     :param id_: The id of the container to remove.
     :param name: A (regex) pattern of names of containers to remove.
@@ -75,7 +77,9 @@ def remove_containers(id_: str = '', name: str = '', status: str = "", choice: s
     print(containers())
 
 
-def remove_images(id_: str = '', name: str = '', tag: str = '', choice: str = '') -> None:
+def remove_images(
+    id_: str = '', name: str = '', tag: str = '', choice: str = ''
+) -> None:
     """Remove specified Docker images.
     :param id_: The id of the image to remove.
     :param name: A (regex) pattern of names of images to remove.
