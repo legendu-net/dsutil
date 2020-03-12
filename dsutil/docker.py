@@ -124,7 +124,6 @@ def containers() -> pd.DataFrame:
     :return: A DataFrame containing all Docker containers.
     """
     frame = shell.to_frame("docker ps -a", split_by_title=True)
-    frame.status = frame.status.astype(str)
     return frame
 
 

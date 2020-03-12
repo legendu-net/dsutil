@@ -49,10 +49,11 @@ def to_frame_space(
         columns = [re.sub(r'\s+', '_', col.lower()) for col in data[header]]
         data = data[[idx for idx in range(len(data)) if idx != header]]
         frame = pd.DataFrame(data, columns=columns)
-        return frame
     elif isinstance(header, list):
-        return pd.DataFrame(data, columns=header)
-    return pd.DataFrame(data)
+        frame = pd.DataFrame(data, columns=header)
+    else:
+        frame = pd.DataFrame(data)
+    return frame.astype(str)
 
 
 def to_frame_title(cmd='', split=r'  +', lines: List[str] = ()):
@@ -78,4 +79,4 @@ def to_frame_title(cmd='', split=r'  +', lines: List[str] = ()):
     frame.columns = [
         col.strip().lower().replace(' ', '_') for col in frame.columns
     ]
-    return frame
+    return frame.astype(str)
