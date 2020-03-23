@@ -25,7 +25,8 @@ You can download a copy of the latest release and install it using pip.
 ```
 pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.10.4/dsutil-0.10.4-py3-none-any.whl
 ```
-Or you can use the following script to download and install the latest version automatically.
+Or you can use the following command to install the latest master branch
+if you have pip 20.0+.
 ```
-curl -sSL www.legendu.net/media/install_py_github.py | python3 - https://github.com/dclong/dsutil
+pip3 install git+https://github.com/dclong/dsutil
 ```
