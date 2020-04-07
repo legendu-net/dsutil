@@ -28,9 +28,12 @@ def delete_tag(token: str, image: str, tag: str = "", user: str = "dclong"):
     if not tag:
         return ""
     url = f"https://hub.docker.com/v2/repositories/{user}/{image}/tags/{tag}/"
-    res = requests.delete(url, headers={
-        "Content-Type": "application/json",
-        "Authorization": f"JWT {token}"
-    })
+    res = requests.delete(
+        url,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"JWT {token}"
+        }
+    )
     if res:
         return tag
