@@ -95,15 +95,15 @@ def flatten_dir(dir_):
         if path.is_dir():
             _flatten_dir(path)
             path.rmdir()
-            
-            
+
+
 def _flatten_dir(dir_):
     """Helper method of flatten_dir.
     """
     for path in dir_.iterdir():
         path.rename(path.parent.parent / path.name)
 
-    
+
 def split_dir(dir_: Union[str, Path], pattern: str, batch: int) -> None:
     """Split files in a directory into sub-directories.
         This function is for the convenience of splitting a directory 
@@ -131,8 +131,9 @@ def _split_dir_1(desdir, files, index, batch):
         path.rename(desdir / path.name)
 
 
-def find_images(root_dir: Union[str, Path, List[str], List[Path]]
-               ) -> List[Path]:
+def find_images(
+    root_dir: Union[str, Path, List[str], List[Path]]
+) -> List[Path]:
     """Find all PNG images in a (sequence) of dir(s) or its/their subdirs.
     :param root_dir: A (list) of dir(s).
     """

@@ -142,7 +142,7 @@ def deshade_3(img, threshold=0.4, cutoff=30):
     arr = np.array(img)
     arr = deshade_arr_3(arr, threshold=threshold, cutoff=cutoff)
     return Image.fromarray(arr)
-    
+
 
 def highlight_frame(rgb: Tuple[int], shape: Tuple[int], thickness: int = 3):
     """Generate a rectangle frame with the specified color and thickness.
