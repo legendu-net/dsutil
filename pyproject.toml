@@ -16,6 +16,8 @@ pylint = ">=2.4.0"
 yapf = ">=0.28.0"
 PyPDF2 = ">=1.26.0"
 requests = ">=2.20.0"
+tqdm = ">=4.40.0"
+opencv-python = ">=4.0.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"
