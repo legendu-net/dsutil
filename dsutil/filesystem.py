@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-
 import os
 import re
 import shutil
-from typing import Iterable, Dict
+from typing import Union, Iterable, Dict, List
+import math
 from pathlib import Path
+import subprocess as sp
+from tqdm import tqdm
 HOME = Path.home()
 
 
@@ -67,3 +69,92 @@ def _count_path_helper(path: str, freq: dict):
     for field in fields:
         path = path + field + '/'
         freq[path] = freq.get(path, 0) + 1
+
+
+def zip_subdirs(root: Union[str, Path]) -> None:
+    """Compress subdirectories into zip files.
+    :param root: The root directory whose subdirs are to be zipped.
+    """
+    if isinstance(root, str):
+        root = Path(root)
+    for path in root.iterdir():
+        if path.is_dir() and not path.name.startswith("."):
+            file = path.with_suffix(".zip")
+            print(f"{path} -> {file}")
+            sp.run(f"zip -qr {file} {path} &", shell=True)
+
+
+def flatten_dir(dir_):
+    """Flatten a directory,
+        i.e., move files in immediate subdirectories into the current directory. 
+    :param dir_: The directory to flatten.
+    """
+    if isinstance(dir_, str):
+        dir_ = Path(dir_)
+    for path in dir_.iterdir():
+        if path.is_dir():
+            _flatten_dir(path)
+            path.rmdir()
+
+
+def _flatten_dir(dir_):
+    """Helper method of flatten_dir.
+    """
+    for path in dir_.iterdir():
+        path.rename(path.parent.parent / path.name)
+
+
+def split_dir(dir_: Union[str, Path], pattern: str, batch: int) -> None:
+    """Split files in a directory into sub-directories.
+        This function is for the convenience of splitting a directory 
+        with a large number of files into smaller directories 
+        so that those subdirs can zipped (into relatively smaller files) and uploaded to cloud quickly.
+
+    :param dir_: The root directory whose files are to be splitted into sub-directories.
+    :param pattern: A wild card pattern specifying files to be included.
+    :param batch: The number files that each subdirs should contain.
+    """
+    if isinstance(dir_, str):
+        dir_ = Path(dir_)
+    files = sorted(dir_.glob("*.png"))
+    num_batch = math.ceil(len(files) / batch)
+    nchar = len(str(num_batch))
+    for index in tqdm(range(num_batch)):
+        _split_dir_1(dir_ / f"{index:0>{nchar}}", files, index, batch)
+
+
+def _split_dir_1(desdir, files, index, batch):
+    """Helper method of split_dir.
+    """
+    desdir.mkdir(exist_ok=True)
+    for path in files[(index * batch):((index + 1) * batch)]:
+        path.rename(desdir / path.name)
+
+
+def find_images(
+    root_dir: Union[str, Path, List[str], List[Path]]
+) -> List[Path]:
+    """Find all PNG images in a (sequence) of dir(s) or its/their subdirs.
+    :param root_dir: A (list) of dir(s).
+    """
+    if isinstance(root_dir, list):
+        images = []
+        for path in root_dir:
+            images.extend(find_images(path))
+        return images
+    if isinstance(root_dir, str):
+        root_dir = Path(root_dir)
+    images = []
+    _find_images(root_dir, images)
+    return images
+
+
+def _find_images(root_dir: Path, images: List):
+    """Helper function of find_images.
+    """
+    for file in root_dir.iterdir():
+        if file.is_file():
+            if file.suffix == ".png":
+                images.append(file)
+        else:
+            _find_images(file, images)
