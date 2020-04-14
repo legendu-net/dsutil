@@ -165,7 +165,7 @@ def push_images(
     """Push Docker images produced by building Git repositories in the specified path.
     :param path: A path containing the pulled Git repositories.
     :param tag: Docker images with the specified tag are pushed.
-    :param tag_tran_fun: A function takeing a tag as parameter 
+    :param tag_tran_fun: A function takeing a tag as the parameter 
         and generating a new tag to tag Docker images before pushing.
     """
     with Path(path, DEP).open() as fin:
@@ -186,11 +186,12 @@ def push_images(
     return frame
 
 
-def date6(_: str) -> str:
+def tag_date(tag: str) -> str:
     """Get the current date as a 6-digit string.
     :return: The current in 6-digit format.
     """
-    return datetime.datetime.now().strftime("%y%m%d")
+    mmdd = datetime.datetime.now().strftime("%m%d")
+    return mmdd if tag in ("", "latest") else f"{tag}_{mmdd}"
 
 
 def pull_images(path: Union[str, Path]):
@@ -256,22 +257,8 @@ def build_images(
             cmd.append("--no-cache")
         run_cmd(cmd, check=True)
     if push:
-        push_images(path=path, tag=tag_build, tag_tran_fun=date6)
+        push_images(path=path, tag=tag_build, tag_tran_fun=tag_date)
     return path
-
-
-def build_images_auto(no_cache: bool = False) -> None:
-    """Automatically build Docker images.
-    :param no_cache: If True then caching is not used during building.
-    """
-    build_images(path="docker-gitpod-py3", no_cache=no_cache)
-    build_images(path="docker-jupyterhub-ds", no_cache=no_cache)
-    build_images(path="docker-jupyterhub-toree")
-    build_images(path="docker-jupyterhub-almond")
-    build_images(path="docker-jupyterhub-selenium-firefox")
-    build_images(path="docker-jupyterhub-selenium-chrome")
-    build_images(path="docker-lubuntu-intellij")
-    build_images(path="docker-lubuntu-pyside2")
 
 
 def update_base_tag(path: Path, tag: str) -> None:
