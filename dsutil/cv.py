@@ -1,4 +1,4 @@
-from typing import Union, Tuple
+from typing import Union, Tuple, Iterable
 from pathlib import Path
 from tqdm import tqdm
 import numpy as np
@@ -25,21 +25,27 @@ def video_to_image(
         count += 1
 
 
-def resize_image(path: Union[str, Path], size: Tuple[int]) -> None:
-    """Resize an image or images in a directory to the given size.
-    :param path: The path to an image or a directory containing images to be resized.
+def resize_image(paths: Union[str, Path, Iterable[Path]], desdir: Union[str, Path, None], size: Tuple[int]) -> None:
+    """Resize images to a given size.
+    :param paths: The paths to images to be resized.
+    :param desdir: The directory to save resized images.
+        Notice that both '.' and '""' stand for the current directory.
+        If None is specified, then the orginal image is overwritten.
     :param size: The new size of images.
     """
-    if isinstance(path, str):
-        path = Path(path)
-    if path.is_dir():
-        files = list(path.glob("*.png"))
-        for file in tqdm(files):
-            resize_image(file, size)
+    if isinstance(desdir, str):
+        desdir = Path(desdir)
+    if isinstance(desdir, Path):
+        desdir.mkdir(exist_ok=True)
+    if isinstance(paths, str):
+        paths = Path(paths)
+    if isinstance(paths, Path):
+        img = Image.open(paths)
+        if img.size != size:
+            img.resize(size).save(desdir / paths.name if desdir else paths)
         return
-    img = Image.open(path)
-    if img.size != size:
-        img.resize(size).save(path)
+    for path in tqdm(paths):
+        resize_image(paths=path, desdir=desdir, size=size)
 
 
 def _is_approx_close(x, y, threshold=0.4):
