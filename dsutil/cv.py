@@ -44,6 +44,8 @@ def resize_image(paths: Union[str, Path, Iterable[Path]], desdir: Union[str, Pat
         if img.size != size:
             img.resize(size).save(desdir / paths.name if desdir else paths)
         return
+    if not hasattr(paths, '__len__'):
+        paths = tuple(paths)
     for path in tqdm(paths):
         resize_image(paths=path, desdir=desdir, size=size)
 
