@@ -8,6 +8,7 @@ import tempfile
 from pathlib import Path
 import re
 import subprocess as sp
+import git
 import pandas as pd
 from loguru import logger
 from . import shell
@@ -194,13 +195,13 @@ def tag_date(tag: str) -> str:
     return mmdd if tag in ("", "latest") else f"{tag}_{mmdd}"
 
 
-def pull_images(path: Union[str, Path]):
+def pull_images(path: Union[str, Path], branch: str):
     """Pull a Docker image and all its dependent images.
     :param path: The Docker image (and whose dependent images) to pull
         or a path containing the cloned Git repositories.
     """
     if not isinstance(path, Path):
-        path = clone_repos(repos=path, repos_root="")
+        path = clone_repos(repos=path, branch=branch, repos_root="")
     # pull Docker images
     with (path / DEP).open() as fin:
         dependencies = fin.readlines()
@@ -228,13 +229,13 @@ def build_images(
     :param tag_build: The tag of built images.
     :param push: If True (default), push images to Docker Hub.
     """
+    if not tag_build:
+        tag_build = "latest"
     if not isinstance(path, Path):
-        path = clone_repos(repos=path, repos_root="")
+        path = clone_repos(repos=path, branch="master" if tag_build == "latest" else "dev", repos_root="")
     # build Docker images
     with (path / DEP).open() as fin:
         dependencies = fin.readlines()
-    if not tag_build:
-        tag_build = "latest"
     for idx, dep in enumerate(dependencies):
         dep = dep.strip()
         path_dep = path / dep
@@ -277,7 +278,7 @@ def update_base_tag(path: Path, tag: str) -> None:
         fout.writelines(lines)
 
 
-def clone_repos(repos: str, repos_root: str = "") -> Path:
+def clone_repos(repos: str, branch: str, repos_root: str = "") -> Path:
     """Pull the GitHub repository and dependent GitHub repositories of a Docker image.
     :param repos: The repository (and whose dependent repositories) to clone. 
         If you want to clone the GitHub repository corresponding to the Docker image dclong/jupyterhub-ds,
@@ -290,6 +291,7 @@ def clone_repos(repos: str, repos_root: str = "") -> Path:
     _clone_repos_helper(
         path=path,
         repos_name=repos,
+        branch=branch,
         repos_root=REPO.format(repos_root),
         dependencies=dependencies
     )
@@ -300,16 +302,17 @@ def clone_repos(repos: str, repos_root: str = "") -> Path:
 
 
 def _clone_repos_helper(
-    path: Path, repos_name: str, repos_root: str, dependencies: List[str]
+    path: Path, repos_name: str, branch: str, repos_root: str, dependencies: List[str]
 ) -> None:
     """A helper function for the function clone_repos.
     """
     print("\n\n")
     repos_name = repos_name.strip("/").replace(PREFIX, "docker-")
     repos_url = REPO.format(repos_name)
-    run_cmd(
-        ["git", "clone", "--depth=1", repos_url, path / repos_name], check=True
-    )
+    repo = git.Repo.clone_from(repos_url, path / repos_name, depth=1)
+    for rb in repo.remote().fetch():
+        if rb.name.split("/")[1] == branch:
+            repo.git.checkout(branch)
     dependencies.append(repos_name)
     if repos_url == repos_root:
         return
@@ -319,6 +322,7 @@ def _clone_repos_helper(
     _clone_repos_helper(
         path=path,
         repos_name=base_image,
+        branch=branch,
         repos_root=repos_root,
         dependencies=dependencies
     )
