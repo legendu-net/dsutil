@@ -232,7 +232,11 @@ def build_images(
     if not tag_build:
         tag_build = "latest"
     if not isinstance(path, Path):
-        path = clone_repos(repos=path, branch="master" if tag_build == "latest" else "dev", repos_root="")
+        path = clone_repos(
+            repos=path,
+            branch="master" if tag_build == "latest" else "dev",
+            repos_root=""
+        )
     # build Docker images
     with (path / DEP).open() as fin:
         dependencies = fin.readlines()
@@ -302,7 +306,8 @@ def clone_repos(repos: str, branch: str, repos_root: str = "") -> Path:
 
 
 def _clone_repos_helper(
-    path: Path, repos_name: str, branch: str, repos_root: str, dependencies: List[str]
+    path: Path, repos_name: str, branch: str, repos_root: str,
+    dependencies: List[str]
 ) -> None:
     """A helper function for the function clone_repos.
     """

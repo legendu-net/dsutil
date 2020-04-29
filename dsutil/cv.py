@@ -25,7 +25,10 @@ def video_to_image(
         count += 1
 
 
-def resize_image(paths: Union[str, Path, Iterable[Path]], desdir: Union[str, Path, None], size: Tuple[int]) -> None:
+def resize_image(
+    paths: Union[str, Path, Iterable[Path]], desdir: Union[str, Path, None],
+    size: Tuple[int]
+) -> None:
     """Resize images to a given size.
     :param paths: The paths to images to be resized.
     :param desdir: The directory to save resized images.
