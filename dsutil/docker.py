@@ -314,7 +314,7 @@ def _clone_repos_helper(
     print("\n\n")
     repos_name = repos_name.strip("/").replace(PREFIX, "docker-")
     repos_url = REPO.format(repos_name)
-    repo = git.Repo.clone_from(repos_url, path / repos_name, depth=1)
+    repo = git.Repo.clone_from(repos_url, path / repos_name)
     for rb in repo.remote().fetch():
         if rb.name.split("/")[1] == branch:
             repo.git.checkout(branch)
