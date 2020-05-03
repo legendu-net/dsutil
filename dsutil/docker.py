@@ -214,7 +214,7 @@ def pull_images(path: Union[str, Path], branch: str):
 
 def build_images(
     path: Union[str, Path],
-    no_cache: bool = False,
+    cache: bool = True,
     no_cache_from: str = "",
     tag_base: str = "",
     tag_build: str = "next",
@@ -224,7 +224,7 @@ def build_images(
     Depdendency images are built first in order if any.
     :param path: The repository to build Docker images from
         or a path containing the pulled Git repositories.
-    :param no_cache: If True, no cache is used.
+    :param cache: If True (default), cache is used. Otherwise, cache is not used.
     :param no_cache_from: Do not use cache from the specified repository/image.
     :param tag_build: The tag of built images.
     :param push: If True (default), push images to Docker Hub.
@@ -252,13 +252,13 @@ def build_images(
         else:
             update_base_tag(path_dep, tag=tag_build)
         if dep == no_cache_from:
-            no_cache = True
+            cache = False
         print(f"\n\nBuilding {dep}...")
         cmd = [
             "docker", "build", "-t",
             f"{dep.replace('docker-', PREFIX)}:{tag_build}", path_dep
         ]
-        if no_cache:
+        if not cache:
             cmd.append("--no-cache")
         run_cmd(cmd, check=True)
     if push:
