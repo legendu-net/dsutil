@@ -191,8 +191,8 @@ def tag_date(tag: str) -> str:
     """Get the current date as a 6-digit string.
     :return: The current in 6-digit format.
     """
-    mmdd = datetime.datetime.now().strftime("%m%d")
-    return mmdd if tag in ("", "latest") else f"{tag}_{mmdd}"
+    mmddhh = datetime.datetime.now().strftime("%m%d%H")
+    return mmddhh if tag in ("", "latest") else f"{tag}_{mmddhh}"
 
 
 def pull_images(path: Union[str, Path], branch: str):
