@@ -174,7 +174,7 @@ def push_images(
     if not isinstance(path, Path):
         path = clone_repos(
             repos=path,
-            branch="master" if tag_build == "latest" else "dev",
+            branch="master" if tag == "latest" else "dev",
             repos_root=""
         )
     with Path(path, DEP).open() as fin:
