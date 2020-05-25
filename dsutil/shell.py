@@ -6,8 +6,8 @@ from typing import List, Sequence, Union
 
 
 def to_frame(
-    cmd='',
-    split: str = r'  +',
+    cmd="",
+    split: str = r"  +",
     header: Union[int, List[str], None] = None,
     skip: Union[int, List[int]] = (),
     lines: List[str] = (),
@@ -21,8 +21,8 @@ def to_frame(
 
 
 def to_frame_space(
-    cmd='',
-    split: str = r'  +',
+    cmd="",
+    split: str = r"  +",
     header: Union[int, List[str], None] = None,
     skip: Union[int, List[int]] = (),
     lines: List[str] = ()
@@ -38,15 +38,15 @@ def to_frame_space(
     :return: A pandas DataFrame.
     """
     if not lines:
-        lines = sp.check_output(cmd, shell=True).decode().strip().split('\n')
+        lines = sp.check_output(cmd, shell=True).decode().strip().split("\n")
     if isinstance(skip, int):
         skip = [skip]
     data = [
         re.split(split, line.strip()) for index, line in enumerate(lines)
-        if line.strip() != '' and index not in skip
+        if line.strip() != "" and index not in skip
     ]
     if isinstance(header, int):
-        columns = [re.sub(r'\s+', '_', col.lower()) for col in data[header]]
+        columns = [re.sub(r"\s+", "_", col.lower()) for col in data[header]]
         data = (row for idx, row in enumerate(data) if idx != header)
         frame = pd.DataFrame(data, columns=columns)
     elif isinstance(header, list):
@@ -56,7 +56,7 @@ def to_frame_space(
     return frame.astype(str)
 
 
-def to_frame_title(cmd='', split=r'  +', lines: List[str] = ()):
+def to_frame_title(cmd="", split=r"  +", lines: List[str] = ()):
     """Convert the result of a shell command to a DataFrame.
     The headers are splitted by a regular expression
     while the columns are splitted by the right-most position of the headers.
@@ -65,7 +65,7 @@ def to_frame_title(cmd='', split=r'  +', lines: List[str] = ()):
     :param cmd: A shell command.
     """
     if not lines:
-        lines = sp.check_output(cmd, shell=True).decode().strip().split('\n')
+        lines = sp.check_output(cmd, shell=True).decode().strip().split("\n")
     headers = re.split(split, lines[0])
     n = len(headers)
     data = {}
@@ -77,6 +77,6 @@ def to_frame_title(cmd='', split=r'  +', lines: List[str] = ()):
     data[headers[-1]] = [line[start:].strip() for line in lines[1:]]
     frame = pd.DataFrame(data)
     frame.columns = [
-        col.strip().lower().replace(' ', '_') for col in frame.columns
+        col.strip().lower().replace(" ", "_") for col in frame.columns
     ]
     return frame.astype(str)
