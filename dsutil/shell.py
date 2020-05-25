@@ -47,7 +47,7 @@ def to_frame_space(
     ]
     if isinstance(header, int):
         columns = [re.sub(r'\s+', '_', col.lower()) for col in data[header]]
-        data = data[[idx for idx in range(len(data)) if idx != header]]
+        data = (row for idx, row in enumerate(data) if idx != header)
         frame = pd.DataFrame(data, columns=columns)
     elif isinstance(header, list):
         frame = pd.DataFrame(data, columns=header)
@@ -57,8 +57,8 @@ def to_frame_space(
 
 
 def to_frame_title(cmd='', split=r'  +', lines: List[str] = ()):
-    """Convert the result of a shell command to a DataFrame. 
-    The headers are splitted by a regular expression 
+    """Convert the result of a shell command to a DataFrame.
+    The headers are splitted by a regular expression
     while the columns are splitted by the right-most position of the headers.
     :param lines: The output of the shell command.
     :param split: A regular expression pattern for splitting headers.
