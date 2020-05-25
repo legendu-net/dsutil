@@ -169,6 +169,14 @@ def push_images(
     :param tag_tran_fun: A function takeing a tag as the parameter 
         and generating a new tag to tag Docker images before pushing.
     """
+    if not tag:
+        tag = "latest"
+    if not isinstance(path, Path):
+        path = clone_repos(
+            repos=path,
+            branch="master" if tag_build == "latest" else "dev",
+            repos_root=""
+        )
     with Path(path, DEP).open() as fin:
         dependencies = fin.readlines()
     timing = []
