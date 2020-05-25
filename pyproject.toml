@@ -20,6 +20,7 @@ tqdm = ">=4.40.0"
 opencv-python = ">=4.0.0.0"
 pillow = ">=7.0.0"
 GitPython = ">=3.0.0"
+pandas = ">=0.25.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"
