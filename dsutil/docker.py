@@ -232,8 +232,7 @@ def pull_images(path: Union[str, Path], branch: str):
         dep = dep.strip()
         if idx == 0:
             _pull_image_retry(_base_image(path / dep))
-        run_cmd(["docker", "pull", 
-        _pull_image_retry(dep.replace("docker-", PREFIX)])
+        _pull_image_retry(dep.replace("docker-", PREFIX))
 
 
 def build_images(

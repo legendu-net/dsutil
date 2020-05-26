@@ -1,1 +1,5 @@
 image: dclong/gitpod
+tasks:
+  - command: nvim --headless +"call dein#install()" +qall
+  - command: export EDITOR=vim
+  - command: export PIP_USER=no
