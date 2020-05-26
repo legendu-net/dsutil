@@ -241,7 +241,7 @@ def build_images(
     no_cache_from: str = "",
     tag_base: str = "",
     tag_build: str = "next",
-    push: bool = False,
+    pull: bool = False,
 ) -> Path:
     """Build Docker image for the specified repository/directory.
     Depdendency images are built first in order if any.
@@ -268,10 +268,10 @@ def build_images(
         path_dep = path / dep
         if idx == 0:
             print("\n\n")
-            # TODO: pull retry similar to push retry
             if tag_base:
                 update_base_tag(path_dep, tag=tag_base)
-            run_cmd(["docker", "pull", _base_image(path_dep)], check=True)
+            if pull:
+                _pull_image_retry(_base_image(path_dep))
         else:
             update_base_tag(path_dep, tag=tag_build)
         if dep == no_cache_from:
@@ -284,8 +284,6 @@ def build_images(
         if not cache:
             cmd.append("--no-cache")
         run_cmd(cmd, check=True)
-    if push:
-        push_images(path=path, tag=tag_build, tag_tran_fun=tag_date)
     return path
 
 
