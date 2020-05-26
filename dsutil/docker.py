@@ -1,3 +1,5 @@
+"""Docker related utils.
+"""
 import sys
 import time
 from timeit import default_timer as timer
@@ -135,7 +137,7 @@ def images() -> pd.DataFrame:
     return shell.to_frame("docker images", split_by_title=True)
 
 
-def _push_images_timing(image: str) -> float:
+def _push_image_timing(image: str) -> float:
     """Push a Docker image to Docker Hub and time the pushing.
     :param image: The full name of the image to push to Docker Hub.
     :return: The time (in seconds) used to push the Docker image.
@@ -146,16 +148,16 @@ def _push_images_timing(image: str) -> float:
     return image, end - start
 
 
-def _push_images_retry(image: str) -> float:
+def _push_image_retry(image: str) -> float:
     """Push a Docker image to Docker Hub. Automatically retry pushing once it fails.
     :param image: The full name of the image to push to Docker Hub.
     :return: The time (in seconds) used to push the Docker image.
     """
     try:
-        return _push_images_timing(image)
+        return _push_image_timing(image)
     except sp.CalledProcessError:
         time.sleep(60)
-        return _push_images_timing(image)
+        return _push_image_timing(image)
 
 
 def push_images(
@@ -184,12 +186,12 @@ def push_images(
         repos = repos.strip()
         image = repos.replace("docker-", PREFIX)
         print("\n\n")
-        timing.append(_push_images_retry(f"{image}:{tag}"))
+        timing.append(_push_image_retry(f"{image}:{tag}"))
         tag_new = tag_tran_fun(tag)
         if tag_new != tag:
             run_cmd(["docker", "tag", f"{image}:{tag}", f"{image}:{tag_new}"])
             print("\n\n")
-            timing.append(_push_images_retry(f"{image}:{tag_new}"))
+            timing.append(_push_image_retry(f"{image}:{tag_new}"))
     frame = pd.DataFrame(timing, columns=["image", "seconds"])
     print("\n", frame, sep="")
     return frame
@@ -201,6 +203,19 @@ def tag_date(tag: str) -> str:
     """
     mmddhh = datetime.datetime.now().strftime("%m%d%H")
     return mmddhh if tag in ("", "latest") else f"{tag}_{mmddhh}"
+
+
+def _pull_image_retry(image: str) -> float:
+    """Pull a Docker image from Docker Hub. Automatically retry pulling once.
+    :param image: The full name of the image to push from Docker Hub.
+    :return: The time (in seconds) to wait before retrying.
+    """
+    cmd = ["docker", "pull", image]
+    try:
+        run_cmd(cmd, check=True)
+    except sp.CalledProcessError:
+        time.sleep(60)
+        run_cmd(cmd, check=True)
 
 
 def pull_images(path: Union[str, Path], branch: str):
@@ -216,8 +231,9 @@ def pull_images(path: Union[str, Path], branch: str):
     for idx, dep in enumerate(dependencies):
         dep = dep.strip()
         if idx == 0:
-            run_cmd(["docker", "pull", _base_image(path / dep)], check=True)
-        run_cmd(["docker", "pull", dep.replace("docker-", PREFIX)], check=True)
+            _pull_image_retry(_base_image(path / dep))
+        run_cmd(["docker", "pull", 
+        _pull_image_retry(dep.replace("docker-", PREFIX)])
 
 
 def build_images(
