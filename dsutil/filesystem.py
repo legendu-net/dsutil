@@ -213,7 +213,8 @@ def _find_data_tables_file(file, filter_) -> Set[str]:
         "from\s+(\w+\.\w+)\W*\s*",
         "join\s+(\w+)\W*\s*",
         "join\s+(\w+\.\w+)\W*\s*",
-        "table\((.+)\)",
+        "table\((\w+)\)",
+        "table\((\w+\.\w+)\)",
     )
     tables = chain.from_iterable(
         re.findall(pattern, text) for pattern in patterns
