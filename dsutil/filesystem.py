@@ -2,11 +2,15 @@
 import os
 import re
 import shutil
-from typing import Union, Iterable, Dict, List
+from typing import Union, Iterable, Dict, List, Set, Callable
 import math
 from pathlib import Path
 import subprocess as sp
 from tqdm import tqdm
+from itertools import chain
+from functools import reduce
+import tempfile
+from loguru import logger
 HOME = Path.home()
 
 
@@ -158,3 +162,62 @@ def _find_images(root_dir: Path, images: List):
                 images.append(file)
         else:
             _find_images(file, images)
+
+
+def find_data_tables(
+    root: Union[str, Path], filter_: Callable = lambda _: True
+) -> Set[str]:
+    """Find keywords which are likely data table names.
+
+    :param root: The root directory or a GitHub repo URL in which to find data table names.
+    :param filter_: A function for filtering identified keywords (via regular expressions).
+        By default, all keywords identified by regular expressions are kept.
+    """
+    if isinstance(root, str):
+        if re.search("(git@|https://).*\.git", root):
+            with tempfile.TemporaryDirectory() as tempdir:
+                sp.run(f"git clone {root} {tempdir}", shell=True, check=True)
+                logger.info(
+                    f"The repo {root} is cloned to the local directory {tempdir}."
+                )
+                return find_data_tables(tempdir, filter_=filter_)
+        root = Path(root)
+    if root.is_file():
+        return _find_data_tables_file(root, filter_=filter_)
+    EXTENSIONS = (
+        ".sql",
+        ".py",
+        ".ipy",
+        ".scala",
+        ".java",
+        ".txt",
+        ".ipynb",
+    )
+    paths = (
+        path for path in Path(root).glob("**/*")
+        if path.suffix.lower() in EXTENSIONS and path.is_file()
+    )
+    return set(
+        chain.from_iterable(
+            _find_data_tables_file(path, filter_) for path in paths
+        )
+    )
+
+
+def _find_data_tables_file(file, filter_) -> Set[str]:
+    if isinstance(file, str):
+        file = Path(file)
+    text = file.read_text().lower()
+    patterns = (
+        "from\s+(\w+)\W*\s*",
+        "from\s+(\w+\.\w+)\W*\s*",
+        "join\s+(\w+)\W*\s*",
+        "join\s+(\w+\.\w+)\W*\s*",
+        "table\((.+)\)",
+    )
+    tables = chain.from_iterable(
+        re.findall(pattern, text) for pattern in patterns
+    )
+    mapping = str.maketrans("", "", "'\"\\")
+    tables = (table.translate(mapping) for table in tables)
+    return set(table for table in tables if filter_(table))
