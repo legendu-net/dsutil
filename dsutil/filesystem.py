@@ -204,7 +204,7 @@ def find_data_tables(
     )
     return set(
         chain.from_iterable(
-            _find_data_tables_file(path, filter_) for path in paths
+            _find_data_tables_file(path, filter_, patterns) for path in paths
         )
     )
 
