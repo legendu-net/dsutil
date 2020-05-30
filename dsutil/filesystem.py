@@ -187,7 +187,7 @@ def find_data_tables(
                 return find_data_tables(tempdir, filter_=filter_)
         root = Path(root)
     if root.is_file():
-        return _find_data_tables_file(root, filter_=filter_)
+        return _find_data_tables_file(root, filter_, patterns)
     extensions = {
         ".sql",
         ".py",
