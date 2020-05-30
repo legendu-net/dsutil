@@ -165,13 +165,17 @@ def _find_images(root_dir: Path, images: List):
 
 
 def find_data_tables(
-    root: Union[str, Path], filter_: Callable = lambda _: True
+    root: Union[str, Path], filter_: Callable = lambda _: True,
+    extensions: Iterable[str] = (),
+    patterns: Iterable[str] = (),
 ) -> Set[str]:
     """Find keywords which are likely data table names.
 
     :param root: The root directory or a GitHub repo URL in which to find data table names.
     :param filter_: A function for filtering identified keywords (via regular expressions).
         By default, all keywords identified by regular expressions are kept.
+    :param extensions: Addtional text file extensions to use.
+    :param extensions: Addtional regular expression patterns to use.
     """
     if isinstance(root, str):
         if re.search("(git@|https://).*\.git", root):
@@ -183,39 +187,42 @@ def find_data_tables(
                 return find_data_tables(tempdir, filter_=filter_)
         root = Path(root)
     if root.is_file():
-        return _find_data_tables_file(root, filter_=filter_)
-    EXTENSIONS = (
+        return _find_data_tables_file(root, filter_, patterns)
+    extensions = {
         ".sql",
         ".py",
         ".ipy",
+        ".ipynb",
         ".scala",
         ".java",
         ".txt",
-        ".ipynb",
-    )
+        "json",
+    } | set(extensions)
     paths = (
         path for path in Path(root).glob("**/*")
-        if path.suffix.lower() in EXTENSIONS and path.is_file()
+        if path.suffix.lower() in extensions and path.is_file()
     )
     return set(
         chain.from_iterable(
-            _find_data_tables_file(path, filter_) for path in paths
+            _find_data_tables_file(path, filter_, patterns) for path in paths
         )
     )
 
 
-def _find_data_tables_file(file, filter_) -> Set[str]:
+def _find_data_tables_file(file, filter_, patterns) -> Set[str]:
     if isinstance(file, str):
         file = Path(file)
     text = file.read_text().lower()
-    patterns = (
+    patterns = {
         "from\s+(\w+)\W*\s*",
         "from\s+(\w+\.\w+)\W*\s*",
         "join\s+(\w+)\W*\s*",
         "join\s+(\w+\.\w+)\W*\s*",
         "table\((\w+)\)",
         "table\((\w+\.\w+)\)",
-    )
+        '"table":\s*"(\w+)"',
+        '"table":\s*"(\w+\.\w+)"',
+    } | set(patterns)
     tables = chain.from_iterable(
         re.findall(pattern, text) for pattern in patterns
     )
