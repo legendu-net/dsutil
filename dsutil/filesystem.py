@@ -165,7 +165,8 @@ def _find_images(root_dir: Path, images: List):
 
 
 def find_data_tables(
-    root: Union[str, Path], filter_: Callable = lambda _: True,
+    root: Union[str, Path],
+    filter_: Callable = lambda _: True,
     extensions: Iterable[str] = (),
     patterns: Iterable[str] = (),
 ) -> Set[str]:
