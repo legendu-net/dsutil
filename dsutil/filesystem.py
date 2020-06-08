@@ -197,7 +197,7 @@ def find_data_tables(
         ".scala",
         ".java",
         ".txt",
-        "json",
+        ".json",
     } | set(extensions)
     paths = (
         path for path in Path(root).glob("**/*")
