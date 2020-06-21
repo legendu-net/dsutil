@@ -135,9 +135,7 @@ def _split_dir_1(desdir, files, index, batch):
         path.rename(desdir / path.name)
 
 
-def find_images(
-    root_dir: Union[str, Path, List[str], List[Path]]
-) -> List[Path]:
+def find_images(root_dir: Union[str, Path, List[str], List[Path]]) -> List[Path]:
     """Find all PNG images in a (sequence) of dir(s) or its/their subdirs.
     :param root_dir: A (list) of dir(s).
     """
@@ -224,9 +222,7 @@ def _find_data_tables_file(file, filter_, patterns) -> Set[str]:
         '"table":\s*"(\w+)"',
         '"table":\s*"(\w+\.\w+)"',
     } | set(patterns)
-    tables = chain.from_iterable(
-        re.findall(pattern, text) for pattern in patterns
-    )
+    tables = chain.from_iterable(re.findall(pattern, text) for pattern in patterns)
     mapping = str.maketrans("", "", "'\"\\")
     tables = (table.translate(mapping) for table in tables)
     return set(table for table in tables if filter_(table))

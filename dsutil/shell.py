@@ -15,9 +15,7 @@ def to_frame(
 ) -> pd.DataFrame:
     if split_by_title:
         return to_frame_title(cmd=cmd, split=split, lines=lines)
-    return to_frame_space(
-        cmd=cmd, split=split, header=header, skip=skip, lines=lines
-    )
+    return to_frame_space(cmd=cmd, split=split, header=header, skip=skip, lines=lines)
 
 
 def to_frame_space(
@@ -42,8 +40,8 @@ def to_frame_space(
     if isinstance(skip, int):
         skip = [skip]
     data = [
-        re.split(split, line.strip()) for index, line in enumerate(lines)
-        if line.strip() != "" and index not in skip
+        re.split(split, line.strip())
+        for index, line in enumerate(lines) if line.strip() != "" and index not in skip
     ]
     if isinstance(header, int):
         columns = [re.sub(r"\s+", "_", col.lower()) for col in data[header]]
@@ -76,7 +74,5 @@ def to_frame_title(cmd="", split=r"  +", lines: List[str] = ()):
     start = lines[0].index(headers[-1])
     data[headers[-1]] = [line[start:].strip() for line in lines[1:]]
     frame = pd.DataFrame(data)
-    frame.columns = [
-        col.strip().lower().replace(" ", "_") for col in frame.columns
-    ]
+    frame.columns = [col.strip().lower().replace(" ", "_") for col in frame.columns]
     return frame.astype(str)
