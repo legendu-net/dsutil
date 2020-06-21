@@ -2,3 +2,6 @@
 unsafe-load-any-extension=no
 extension-pkg-whitelist=numpy,cv2
 generated-members=cv2.*
+
+[TYPECHECK]
+ignored-classes=Namespace

@@ -6,9 +6,7 @@ from PIL import Image
 import cv2
 
 
-def video_to_image(
-    video, frames_per_image: int = 60, output: str = "frame_{:0>7}.png"
-):
+def video_to_image(video, frames_per_image: int = 60, output: str = "frame_{:0>7}.png"):
     """Extract images from a video.
     :param video: The path to a video file.
     :param frames_per_image: Extract 1 image every frames_per_image.
