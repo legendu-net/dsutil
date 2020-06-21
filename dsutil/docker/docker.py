@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Union, List, Set, Tuple, Dict, Iterable, Callable
 import tempfile
 from pathlib import Path
@@ -71,7 +72,7 @@ def pull_image(image: str, retry: int = 3, seconds: float = 60) -> Tuple[str, fl
     :param image: The full name of the image to push from Docker Hub.
     :return: The time (in seconds) to wait before retrying.
     """
-    logger.info("\n\nPulling the Docker image {}...", image)
+    logger.info("Pulling the Docker image {}...", image)
     if retry <= 1:
         return _pull_image_timing(image)
     for _ in range(retry):
@@ -95,7 +96,7 @@ class DockerImage:
         self,
         name: str,
         path: Path = None,
-        git_url_mapping: Union[Dict[str, str], Callable] = DockerImage.git_url,
+        git_url_mapping: Union[Dict[str, str], Callable] = None,
         branch: str = "dev"
     ):
         """Initialize a DockerImage object.
@@ -107,7 +108,7 @@ class DockerImage:
         """
         self.name = name
         self.path = path
-        self.git_url_mapping = git_url_mapping
+        self.git_url_mapping = git_url_mapping if git_url_mapping else DockerImage.git_url
         self.git_url = self._get_git_url()
         self.branch = branch
         self.is_root = False
@@ -119,7 +120,7 @@ class DockerImage:
         while obj.git_url not in images:
             if obj.git_url:
                 deps.appendleft(obj)
-                name, _ = self.base_image()
+                name, _ = obj.base_image()
                 obj = DockerImage(
                     name=name, git_url_mapping=self.git_url_mapping, branch=self.branch
                 )
@@ -131,9 +132,10 @@ class DockerImage:
         return images
 
     def clone_repo(self) -> Path:
-        if not self.git_url or self.path:
+        if self.path:
             return None
         self.path = Path(tempfile.mkdtemp())
+        logger.info("Cloning {} into {}", self.git_url, self.path)
         repo = git.Repo.clone_from(self.git_url, self.path)
         for rb in repo.remote().fetch():
             if rb.name.split("/")[1] == self.branch:
@@ -141,26 +143,36 @@ class DockerImage:
 
     def _get_git_url(self):
         if isinstance(self.git_url_mapping, dict):
-            return self.git_url_mapping.get(self.name, DockerImage.git_url(self.name))
+            return self.git_url_mapping.get(self.name, DockerImage.git_url(self.name))  # pylint: disable=E1101
         return self.git_url_mapping(self.name)
 
     def build(self,
-              tag_build: str,
+              tag_build: str = None,
               tag_base: str = "",
               no_cache: bool = False) -> Tuple[str, float]:
+        start = timer()
+        if tag_build is None:
+            tag_build = "latest" if self.branch == "master" else "next"
+        elif tag_build == "":
+            tag_build = "latest"
         self.clone_repo()
         if self.is_root:
             pull_image(":".join(self.base_image()))
-        logger.info("\n\nBuilding the Docker image {}...", self.name)
+        logger.info("Building the Docker image {}...", self.name)
         self._update_base_tag(tag_build, tag_base)
-        cmd = ["docker", "build", "-t", f"{self.name}:{tag_build}", str(self.path)]
+        image = f"{self.name}:{tag_build}"
+        cmd = ["docker", "build", "-t", image, str(self.path)]
         if no_cache:
             cmd.append("--no-cache")
         run_cmd(cmd, check=True)
         self.tag_build = tag_build
+        end = timer()
+        return image, end - start
 
     def _update_base_tag(self, tag_build: str, tag_base: str) -> None:
         tag = tag_base if self.is_root else tag_build
+        if not tag:
+            return
         dockerfile = self.path / DockerImage.DOCKERFILE
         with dockerfile.open() as fin:
             lines = fin.readlines()
@@ -174,6 +186,7 @@ class DockerImage:
     def base_image(self) -> List[str, str]:
         """Get the name of the base image (of this Docker image).
         """
+        self.clone_repo()
         dockerfile = self.path / DockerImage.DOCKERFILE
         with dockerfile.open() as fin:
             for line in fin:
@@ -203,28 +216,45 @@ class DockerImage:
 class DockerImageBuilder:
     def __init__(
         self,
-        names: Iterable[str],
+        names: Union[Iterable[str], str, Path],
         paths: Iterable[Path] = it.repeat(None),
         git_url_mapping: Union[Dict[str, str], Callable] = DockerImage.git_url,
-        branch: str = ""
+        branch: str = "dev"
     ):
+        if isinstance(names, str):
+            names = Path(names)
+        if isinstance(names, Path):
+            with names.open("r") as fin:
+                names = [line.strip() for line in fin]
+        self.names = names
+        self.paths = paths
+        self.git_url_mapping = git_url_mapping
+        self.branch = branch
         self.docker_images = {}
-        for name, path in zip(names, paths):
-            DockerImage(
-                name=name, path=path, git_url_mapping=git_url_mapping, branch=branch
-            ).get_deps(self.docker_images)
+
+    def get_deps(self) -> Dict[str, DockerImage]:
+        if not self.docker_images:
+            for name, path in zip(self.names, self.paths):
+                DockerImage(
+                    name=name,
+                    path=path,
+                    git_url_mapping=self.git_url_mapping,
+                    branch=self.branch
+                ).get_deps(self.docker_images)
+        return self.docker_images
 
     def push(self, tag_tran_fun: Callable = tag_date) -> pd.DataFrame:
         """Push all Docker images in self.docker_images.
         :param tag_tran_fun: A function takeing a tag as the parameter 
             and generating a new tag to tag Docker images before pushing.
         """
-        frames = [image.push(tag_tran_fun) for _, image in self.docker_images]
+        self.get_deps()
+        frames = [image.push(tag_tran_fun) for _, image in self.docker_images.items()]
         return pd.concat(frames)
 
     def build(
         self,
-        tag_build: str = "next",
+        tag_build: str = None,
         tag_base: str = "",
         no_cache: Set[str] = set()
     ) -> Tuple[str, float]:
@@ -233,5 +263,9 @@ class DockerImageBuilder:
         :param tag_base: The tag to the root base image to use.
         :param no_cache: A set of docker images to disable cache when building.
         """
-        frames = [image.build(tag_base, tag_build) for _, image in self.docker_images]
-        return pd.concat(frames)
+        self.get_deps()
+        data = [
+            image.build(tag_build=tag_build, tag_base=tag_base)
+            for _, image in self.docker_images.items()
+        ]
+        return pd.DataFrame(data, columns=["image", "seconds"])
