@@ -1,8 +1,15 @@
-from typing import Union, Dict, Callable
+from typing import Union, List, Set, Tuple, Dict, Iterable, Callable
 import tempfile
+from pathlib import Path
+import itertools as it
+import time
+from timeit import default_timer as timer
+import datetime
+import subprocess as sp
 from loguru import logger
 import git
 from collections import deque
+import pandas as pd
 
 
 def run_cmd(cmd, shell: bool = False, check: bool = False) -> None:
@@ -78,24 +85,30 @@ class DockerImage:
     DOCKERFILE = "Dockerfile"
 
     @classmethod
-    def git_url(cls, docker_image) -> str:
+    def git_url(cls, docker_image) -> str:  # pylint: disable=E0202
         if docker_image.startswith("dclong/"):
-            docker_image = docker_image.replace("dclong/", "docker-") 
+            docker_image = docker_image.replace("dclong/", "docker-")
             return f"https://github.com/dclong/{docker_image}.git"
         return ""
 
-    def __init__(self, name: str, path: Path = None, 
-        git_url_mapping: Union[Dict[str, str], Callable] = DockerImage.git_url, branch: str = "dev"):
+    def __init__(
+        self,
+        name: str,
+        path: Path = None,
+        git_url_mapping: Union[Dict[str, str], Callable] = DockerImage.git_url,
+        branch: str = "dev"
+    ):
         """Initialize a DockerImage object.
 
         :param name: Name of the Docker image, e.g., "dclong/jupyterhub-ds".
         :param path: The path to a local directory containing a local copy of the Git repository.
-        :param git_url_mapping: A dictionary of callable function to map the Docker image name to its Git repo URL.
+        :param git_url: A dictionary or callable function to map the Docker image name to its Git repo URL.
         :param branch: The branch of the GitHub repository to use.
         """
         self.name = name
         self.path = path
-        self.git_url = self._get_git_url(git_url_mapping)
+        self.git_url_mapping = git_url_mapping
+        self.git_url = self._get_git_url()
         self.branch = branch
         self.is_root = False
         self.tag_build = None
@@ -107,8 +120,9 @@ class DockerImage:
             if obj.git_url:
                 deps.appendleft(obj)
                 name, _ = self.base_image()
-                obj = DockerImage(name=name,
-                    git_url_mapping=self.git_url_mapping, branch=self.branch)
+                obj = DockerImage(
+                    name=name, git_url_mapping=self.git_url_mapping, branch=self.branch
+                )
             else:
                 deps[0].is_root = True
                 break
@@ -125,27 +139,27 @@ class DockerImage:
             if rb.name.split("/")[1] == self.branch:
                 repo.git.checkout(self.branch)
 
-    def _get_git_url(self, git_url_mapping: Union[Dict[str, str], Callable]):
-        if isinstance(git_url_mapping, dict):
-            return git_url_mapping.get(self.name, DockerImage.git_url(self.name))
-        return git_url_mapping(self.name)
+    def _get_git_url(self):
+        if isinstance(self.git_url_mapping, dict):
+            return self.git_url_mapping.get(self.name, DockerImage.git_url(self.name))
+        return self.git_url_mapping(self.name)
 
-    def build(self, tag_build: str, tag_base: str = "", no_cache: bool = False) -> Tuple[str, float]:
+    def build(self,
+              tag_build: str,
+              tag_base: str = "",
+              no_cache: bool = False) -> Tuple[str, float]:
         self.clone_repo()
         if self.is_root:
             pull_image(":".join(self.base_image()))
         logger.info("\n\nBuilding the Docker image {}...", self.name)
-        self._update_base_tag()
-        cmd = [
-            "docker", "build", "-t",
-            f"{self.name}:{tag_build}", str(self.path)
-        ]
+        self._update_base_tag(tag_build, tag_base)
+        cmd = ["docker", "build", "-t", f"{self.name}:{tag_build}", str(self.path)]
         if no_cache:
             cmd.append("--no-cache")
         run_cmd(cmd, check=True)
         self.tag_build = tag_build
 
-    def _update_base_tag(self) -> None:
+    def _update_base_tag(self, tag_build: str, tag_base: str) -> None:
         tag = tag_base if self.is_root else tag_build
         dockerfile = self.path / DockerImage.DOCKERFILE
         with dockerfile.open() as fin:
@@ -170,11 +184,14 @@ class DockerImage:
                     return [line, "latest"]
             raise LookupError("The FROM line is not found in the Dockerfile!")
 
-    def push(self, tag_tran_fun: Callable = tag_date, retry: int = 3, seconds: float = 60) -> pd.DataFrame:
+    def push(
+        self,
+        tag_tran_fun: Callable = tag_date,
+        retry: int = 3,
+        seconds: float = 60
+    ) -> pd.DataFrame:
         image = f"{self.name}:{self.tag_build}"
-        data = [
-            push_image(image=image, retry=retry, seconds=seconds)
-        ]
+        data = [push_image(image=image, retry=retry, seconds=seconds)]
         tag_new = tag_tran_fun(self.tag_build)
         if tag_new != self.tag_build:
             image_new = f"{self.name}:{tag_new}"
@@ -184,13 +201,18 @@ class DockerImage:
 
 
 class DockerImageBuilder:
-
-    def __init__(self, names: Iterable[str], paths: Iterable[Path] = it.repeat(None), 
-        git_url_mapping: Union[Dict[str, str], Callable] = DockerImage.git_url, branch: str = ""):
+    def __init__(
+        self,
+        names: Iterable[str],
+        paths: Iterable[Path] = it.repeat(None),
+        git_url_mapping: Union[Dict[str, str], Callable] = DockerImage.git_url,
+        branch: str = ""
+    ):
         self.docker_images = {}
         for name, path in zip(names, paths):
-            DockerImage(name=name, path=path, 
-                git_url_mapping=git_url_mapping, branch=branch).get_deps(self.docker_images)
+            DockerImage(
+                name=name, path=path, git_url_mapping=git_url_mapping, branch=branch
+            ).get_deps(self.docker_images)
 
     def push(self, tag_tran_fun: Callable = tag_date) -> pd.DataFrame:
         """Push all Docker images in self.docker_images.
@@ -200,7 +222,12 @@ class DockerImageBuilder:
         frames = [image.push(tag_tran_fun) for _, image in self.docker_images]
         return pd.concat(frames)
 
-    def build(tag_build: str = "next", tag_base: str = "", no_cache: Set[str] = set()) -> Tuple[str, float]:
+    def build(
+        self,
+        tag_build: str = "next",
+        tag_base: str = "",
+        no_cache: Set[str] = set()
+    ) -> Tuple[str, float]:
         """Build all Docker images in self.docker_images in order.
         :param tag_build: The tag of built images.
         :param tag_base: The tag to the root base image to use.

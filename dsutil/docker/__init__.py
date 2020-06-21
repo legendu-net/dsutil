@@ -13,8 +13,7 @@ import subprocess as sp
 import pandas as pd
 from loguru import logger
 from .. import shell
-from .docker import DockerImage
-from .docker import DockerImageBuilder
+from .docker import run_cmd, DockerImage, DockerImageBuilder
 
 
 def remove(choice: str = "") -> None:
