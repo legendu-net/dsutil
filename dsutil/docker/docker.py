@@ -205,11 +205,12 @@ class DockerImage:
     ) -> pd.DataFrame:
         image = f"{self.name}:{self.tag_build}"
         data = [push_image(image=image, retry=retry, seconds=seconds)]
-        tag_new = tag_tran_fun(self.tag_build)
-        if tag_new != self.tag_build:
-            image_new = f"{self.name}:{tag_new}"
-            run_cmd(["docker", "tag", image, image_new])
-            data.append(push_image(image=image_new, retry=retry, seconds=seconds))
+        if tag_tran_fun:
+            tag_new = tag_tran_fun(self.tag_build)
+            if tag_new != self.tag_build:
+                image_new = f"{self.name}:{tag_new}"
+                run_cmd(["docker", "tag", image, image_new])
+                data.append(push_image(image=image_new, retry=retry, seconds=seconds))
         return pd.DataFrame(data, columns=["image", "seconds"])
 
 
