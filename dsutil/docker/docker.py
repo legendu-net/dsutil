@@ -114,7 +114,7 @@ class DockerImage:
         self.is_root = False
         self.tag_build = None
 
-    def get_deps(self, images: Dict[str, DockerImage]) -> Dict[str, DockerImage]:
+    def get_deps(self, images: Dict[str, "DockerImage"]) -> Dict[str, "DockerImage"]:
         deps = deque()
         obj = self
         while obj.git_url not in images:
