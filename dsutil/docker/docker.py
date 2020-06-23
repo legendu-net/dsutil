@@ -183,7 +183,7 @@ class DockerImage:
         with dockerfile.open("w") as fout:
             fout.writelines(lines)
 
-    def base_image(self) -> List[str, str]:
+    def base_image(self) -> List[str]:
         """Get the name of the base image (of this Docker image).
         """
         self.clone_repo()
