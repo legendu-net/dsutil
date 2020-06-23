@@ -226,7 +226,7 @@ class DockerImageBuilder:
             names = Path(names)
         if isinstance(names, Path):
             with names.open("r") as fin:
-                names = [line.strip() for line in fin]
+                names = [line.strip() for line in fin if not line.strip().startswith("#")]
         self.names = names
         self.paths = paths
         self.git_url_mapping = git_url_mapping
