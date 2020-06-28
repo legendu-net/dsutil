@@ -125,7 +125,7 @@ def _format_code(inplace: bool = False, proj_dir: Path = None):
         print(proc.stdout.decode())
         sys.stdout.flush()
         sys.stderr.flush()
-        logger.warning(f"Please format the code (yapf -ir {pkg})!")
+        logger.warning(f"Please format the code: yapf -ir {pkg}")
 
 
 def build_package(proj_dir: Path = None) -> None:
@@ -140,7 +140,7 @@ def build_package(proj_dir: Path = None) -> None:
     pkg = _project_name(proj_dir)
     try:
         logger.info(
-            f"Checking code for errors (.venv/bin/python -m pylint -E {pkg}) ..."
+            f"Checking code for errors: .venv/bin/python -m pylint -E {pkg} ..."
         )
         with open(os.devnull, "w") as devnull:
             sp.run(
