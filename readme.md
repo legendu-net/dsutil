@@ -28,5 +28,5 @@ pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.19.
 Or you can use the following command to install the latest master branch
 if you have pip 20.0+.
 ```
-pip3 install git+https://github.com/dclong/dsutil
+pip3 install git+https://github.com/dclong/dsutil@master
 ```
