@@ -259,7 +259,7 @@ class DockerImageBuilder:
         self,
         tag_build: str = None,
         tag_base: str = "",
-        no_cache: Set[str] = set()
+        no_cache: Union[str, List[str], Set[str]] = None
     ) -> Tuple[str, float]:
         """Build all Docker images in self.docker_images in order.
         :param tag_build: The tag of built images.
@@ -267,8 +267,15 @@ class DockerImageBuilder:
         :param no_cache: A set of docker images to disable cache when building.
         """
         self.get_deps()
+        if isinstance(no_cache, str):
+            no_cache = set([no_cache])
+        elif isinstance(no_cache, list):
+            no_cache = set(no_cache)
+        elif no_cache is None:
+            no_cache = set()
         data = [
-            image.build(tag_build=tag_build, tag_base=tag_base)
-            for _, image in self.docker_images.items()
+            image.build(
+                tag_build=tag_build, tag_base=tag_base, no_cache=image in no_cache
+            ) for _, image in self.docker_images.items()
         ]
         return pd.DataFrame(data, columns=["image", "seconds"])

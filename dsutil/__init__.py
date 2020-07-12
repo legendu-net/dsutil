@@ -9,4 +9,4 @@ from . import pdf
 from . import text
 from . import url
 
-__version__ = "0.19.4"
+__version__ = "0.19.5"
