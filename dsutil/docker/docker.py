@@ -144,7 +144,7 @@ class DockerImage:
         obj = self
         while obj.git_url_base not in images:
             if obj.git_url_base:
-                obj = DockerImage(git_url=self.git_url_base, branch=self.branch)
+                obj = DockerImage(git_url=obj.git_url_base, branch=obj.branch)
                 obj.clone_repo()
                 deps.appendleft(obj)
             else:
