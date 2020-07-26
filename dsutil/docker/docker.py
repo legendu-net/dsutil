@@ -156,12 +156,13 @@ class DockerImage:
                 pass
             shutil.copy2(Path.home() / ".ssh", ssh_dst)
 
-    def build(self,
-              tag_build: str = None,
-              tag_base: str = "",
-              no_cache: bool = False,
-              copy_ssh_to: str = ""
-        ) -> Tuple[str, float]:
+    def build(
+        self,
+        tag_build: str = None,
+        tag_base: str = "",
+        no_cache: bool = False,
+        copy_ssh_to: str = ""
+    ) -> Tuple[str, float]:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
