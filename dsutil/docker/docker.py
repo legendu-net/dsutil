@@ -93,7 +93,6 @@ class DockerImage:
         """Initialize a DockerImage object.
 
         :param git_url: URL of the remote Git repository.
-        :param path: The path to a local directory containing a local copy of the Git repository.
         :param branch: The branch of the GitHub repository to use.
         """
         self.git_url = git_url
