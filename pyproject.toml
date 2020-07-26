@@ -23,7 +23,7 @@ GitPython = ">=3.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"
-pylint = "^2.5.3"
+pylint = ">=2.5.3"
 mypy = ">=0.782"
 
 [build-system]
