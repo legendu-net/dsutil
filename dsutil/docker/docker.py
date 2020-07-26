@@ -193,7 +193,7 @@ class DockerImage:
         elif tag_build == "":
             tag_build = "latest"
         if self.is_root:
-            pull_image(":".join(self.base_image()))
+            pull_image(":".join(self.base_image))
         logger.info("Building the Docker image {}...", self.name)
         self._update_base_tag(tag_build, tag_base)
         image = f"{self.name}:{tag_build}"
@@ -270,7 +270,7 @@ class DockerImageBuilder:
                 ]
         self.git_urls = git_urls
         self.branch = branch
-        self.docker_images = {}
+        self.docker_images: Dict[str, DockerImage] = {}
 
     def _get_deps(self) -> None:
         """Get dependencies (of all Docker images to build) in order.
