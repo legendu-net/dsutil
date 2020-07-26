@@ -209,7 +209,7 @@ class DockerImage:
     def _remove_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
             try:
-                (self.path / copy_ssh_to).unlink()
+                shutil.rmtree(self.path / copy_ssh_to)
             except FileNotFoundError:
                 pass
 
