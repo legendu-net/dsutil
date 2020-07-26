@@ -7,9 +7,10 @@ import time
 from timeit import default_timer as timer
 import datetime
 import subprocess as sp
+from collections import deque
+import shutil
 from loguru import logger
 import git
-from collections import deque
 import pandas as pd
 
 
@@ -146,16 +147,46 @@ class DockerImage:
             return self.git_url_mapping.get(self.name, DockerImage.git_url(self.name))  # pylint: disable=E1101
         return self.git_url_mapping(self.name)
 
-    def build(self,
-              tag_build: str = None,
-              tag_base: str = "",
-              no_cache: bool = False) -> Tuple[str, float]:
+    def _copy_ssh(self, copy_ssh_to: str):
+        if copy_ssh_to:
+            ssh_dst = self.path / copy_ssh_to
+            try:
+                ssh_dst.unlink()
+            except FileNotFoundError:
+                pass
+            shutil.copy2(Path.home() / ".ssh", ssh_dst)
+
+    def build(
+        self,
+        tag_build: str = None,
+        tag_base: str = "",
+        no_cache: bool = False,
+        copy_ssh_to: str = ""
+    ) -> Tuple[str, float]:
+        """Build the Docker image.
+
+        :param tag_build: The tag of the Docker image to build.
+        If None (default), then it is determined by the branch name.
+        When the branch is master the "latest" tag is used,
+        otherwise the next tag is used.
+        If an empty string is specifed for tag_build,
+        it is also treated as the latest tag.
+        :param tag_base: The tag of the base image to use.
+        If emtpy (default),
+        then the tag of the base image is as specified in the Dockerfile.
+        :param no_cache: If True, no cache is used when building the Docker image;
+        otherwise, cache is used.
+        :param copy_ssh_keys: If True, SSH keys are copied into a directory named ssh 
+        under the current local Git repository. 
+        :return: A tuple of the format (image_name_built, time_taken).
+        """
         start = timer()
+        self.clone_repo()
+        self._copy_ssh(copy_ssh_to)
         if tag_build is None:
             tag_build = "latest" if self.branch == "master" else "next"
         elif tag_build == "":
             tag_build = "latest"
-        self.clone_repo()
         if self.is_root:
             pull_image(":".join(self.base_image()))
         logger.info("Building the Docker image {}...", self.name)
@@ -166,8 +197,16 @@ class DockerImage:
             cmd.append("--no-cache")
         run_cmd(cmd, check=True)
         self.tag_build = tag_build
+        self._remove_ssh(copy_ssh_to)
         end = timer()
         return image, end - start
+
+    def _remove_ssh(self, copy_ssh_to: str):
+        if copy_ssh_to:
+            try:
+                (self.path / copy_ssh_to).unlink()
+            except FileNotFoundError:
+                pass
 
     def _update_base_tag(self, tag_build: str, tag_base: str) -> None:
         tag = tag_base if self.is_root else tag_build
