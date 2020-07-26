@@ -131,7 +131,9 @@ class DockerImage:
         if not self.base_image:
             raise LookupError("The FROM line is not found in the Dockerfile!")
         if not self.git_url:
-            raise LookupError("The base Git URL tag '# GIT:' is not found in the Dockerfile!")
+            raise LookupError(
+                "The base Git URL tag '# GIT:' is not found in the Dockerfile!"
+            )
 
     def get_deps(self, images: Dict[str, "DockerImage"]) -> Deque["DockerImage"]:
         """Get all dependencies of this DockerImage in order.
@@ -281,10 +283,8 @@ class DockerImageBuilder:
         """
         if not self.docker_images:
             for git_url in self.git_urls:
-                deps = DockerImage(
-                    git_url=git_url,
-                    branch=self.branch
-                ).get_deps(self.docker_images)
+                deps = DockerImage(git_url=git_url,
+                                   branch=self.branch).get_deps(self.docker_images)
                 for dep in deps:
                     self.docker_images[dep.git_url] = dep
 
@@ -319,7 +319,10 @@ class DockerImageBuilder:
             no_cache = set()
         data = [
             image.build(
-                tag_build=tag_build, tag_base=tag_base, no_cache=image.name in no_cache, copy_ssh_to=copy_ssh_to
+                tag_build=tag_build,
+                tag_base=tag_base,
+                no_cache=image.name in no_cache,
+                copy_ssh_to=copy_ssh_to
             ) for _, image in self.docker_images.items()
         ]
         return pd.DataFrame(data, columns=["image", "seconds"])
