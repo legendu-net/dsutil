@@ -156,7 +156,7 @@ class DockerImage:
         if copy_ssh_to:
             ssh_dst = self.path / copy_ssh_to
             try:
-                ssh_dst.unlink()
+                shutil.rmtree(ssh_dst)
             except FileNotFoundError:
                 pass
             shutil.copy2(Path.home() / ".ssh", ssh_dst)
