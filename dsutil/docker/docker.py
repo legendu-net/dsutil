@@ -130,10 +130,6 @@ class DockerImage:
             raise LookupError("The name tag '# NAME:' is not found in the Dockerfile!")
         if not self.base_image:
             raise LookupError("The FROM line is not found in the Dockerfile!")
-        if not self.git_url:
-            raise LookupError(
-                "The base Git URL tag '# GIT:' is not found in the Dockerfile!"
-            )
 
     def get_deps(self, images: Dict[str, "DockerImage"]) -> Deque["DockerImage"]:
         """Get all dependencies of this DockerImage in order.
