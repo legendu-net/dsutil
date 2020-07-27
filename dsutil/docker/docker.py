@@ -107,13 +107,14 @@ class DockerImage:
     def clone_repo(self) -> None:
         """Clone the Git repository to a local directory.
         """
-        if not self.path:
-            self.path = Path(tempfile.mkdtemp())
-            logger.info("Cloning {} into {}", self.git_url, self.path)
-            repo = git.Repo.clone_from(self.git_url, self.path)
-            for rb in repo.remote().fetch():
-                if rb.name.split("/")[1] == self.branch:
-                    repo.git.checkout(self.branch)
+        if self.path:
+            return
+        self.path = Path(tempfile.mkdtemp())
+        logger.info("Cloning {} into {}", self.git_url, self.path)
+        repo = git.Repo.clone_from(self.git_url, self.path)
+        for rb in repo.remote().fetch():
+            if rb.name.split("/")[1] == self.branch:
+                repo.git.checkout(self.branch)
         self._parse_dockerfile()
 
     def _parse_dockerfile(self):
