@@ -122,10 +122,13 @@ class DockerImage:
             for line in fin:
                 if line.startswith("# NAME:"):
                     self.name = line[7:].strip()
-                if line.startswith("FROM "):
+                    logger.info("This image name: {}", self.name)
+                elif line.startswith("FROM "):
                     self.base_image = line[5:].strip()
-                if line.startswith("# GIT:"):
+                    logger.info("Base image name: {}", self.base_image)
+                elif line.startswith("# GIT:"):
                     self.git_url_base = line[6:].strip()
+                    logger.info("Base image URL: {}", self.git_url_base)
         if not self.name:
             raise LookupError("The name tag '# NAME:' is not found in the Dockerfile!")
         if not self.base_image:
