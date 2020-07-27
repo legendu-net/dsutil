@@ -95,7 +95,7 @@ class DockerImage:
         :param git_url: URL of the remote Git repository.
         :param branch: The branch of the GitHub repository to use.
         """
-        self.git_url = git_url
+        self.git_url = git_url.strip()
         self.branch = branch
         self.path = None
         self.name = ""
@@ -268,8 +268,9 @@ class DockerImageBuilder:
             git_urls = Path(git_urls)
         if isinstance(git_urls, Path):
             with git_urls.open("r") as fin:
+                lines = (line.strip() for line in fin)
                 git_urls = [
-                    line.strip() for line in fin if not line.strip().startswith("#")
+                    line for line in lines if not line.startswith("#") and not line == ""
                 ]
         self.git_urls = git_urls
         self.branch = branch
