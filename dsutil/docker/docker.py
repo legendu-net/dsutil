@@ -95,7 +95,7 @@ class DockerImage:
         :param git_url: URL of the remote Git repository.
         :param branch: The branch of the GitHub repository to use.
         """
-        self.git_url = git_url
+        self.git_url = git_url.strip()
         self.branch = branch
         self.path = None
         self.name = ""
@@ -122,10 +122,13 @@ class DockerImage:
             for line in fin:
                 if line.startswith("# NAME:"):
                     self.name = line[7:].strip()
-                if line.startswith("FROM "):
+                    logger.info("This image name: {}", self.name)
+                elif line.startswith("FROM "):
                     self.base_image = line[5:].strip()
-                if line.startswith("# GIT:"):
+                    logger.info("Base image name: {}", self.base_image)
+                elif line.startswith("# GIT:"):
                     self.git_url_base = line[6:].strip()
+                    logger.info("Base image URL: {}", self.git_url_base)
         if not self.name:
             raise LookupError("The name tag '# NAME:' is not found in the Dockerfile!")
         if not self.base_image:
@@ -265,8 +268,9 @@ class DockerImageBuilder:
             git_urls = Path(git_urls)
         if isinstance(git_urls, Path):
             with git_urls.open("r") as fin:
+                lines = (line.strip() for line in fin)
                 git_urls = [
-                    line.strip() for line in fin if not line.strip().startswith("#")
+                    line for line in lines if not line.startswith("#") and line != ""
                 ]
         self.git_urls = git_urls
         self.branch = branch
