@@ -270,7 +270,7 @@ class DockerImageBuilder:
             with git_urls.open("r") as fin:
                 lines = (line.strip() for line in fin)
                 git_urls = [
-                    line for line in lines if not line.startswith("#") and not line == ""
+                    line for line in lines if not line.startswith("#") and line != ""
                 ]
         self.git_urls = git_urls
         self.branch = branch
