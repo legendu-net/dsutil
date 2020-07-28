@@ -4,7 +4,7 @@ from pathlib import Path
 from loguru import logger
 
 
-def rmd5(path: Union[str, Path], output: Union[str, Path] = "") -> List[Tuple[str, str]]:
+def rmd5(path: Union[str, Path], output: Union[str, Path] = "") -> str:
     """Calculate md5sums recursively for the given path.
 
     :param path: The path of a file or directory.

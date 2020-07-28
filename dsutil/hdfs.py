@@ -87,7 +87,6 @@ def num_partitions(path: str) -> int:
     :param path: A HDFS path.
     """
     cmd = f"{HDFS} dfs -ls {path}/part-* | wc -l"
-    logger.info(f"{hdfs_path}: {partitions} partitions")
     return int(sp.check_output(cmd, shell=True))
 
 

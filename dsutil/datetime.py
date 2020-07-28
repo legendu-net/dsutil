@@ -39,21 +39,22 @@ def last_weekday(weekday) -> datetime.date:
     """Get the date of latest occurrence of the specified weekday.
     """
     mapping = {
-        'Monday': 0,
-        'Mon': 0,
-        'Tuesday': 1,
-        'Tue': 1,
-        'Wednesday': 2,
-        'Wed': 2,
-        'Thursday': 3,
-        'Thu': 3,
-        'Friday': 4,
-        'Fri': 4,
-        'Saturday': 5,
-        'Sat': 5,
-        'Sunday': 6,
+        "Monday": 0,
+        "Mon": 0,
+        "Tuesday": 1,
+        "Tue": 1,
+        "Wednesday": 2,
+        "Wed": 2,
+        "Thursday": 3,
+        "Thu": 3,
+        "Friday": 4,
+        "Fri": 4,
+        "Saturday": 5,
+        "Sat": 5,
+        "Sunday": 6,
+        "Sun": 6
     }
-    if type(weekday) == str:
+    if isinstance(weekday, str):
         weekday = mapping[weekday]
     today = datetime.date.today()
     diff = today.weekday() - weekday
