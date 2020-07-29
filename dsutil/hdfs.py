@@ -31,7 +31,6 @@ class Hdfs():
         frame.drop('mdate', axis=1, inplace=True)
         return frame
 
-
     def count(self, path: str) -> pd.DataFrame:
         """Return the results of hdfs dfs -count -q -v /hdfs/path as a DataFrame.
         :param path: A HDFS path.
@@ -40,7 +39,6 @@ class Hdfs():
         frame = to_frame(cmd, split=r' +', header=0)
         frame.columns = frame.columns.str.lower()
         return frame
-
 
     def du(self, path: str, depth: int = 1) -> pd.DataFrame:
         """Get the size of HDFS paths.
@@ -52,17 +50,16 @@ class Hdfs():
         if depth > 1:
             paths = self.ls(path, recursive=True).filename
             frames = [
-                self._du_helper(path) for path in paths if path[index:].count('/') + 1 == depth
+                self._du_helper(path)
+                for path in paths if path[index:].count('/') + 1 == depth
             ]
             return pd.concat(frames)
         return self._du_helper(path)
-
 
     def _du_helper(self, path: str) -> pd.DataFrame:
         cmd = f'{self.path} dfs -du {path}'
         frame = to_frame(cmd, split=r' +', header=['size', 'path'])
         return frame
-
 
     def exists(self, path: str) -> bool:
         """Check if a HDFS path exist.
@@ -77,7 +74,6 @@ class Hdfs():
         except sp.CalledProcessError:
             return False
 
-
     def remove(self, path: str) -> None:
         """Remove a HDFS path.
         :param path: A HDFS path.
@@ -85,14 +81,12 @@ class Hdfs():
         cmd = f"{self.path} dfs -rm -r {path}"
         sp.run(cmd, shell=True, check=True)
 
-
     def num_partitions(self, path: str) -> int:
         """Get the number of partitions of a HDFS path.
         :param path: A HDFS path.
         """
         cmd = f"{self.path} dfs -ls {path}/part-* | wc -l"
         return int(sp.check_output(cmd, shell=True))
-
 
     def get(self, path: str, dst_dir: str = '') -> None:
         """Download a HDFS path to local.
