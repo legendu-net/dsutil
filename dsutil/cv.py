@@ -153,7 +153,7 @@ def deshade_3(img, threshold=0.4, cutoff=30):
     return Image.fromarray(arr)
 
 
-def highlight_frame(rgb: Tuple[int], shape: Tuple[int], thickness: int = 3):
+def highlight_frame(rgb: Tuple[int, int, int], shape: Tuple[int, int], thickness: int = 3):
     """Generate a rectangle frame with the specified color and thickness.
     """
     nrow = shape[0]
@@ -174,7 +174,7 @@ def highlight_frame(rgb: Tuple[int], shape: Tuple[int], thickness: int = 3):
     return Image.fromarray(arr)
 
 
-def frame_image(img, rgb, thickness: int = 3):
+def frame_image(img: Image.Image, rgb, thickness: int = 3):
     """Add a highlight frame to an image.
     """
     shape = img.size

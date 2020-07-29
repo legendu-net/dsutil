@@ -24,7 +24,7 @@ GitPython = ">=3.0.0"
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"
 pylint = ">=2.5.3"
-mypy = ">=0.782"
+pytype = ">=2020.0.0"
 
 [build-system]
 requires = ["poetry>=1.0.0"]
