@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Filesystem related util functions.
+"""
 import os
 import re
 import shutil
@@ -8,7 +10,6 @@ from pathlib import Path
 import subprocess as sp
 from tqdm import tqdm
 from itertools import chain
-from functools import reduce
 import tempfile
 from loguru import logger
 HOME = Path.home()
@@ -25,7 +26,7 @@ def copy_if_exists(src, dst=HOME) -> bool:
     try:
         shutil.copy2(src, dst)
         return True
-    finally:
+    except:
         return False
 
 
@@ -42,7 +43,7 @@ def link_if_exists(src, dst=HOME, target_is_directory=True) -> bool:
     try:
         os.symlink(src, dst, target_is_directory=target_is_directory)
         return True
-    finally:
+    except:
         return False
 
 
@@ -85,7 +86,7 @@ def zip_subdirs(root: Union[str, Path]) -> None:
         if path.is_dir() and not path.name.startswith("."):
             file = path.with_suffix(".zip")
             print(f"{path} -> {file}")
-            sp.run(f"zip -qr {file} {path} &", shell=True)
+            sp.run(f"zip -qr {file} {path} &", shell=True, check=True)
 
 
 def flatten_dir(dir_):
@@ -108,19 +109,19 @@ def _flatten_dir(dir_):
         path.rename(path.parent.parent / path.name)
 
 
-def split_dir(dir_: Union[str, Path], pattern: str, batch: int) -> None:
+def split_dir(dir_: Union[str, Path], batch: int, wildcard: str = "*") -> None:
     """Split files in a directory into sub-directories.
         This function is for the convenience of splitting a directory 
         with a large number of files into smaller directories 
         so that those subdirs can zipped (into relatively smaller files) and uploaded to cloud quickly.
 
     :param dir_: The root directory whose files are to be splitted into sub-directories.
-    :param pattern: A wild card pattern specifying files to be included.
+    :param wildcard: A wild card pattern specifying files to be included.
     :param batch: The number files that each subdirs should contain.
     """
     if isinstance(dir_, str):
         dir_ = Path(dir_)
-    files = sorted(dir_.glob("*.png"))
+    files = sorted(dir_.glob(wildcard))
     num_batch = math.ceil(len(files) / batch)
     nchar = len(str(num_batch))
     for index in tqdm(range(num_batch)):
@@ -226,3 +227,15 @@ def _find_data_tables_file(file, filter_, patterns) -> Set[str]:
     mapping = str.maketrans("", "", "'\"\\")
     tables = (table.translate(mapping) for table in tables)
     return set(table for table in tables if filter_(table))
+
+
+def is_empty(dir_: Union[str, Path], filter_: Union[None, Callable] = lambda _: True):
+    """Check whether a directory is empty.
+
+    :param dir_: The directory to check.
+    :param filter_: A filtering function (default True always) to limit the check to sub files/dirs.
+    """
+    if isinstance(dir_, str):
+        dir_ = Path(dir_)
+    paths = dir_.glob("**/*")
+    return not any(True for path in paths if filter_(path))
