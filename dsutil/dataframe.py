@@ -1,22 +1,24 @@
 import os
 import re
-import pandas as pd
 import subprocess as sp
 from typing import List, Sequence, Union
+import pandas as pd
 
 
-def table_2w(frame: pd.DataFrame, columns: List[str], na_as=None):
+def table_2w(frame: pd.DataFrame, columns: Union[str, List[str], None], na_as=None):
     """Create 2-way table from columns of a DataFrame.
     """
     if na_as is not None:
         frame = frame.fillna(na_as)
-    if type(frame) == pd.Series:
+    if isinstance(frame, pd.Series):
         df = frame.unstack()
         df.index = pd.MultiIndex.from_product([[df.index.name], df.index.values])
         df.columns = pd.MultiIndex.from_product([[df.columns.name], df.columns.values])
         return df
     if isinstance(frame, pd.DataFrame):
-        return table_2w(frame[columns].groupby(columns).size())  # pylint: disable=E1120
+        if isinstance(columns, str):
+            columns = [columns]
+        return table_2w(frame[columns].groupby(columns).size(), columns=None)
     raise TypeError('"frame" must be pandas.Series or pandas.DataFrame.')
 
 

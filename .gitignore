@@ -8,7 +8,8 @@ venv/
 target/
 dist/
 .coverage
-.mypy
+.mypy/
+.pytype/
 .mypy_cache
 *.crc
 *.egg-info/
