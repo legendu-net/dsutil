@@ -24,7 +24,7 @@ class Hdfs():
             'filesize',
             'mdate',
             'mtime',
-            'filename',
+            'path',
         ]
         cmd = f'{self.path} dfs -ls {"-R" if recursive else ""} {path}'
         frame = to_frame(cmd, split=r' +', skip=0, header=cols)
