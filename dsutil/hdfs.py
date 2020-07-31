@@ -1,5 +1,6 @@
 """Wrapping HDFS commands.
 """
+import os
 import subprocess as sp
 import pandas as pd
 from .shell import to_frame
@@ -95,3 +96,26 @@ class Hdfs():
         """
         cmd = f"{self.path} dfs -get {path} {dst_dir}"
         sp.run(cmd, shell=True, check=True)
+
+    @staticmethod
+    def _file_size_1(path: str, size: int, dir_size: Dict[str, int]):
+        while path != "/":
+            path = os.path.dirname(path)
+            dir_size.setdefault(path, 0)
+            dir_size[path] += size
+
+    def _file_size(self, files):
+        dir_size = {}
+        for path, bytes_ in files.bytes[~files.permissions.str.startswith("d")].iteritems():
+            self._file_size_1(path, bytes_, dir_size)
+        return dir_size
+
+    def size(self, path: str) -> pd.DataFrame:
+        files = self.ls(path, recursive = True)
+        files.set_index("path", inplace=True)
+        dir_size = self._file_size(files)
+        bytes_ = pd.Series(dir_size, name="bytes")
+        files.update(bytes_)
+        files.reset_index(inplace=True)
+        files.insert(6, "metabytes", round(files.bytes / 1E6, 2))
+        return files.sort_values("bytes", ascending=False)
