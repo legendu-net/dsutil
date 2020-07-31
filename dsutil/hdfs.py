@@ -1,6 +1,7 @@
 """Wrapping HDFS commands.
 """
 import os
+from typing import Dict
 import subprocess as sp
 import pandas as pd
 from .shell import to_frame
@@ -111,7 +112,9 @@ class Hdfs():
         return dir_size
 
     def size(self, path: str) -> pd.DataFrame:
-        files = self.ls(path, recursive = True)
+        """Calculate sizes of subdirs and subfiles under a path.
+        """
+        files = self.ls(path, recursive=True)
         files.set_index("path", inplace=True)
         dir_size = self._file_size(files)
         bytes_ = pd.Series(dir_size, name="bytes")
