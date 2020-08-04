@@ -5,6 +5,7 @@ description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
 [tool.poetry.scripts]
+logf = "dsutil.hadoop:logf.main"
 
 [tool.poetry.dependencies]
 python = ">=3.6"
