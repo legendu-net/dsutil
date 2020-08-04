@@ -11,7 +11,9 @@ import subprocess as sp
 from tqdm import tqdm
 from itertools import chain
 import tempfile
+import nbformat
 from loguru import logger
+from yapf.yapflib.yapf_api import FormatCode
 HOME = Path.home()
 
 
@@ -239,3 +241,37 @@ def is_empty(dir_: Union[str, Path], filter_: Union[None, Callable] = lambda _: 
         dir_ = Path(dir_)
     paths = dir_.glob("**/*")
     return not any(True for path in paths if filter_(path))
+
+
+def _format_cell(cell: Dict, style_file: str) -> bool:
+    """Format a cell in a Jupyter notebook.
+    """
+    if cell["cell_type"] != "code":
+        return False
+    code = cell["source"]
+    lines = code.split("\n")
+    if not lines:
+        return False
+    formatted, changed = FormatCode(code, style_config=style_file)
+    if formatted.endswith("\n"):
+        formatted = formatted[:-1]  # remove last newline
+        changed = True
+    if changed:
+        cell["source"] = formatted
+    return changed
+
+
+def format_notebook(path: str, style_file: str = ".style.yapf"):
+    """Format code in a Jupyter/Lab notebook.
+
+    :param path: Path to a notebook.
+    :param style_file: [description], defaults to ".style.yapf"
+    """
+    logger.info("Formatting {}...", path)
+    notebook = nbformat.read(path, as_version=nbformat.NO_CONVERT)
+    nbformat.validate(notebook)
+    changed = False
+    for cell in notebook.cells:
+        changed |= _format_cell(cell, style_file=style_file)
+    if changed:
+        nbformat.write(notebook, path, version=nbformat.NO_CONVERT)

@@ -11,7 +11,7 @@ def to_bool(value: Any) -> bool:
     if isinstance(value, bool):
         return value
     if isinstance(value, str):
-        if value.lower() in ('t', 'true', 'y', 'yes'):
+        if value.lower() in ("t", "true", "y", "yes"):
             return True
         if value.isdigit():
             return int(value) != 0
