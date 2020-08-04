@@ -5,9 +5,9 @@ import datetime
 import pandas as pd
 #import pysnooper
 
-DATE_FORMAT_DASH = '%Y-%m-%d'
-DATE_FORMAT_DIGIT = '%Y%m%d'
-TIME_FORMAT_DASH = '%Y-%m-%d %H:%M:%S'
+DATE_FORMAT_DASH = "%Y-%m-%d"
+DATE_FORMAT_DIGIT = "%Y%m%d"
+TIME_FORMAT_DASH = "%Y-%m-%d %H:%M:%S"
 
 
 def range_str(
@@ -66,43 +66,43 @@ def last_weekday(weekday) -> datetime.date:
 def last_monday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
     """
-    return last_weekday('Mon')
+    return last_weekday("Mon")
 
 
 def last_tuesday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
     """
-    return last_weekday('Tue')
+    return last_weekday("Tue")
 
 
 def last_wednesday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
     """
-    return last_weekday('Wed')
+    return last_weekday("Wed")
 
 
 def last_thursday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
     """
-    return last_weekday('Thu')
+    return last_weekday("Thu")
 
 
 def last_friday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
     """
-    return last_weekday('Fri')
+    return last_weekday("Fri")
 
 
 def last_saturday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
     """
-    return last_weekday('Sat')
+    return last_weekday("Sat")
 
 
 def last_sunday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
     """
-    return last_weekday('Sun')
+    return last_weekday("Sun")
 
 
 def today(days: int = 0) -> datetime.date:

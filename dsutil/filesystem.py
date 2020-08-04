@@ -71,10 +71,10 @@ def count_path(paths: Iterable[str]) -> Dict[str, int]:
 
 
 def _count_path_helper(path: str, freq: dict):
-    fields = path.rstrip('/').split('/')[:-1]
-    path = ''
+    fields = path.rstrip("/").split("/")[:-1]
+    path = ""
     for field in fields:
-        path = path + field + '/'
+        path = path + field + "/"
         freq[path] = freq.get(path, 0) + 1
 
 

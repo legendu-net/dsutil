@@ -1,5 +1,5 @@
 import pandas as pd
-from typing import Any, Sized, Union
+from typing import Any, Sized
 
 
 def to_bool(value: Any) -> bool:

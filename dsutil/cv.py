@@ -45,7 +45,7 @@ def resize_image(
         if img.size != size:
             img.resize(size).save(desdir / paths.name if desdir else paths)
         return
-    if not hasattr(paths, '__len__'):
+    if not hasattr(paths, "__len__"):
         paths = tuple(paths)
     for path in tqdm(paths):
         resize_image(paths=path, desdir=desdir, size=size)

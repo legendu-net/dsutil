@@ -30,7 +30,7 @@ def read_csv(path: str, **kwargs):
     frame_list = []
     if os.path.isdir(path):
         for file in os.listdir(path):
-            if os.path.splitext(file)[1].lower() == '.csv':
+            if os.path.splitext(file)[1].lower() == ".csv":
                 file = os.path.join(path, file)
                 frame_list.append(pd.read_csv(file, **kwargs))
     return pd.concat(frame_list)

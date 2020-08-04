@@ -7,7 +7,7 @@ def format_item_html(key: Any, value: Any) -> str:
     :param key: An key of the dictionary.
     :param value: The corresponding value of the key.
     """
-    return '&nbsp;' * 4 + f'{key}: {value}'
+    return "&nbsp;" * 4 + f"{key}: {value}"
 
 
 def format_item_plain(key: Any, value: Any) -> str:
@@ -16,7 +16,7 @@ def format_item_plain(key: Any, value: Any) -> str:
     :param key: An key of the dictionary.
     :param value: The corresponding value of the key.
     """
-    return ' ' * 4 + f'{key}: {value}'
+    return " " * 4 + f"{key}: {value}"
 
 
 def format_dict_html(
@@ -32,7 +32,7 @@ def format_dict_html(
     :is_html: whether to format the dictionary in HTML format or in plain text format.
     """
     lines = (fmt(k, v) for k, v in dict_.items() if filter_(k, v))
-    return '{<br>' + '<br>'.join(lines) + '<br>}'
+    return "{<br>" + "<br>".join(lines) + "<br>}"
 
 
 def format_dict_plain(
@@ -48,4 +48,4 @@ def format_dict_plain(
     :is_html: whether to format the dictionary in HTML format or in plain text format.
     """
     lines = (fmt(k, v) for k, v in dict_.items() if filter_(k, v))
-    return '{\n' + '\n'.join(lines) + '\n}'
+    return "{\n" + "\n".join(lines) + "\n}"
