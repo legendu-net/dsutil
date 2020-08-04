@@ -129,7 +129,9 @@ def _format_code(inplace: bool = False, proj_dir: Path = None):
     proc = sp.run(cmd, check=False, stdout=sp.PIPE)
     if proc.returncode:
         cmd[1] = "-ir"
-        logger.warning("Please format the code: {}\n{}", " ".join(cmd), proc.stdout.decode())
+        logger.warning(
+            "Please format the code: {}\n{}", " ".join(cmd), proc.stdout.decode()
+        )
         sys.stdout.flush()
         sys.stderr.flush()
 
