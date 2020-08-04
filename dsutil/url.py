@@ -1,5 +1,7 @@
 """URL related utility functions.
 """
+
+
 def format(url: str, text: str = "", type_="html") -> str:
     """Convert an URL to be a HTML hyperlink or a hyperlink formula in Excel so that it can be opened by clicking.
     :param url: The url to be converted to a hyperlink.

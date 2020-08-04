@@ -22,7 +22,6 @@ class DockerHub():
         res = requests.get(url)
         return res.json()["results"]
 
-
     def token(self, password: str) -> None:
         """Generate a token of the account.
         """
@@ -34,7 +33,6 @@ class DockerHub():
             },
         )
         self._token = res.json()["token"]
-
 
     def delete_tag(self, image: str, tag: str = "") -> str:
         """Delete a tag of the specified Docker image.

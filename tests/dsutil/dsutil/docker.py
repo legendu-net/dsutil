@@ -40,9 +40,7 @@ def remove() -> None:
     print(images())
 
 
-def remove_containers(
-    id_: str = '', name: str = '', exited: bool = False
-) -> None:
+def remove_containers(id_: str = '', name: str = '', exited: bool = False) -> None:
     """Remove the specified Docker containers.
     :param id_: The id of the container to remove.
     :param name: A (regex) pattern of names of containers to remove.
@@ -240,8 +238,8 @@ def build_images(
             no_cache = True
         print(f'\n\nBuilding {dep}...')
         cmd = [
-            'docker', 'build', '-t',
-            f'{dep.replace("docker-", PREFIX)}:{tag_build}', path_dep
+            'docker', 'build', '-t', f'{dep.replace("docker-", PREFIX)}:{tag_build}',
+            path_dep
         ]
         if no_cache:
             cmd.append('--no-cache')
@@ -310,9 +308,7 @@ def _clone_repos_helper(
     print('\n\n')
     repos_name = repos_name.strip('/').replace(PREFIX, 'docker-')
     repos_url = REPO.format(repos_name)
-    run_cmd(
-        ['git', 'clone', '--depth=1', repos_url, path / repos_name], check=True
-    )
+    run_cmd(['git', 'clone', '--depth=1', repos_url, path / repos_name], check=True)
     dependencies.append(repos_name)
     if repos_url == repos_root:
         return

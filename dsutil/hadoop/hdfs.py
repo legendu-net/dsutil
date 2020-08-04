@@ -109,7 +109,8 @@ class Hdfs():
 
     def _file_size(self, files):
         dir_size = {}
-        for path, bytes_ in files.bytes[~files.permissions.str.startswith("d")].iteritems():
+        for path, bytes_ in files.bytes[~files.permissions.str.
+                                        startswith("d")].iteritems():
             self._file_size_1(path, bytes_, dir_size)
         return dir_size
 

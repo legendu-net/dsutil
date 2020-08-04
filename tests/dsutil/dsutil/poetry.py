@@ -57,9 +57,7 @@ def _update_version_toml(ver: str, proj_dir: Path) -> None:
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
-    update_file(
-        proj_dir / TOML, r'version = .\d+\.\d+\.\d+.', f'version = "{ver}"'
-    )
+    update_file(proj_dir / TOML, r'version = .\d+\.\d+\.\d+.', f'version = "{ver}"')
 
 
 def _update_version_init(ver: str, proj_dir: Path) -> None:
@@ -73,8 +71,7 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
             path = Path(subdir, file)
             if path.suffix == ".py":
                 update_file(
-                    path, r'__version__ = .\d+\.\d+\.\d+.',
-                    f'__version__ = "{ver}"'
+                    path, r'__version__ = .\d+\.\d+\.\d+.', f'__version__ = "{ver}"'
                 )
 
 

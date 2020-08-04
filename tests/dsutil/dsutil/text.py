@@ -128,8 +128,7 @@ def merge_args(args=None, namespace=None):
         type=int,
         required=False,
         default=5,
-        help=
-        'the number of non-empty files for deciding whether there are headers.'
+        help='the number of non-empty files for deciding whether there are headers.'
     )
     args = parser.parse_args(args=args, namespace=namespace)
     files = [file for pattern in args.files for file in glob.glob(pattern)]
@@ -141,9 +140,8 @@ def dedup_header(file, output: str = ''):
     Only the header on the first line is kept and headers (identical line to the first line) 
     on other lines are removed.
     """
-    with open(
-        file, 'rb'
-    ) as fin, open(output, 'wb') if output else sys.stdout.buffer as fout:
+    with open(file, 'rb'
+             ) as fin, open(output, 'wb') if output else sys.stdout.buffer as fout:
         header = fin.readline()
         fout.write(header)
         for line in fin:
@@ -181,9 +179,7 @@ def select(file, columns, delimiter, output: str = ''):
             if field in columns:
                 index.append(i)
                 columns_full.append(field)
-        with (
-            open(output, 'w', encoding='utf-8') if output else sys.stdout
-        ) as fout:
+        with (open(output, 'w', encoding='utf-8') if output else sys.stdout) as fout:
             fout.write(delimiter.join(columns_full) + '\n')
             for line in fin:
                 fields = line.split(delimiter)
