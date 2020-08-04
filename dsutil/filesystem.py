@@ -252,22 +252,23 @@ def _format_cell(cell: Dict, style_file: str) -> bool:
     lines = code.split("\n")
     if not lines:
         return False
-    formatted, changed = FormatCode(code, style_config=style_file)
-    if formatted.endswith("\n"):
-        formatted = formatted[:-1]  # remove last newline
-        changed = True
-    if changed:
+    try:
+        formatted, _ = FormatCode(code, style_config=style_file)
+    except:
+        return False
+    # remove the trailing new line
+    formatted = formatted.rstrip("\n")
+    if formatted != code:
         cell["source"] = formatted
-    return changed
+        return True
+    return False
 
 
 def format_notebook(path: str, style_file: str = ".style.yapf"):
     """Format code in a Jupyter/Lab notebook.
-
     :param path: Path to a notebook.
     :param style_file: [description], defaults to ".style.yapf"
     """
-    logger.info("Formatting {}...", path)
     notebook = nbformat.read(path, as_version=nbformat.NO_CONVERT)
     nbformat.validate(notebook)
     changed = False
@@ -275,3 +276,6 @@ def format_notebook(path: str, style_file: str = ".style.yapf"):
         changed |= _format_cell(cell, style_file=style_file)
     if changed:
         nbformat.write(notebook, path, version=nbformat.NO_CONVERT)
+        logger.info("The notebook {} is formatted.", path)
+    else:
+        logger.info("No change is made to the notebook {} (as it is already well formatted).", path)
