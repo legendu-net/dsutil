@@ -1,7 +1,10 @@
 """Wrapping HDFS commands.
 """
+import os
+from typing import Dict
 import subprocess as sp
 import pandas as pd
+from loguru import logger
 from .shell import to_frame
 
 
@@ -16,27 +19,28 @@ class Hdfs():
         :param path: A HDFS path.
         """
         cols = [
-            'permissions',
-            'replicas',
-            'userid',
-            'groupid',
-            'filesize',
-            'mdate',
-            'mtime',
-            'filename',
+            "permissions",
+            "replicas",
+            "userid",
+            "groupid",
+            "filesize",
+            "mdate",
+            "mtime",
+            "path",
         ]
         cmd = f'{self.path} dfs -ls {"-R" if recursive else ""} {path}'
-        frame = to_frame(cmd, split=r' +', skip=0, header=cols)
-        frame.mtime = pd.to_datetime(frame.mdate + ' ' + frame.mtime)
-        frame.drop('mdate', axis=1, inplace=True)
+        logger.info("Running command: {}. Might take several minutes.", cmd)
+        frame = to_frame(cmd, split=r" +", skip=0, header=cols)
+        frame.mtime = pd.to_datetime(frame.mdate + " " + frame.mtime)
+        frame.drop("mdate", axis=1, inplace=True)
         return frame
 
     def count(self, path: str) -> pd.DataFrame:
         """Return the results of hdfs dfs -count -q -v /hdfs/path as a DataFrame.
         :param path: A HDFS path.
         """
-        cmd = f'{self.path} dfs -count -q -v {path}'
-        frame = to_frame(cmd, split=r' +', header=0)
+        cmd = f"{self.path} dfs -count -q -v {path}"
+        frame = to_frame(cmd, split=r" +", header=0)
         frame.columns = frame.columns.str.lower()
         return frame
 
@@ -46,19 +50,19 @@ class Hdfs():
         :param depth: The depth (by default 1) of paths to calculate sizes for.
         Note that any depth less than 1 is treated as 1.
         """
-        index = len(path.rstrip('/'))
+        index = len(path.rstrip("/"))
         if depth > 1:
             paths = self.ls(path, recursive=True).filename
             frames = [
                 self._du_helper(path)
-                for path in paths if path[index:].count('/') + 1 == depth
+                for path in paths if path[index:].count("/") + 1 == depth
             ]
             return pd.concat(frames)
         return self._du_helper(path)
 
     def _du_helper(self, path: str) -> pd.DataFrame:
-        cmd = f'{self.path} dfs -du {path}'
-        frame = to_frame(cmd, split=r' +', header=['size', 'path'])
+        cmd = f"{self.path} dfs -du {path}"
+        frame = to_frame(cmd, split=r" +", header=["size", "path"])
         return frame
 
     def exists(self, path: str) -> bool:
@@ -88,10 +92,36 @@ class Hdfs():
         cmd = f"{self.path} dfs -ls {path}/part-* | wc -l"
         return int(sp.check_output(cmd, shell=True))
 
-    def get(self, path: str, dst_dir: str = '') -> None:
+    def get(self, path: str, dst_dir: str = "") -> None:
         """Download a HDFS path to local.
         :param path: A HDFS path.
         :param dst_dir: The local directory to download the HDFS path to.
         """
         cmd = f"{self.path} dfs -get {path} {dst_dir}"
         sp.run(cmd, shell=True, check=True)
+
+    @staticmethod
+    def _file_size_1(path: str, size: int, dir_size: Dict[str, int]):
+        while path != "/":
+            path = os.path.dirname(path)
+            dir_size.setdefault(path, 0)
+            dir_size[path] += size
+
+    def _file_size(self, files):
+        dir_size = {}
+        for path, bytes_ in files.bytes[~files.permissions.str.
+                                        startswith("d")].iteritems():
+            self._file_size_1(path, bytes_, dir_size)
+        return dir_size
+
+    def size(self, path: str) -> pd.DataFrame:
+        """Calculate sizes of subdirs and subfiles under a path.
+        """
+        files = self.ls(path, recursive=True)
+        files.set_index("path", inplace=True)
+        dir_size = self._file_size(files)
+        bytes_ = pd.Series(dir_size, name="bytes")
+        files.update(bytes_)
+        files.reset_index(inplace=True)
+        files.insert(6, "metabytes", round(files.bytes / 1E6, 2))
+        return files.sort_values("bytes", ascending=False)

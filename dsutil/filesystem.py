@@ -11,7 +11,9 @@ import subprocess as sp
 from tqdm import tqdm
 from itertools import chain
 import tempfile
+import nbformat
 from loguru import logger
+from yapf.yapflib.yapf_api import FormatCode
 HOME = Path.home()
 
 
@@ -69,10 +71,10 @@ def count_path(paths: Iterable[str]) -> Dict[str, int]:
 
 
 def _count_path_helper(path: str, freq: dict):
-    fields = path.rstrip('/').split('/')[:-1]
-    path = ''
+    fields = path.rstrip("/").split("/")[:-1]
+    path = ""
     for field in fields:
-        path = path + field + '/'
+        path = path + field + "/"
         freq[path] = freq.get(path, 0) + 1
 
 
@@ -239,3 +241,44 @@ def is_empty(dir_: Union[str, Path], filter_: Union[None, Callable] = lambda _: 
         dir_ = Path(dir_)
     paths = dir_.glob("**/*")
     return not any(True for path in paths if filter_(path))
+
+
+def _format_cell(cell: Dict, style_file: str) -> bool:
+    """Format a cell in a Jupyter notebook.
+    """
+    if cell["cell_type"] != "code":
+        return False
+    code = cell["source"]
+    lines = code.split("\n")
+    if not lines:
+        return False
+    try:
+        formatted, _ = FormatCode(code, style_config=style_file)
+    except:
+        return False
+    # remove the trailing new line
+    formatted = formatted.rstrip("\n")
+    if formatted != code:
+        cell["source"] = formatted
+        return True
+    return False
+
+
+def format_notebook(path: str, style_file: str = ".style.yapf"):
+    """Format code in a Jupyter/Lab notebook.
+    :param path: Path to a notebook.
+    :param style_file: [description], defaults to ".style.yapf"
+    """
+    notebook = nbformat.read(path, as_version=nbformat.NO_CONVERT)
+    nbformat.validate(notebook)
+    changed = False
+    for cell in notebook.cells:
+        changed |= _format_cell(cell, style_file=style_file)
+    if changed:
+        nbformat.write(notebook, path, version=nbformat.NO_CONVERT)
+        logger.info("The notebook {} is formatted.", path)
+    else:
+        logger.info(
+            "No change is made to the notebook {} (as it is already well formatted).",
+            path
+        )

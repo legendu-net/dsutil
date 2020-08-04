@@ -21,8 +21,7 @@ def range_str(
         yield ts.strftime(format)
 
 
-def range(start, stop,
-          step=datetime.timedelta(days=1)) -> Iterable[datetime.datetime]:
+def range(start, stop, step=datetime.timedelta(days=1)) -> Iterable[datetime.datetime]:
     """Generate a range of datetime objects.
     :param start: A datetime object or a string that can be parsed into a datetime.
     :param stop: A datetime object or a string that can be parsed into a datetime.

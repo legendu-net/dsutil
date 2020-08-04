@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dsutil"
-version = "0.21.0"
+version = "0.22.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
@@ -20,6 +20,7 @@ tqdm = ">=4.40.0"
 opencv-python = ">=4.0.0.0"
 pillow = ">=7.0.0"
 GitPython = ">=3.0.0"
+nbformat = ">=5.0.7"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"

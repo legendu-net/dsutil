@@ -111,21 +111,29 @@ def version(
 def _format_code(inplace: bool = False, proj_dir: Path = None):
     if proj_dir is None:
         proj_dir = _project_dir()
-    cmd = ["yapf", "-r"]
+    cmd = ["yapf"]
     if inplace:
-        cmd.append("-i")
+        cmd.append("-ir")
         logger.info("Formatting code...")
     else:
-        cmd.append("-d")
+        cmd.append("-dr")
         logger.info("Checking code formatting...")
+    # source dir
     pkg = _project_name(proj_dir)
     cmd.append(str(proj_dir / pkg))
+    # test dir
+    for dir_ in ["test", "tests"]:
+        test = proj_dir / dir_
+        if test.is_dir():
+            cmd.append(str(test))
     proc = sp.run(cmd, check=False, stdout=sp.PIPE)
     if proc.returncode:
-        print(proc.stdout.decode())
+        cmd[1] = "-ir"
+        logger.warning(
+            "Please format the code: {}\n{}", " ".join(cmd), proc.stdout.decode()
+        )
         sys.stdout.flush()
         sys.stderr.flush()
-        logger.warning(f"Please format the code: yapf -ir {pkg}")
 
 
 def build_package(proj_dir: Path = None) -> None:
