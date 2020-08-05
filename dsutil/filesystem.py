@@ -279,6 +279,6 @@ def format_notebook(path: str, style_file: str = ".style.yapf"):
         logger.info("The notebook {} is formatted.", path)
     else:
         logger.info(
-            "No change is made to the notebook {} (as it is already well formatted).",
+            "No change is made to the notebook {}.",
             path
         )
