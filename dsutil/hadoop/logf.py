@@ -6,6 +6,8 @@ YARN = '/apache/hadoop/bin/yarn'
 
 
 def filter_(args):
+    """Filter the a log file.
+    """
     logf = LogFilter(
         log_file=args.log_file,
         context_size=args.context_size,
@@ -29,6 +31,8 @@ def _format_app_id(app_id: str):
 
 
 def fetch(args):
+    """Fetch and filter the log of a Spark/Hadoop application.
+    """
     app_id = _format_app_id(args.app_id)
     output = args.output if args.output else app_id
     cmd = [YARN, 'logs', '-applicationId', app_id]
@@ -39,24 +43,14 @@ def fetch(args):
     LogFilter(log_file=output).filter()
 
 
-def version(args):
-    print(__version__)
-
-
 def parse_args(args=None, namespace=None):
+    """Parse command-line arguments.
+    """
     parser = argparse.ArgumentParser(description='Spark/Hadoop log utils.')
     subparsers = parser.add_subparsers(help='Sub commands.')
-    _subparser_version(subparsers)
     _subparser_fetch(subparsers)
     _subparser_filter(subparsers)
     return parser.parse_args(args=args, namespace=namespace)
-
-
-def _subparser_version(subparsers):
-    parser_version = subparsers.add_parser(
-        'version', aliases=['ver', 'v'], help='Show the version of this script.'
-    )
-    parser_version.set_defaults(func=version)
 
 
 def _subparser_fetch(subparsers):

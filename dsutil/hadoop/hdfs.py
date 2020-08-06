@@ -5,7 +5,7 @@ from typing import Dict
 import subprocess as sp
 import pandas as pd
 from loguru import logger
-from .shell import to_frame
+from ..shell import to_frame
 
 
 class Hdfs():
