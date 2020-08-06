@@ -148,7 +148,7 @@ def build_package(proj_dir: Path = None) -> None:
     pkg = _project_name(proj_dir)
     try:
         logger.info(
-            f"Checking code for errors: .venv/bin/python -m pylint -E {pkg} ..."
+            "Checking code for errors..."
         )
         with open(os.devnull, "w") as devnull:
             sp.run(
@@ -158,7 +158,7 @@ def build_package(proj_dir: Path = None) -> None:
                 stderr=devnull
             )
     except sp.CalledProcessError:
-        logger.error("Please fix errors in code before building the package!")
+        logger.error("Please fix errors: .venv/bin/python -m pylint -E {}", pkg)
         return
     _format_code(proj_dir=proj_dir)
     logger.info("Building the package...")

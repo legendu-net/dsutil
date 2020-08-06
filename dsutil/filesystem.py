@@ -278,7 +278,4 @@ def format_notebook(path: str, style_file: str = ".style.yapf"):
         nbformat.write(notebook, path, version=nbformat.NO_CONVERT)
         logger.info("The notebook {} is formatted.", path)
     else:
-        logger.info(
-            "No change is made to the notebook {}.",
-            path
-        )
+        logger.info("No change is made to the notebook {}.", path)
