@@ -147,9 +147,7 @@ def build_package(proj_dir: Path = None) -> None:
         shutil.rmtree(DIST)
     pkg = _project_name(proj_dir)
     try:
-        logger.info(
-            "Checking code for errors..."
-        )
+        logger.info("Checking code for errors...")
         with open(os.devnull, "w") as devnull:
             sp.run(
                 f"cd {proj_dir} && .venv/bin/python -m pylint -E {pkg}",
