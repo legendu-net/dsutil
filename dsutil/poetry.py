@@ -147,9 +147,7 @@ def build_package(proj_dir: Path = None) -> None:
         shutil.rmtree(DIST)
     pkg = _project_name(proj_dir)
     try:
-        logger.info(
-            f"Checking code for errors: .venv/bin/python -m pylint -E {pkg} ..."
-        )
+        logger.info("Checking code for errors...")
         with open(os.devnull, "w") as devnull:
             sp.run(
                 f"cd {proj_dir} && .venv/bin/python -m pylint -E {pkg}",
@@ -158,7 +156,7 @@ def build_package(proj_dir: Path = None) -> None:
                 stderr=devnull
             )
     except sp.CalledProcessError:
-        logger.error("Please fix errors in code before building the package!")
+        logger.error("Please fix errors: .venv/bin/python -m pylint -E {}", pkg)
         return
     _format_code(proj_dir=proj_dir)
     logger.info("Building the package...")
