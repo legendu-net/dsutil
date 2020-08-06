@@ -8,9 +8,9 @@ from typing import Union, Iterable, Dict, List, Set, Callable
 import math
 from pathlib import Path
 import subprocess as sp
-from tqdm import tqdm
 from itertools import chain
 import tempfile
+from tqdm import tqdm
 import nbformat
 from loguru import logger
 from yapf.yapflib.yapf_api import FormatCode
@@ -62,7 +62,8 @@ def update_file(path: Path, pattern: str, replace: str) -> None:
 
 def count_path(paths: Iterable[str]) -> Dict[str, int]:
     """Count frequence of paths and their parent paths.
-    :param path: An iterable collection of paths.
+
+    :param paths: An iterable collection of paths.
     """
     freq = {}
     for path in paths:
