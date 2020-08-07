@@ -115,7 +115,7 @@ class Hdfs():
             self._file_size_1(path, bytes_, dir_size)
         return dir_size
 
-    def count_path(self, path: str):
+    def count_path(self, path: str) -> pd.Series:
         """Count frequence of paths and their parent paths.
         :param path: An iterable collection of paths.
         """

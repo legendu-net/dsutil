@@ -11,6 +11,7 @@ import subprocess as sp
 from itertools import chain
 import tempfile
 from tqdm import tqdm
+import pandas as pd
 import nbformat
 from loguru import logger
 from yapf.yapflib.yapf_api import FormatCode
@@ -60,7 +61,7 @@ def update_file(path: Path, pattern: str, replace: str) -> None:
     path.write_text(text)
 
 
-def count_path(paths: Iterable[str]) -> Dict[str, int]:
+def count_path(paths: Iterable[str], ascending=False) -> pd.Series:
     """Count frequence of paths and their parent paths.
 
     :param paths: An iterable collection of paths.
@@ -68,6 +69,7 @@ def count_path(paths: Iterable[str]) -> Dict[str, int]:
     freq = {}
     for path in paths:
         _count_path_helper(path, freq)
+    freq = pd.Series(freq, name="count").sort_values(ascending=ascending)
     return freq
 
 
