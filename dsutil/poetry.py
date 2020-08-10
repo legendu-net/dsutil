@@ -141,7 +141,7 @@ def _lint_code(proj_dir: Path = None, linter: str = "pylint"):
     if proj_dir is None:
         proj_dir = _project_dir()
     pkg = _project_name(proj_dir)
-    cmd = ".venv/bin/python -m pylint -E {pkg}/"
+    cmd = f".venv/bin/python -m {linter} -E {pkg}/"
     for dir_ in ["test", "tests"]:
         test = proj_dir / dir_
         if test.is_dir():
