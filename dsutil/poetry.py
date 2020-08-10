@@ -136,7 +136,30 @@ def _format_code(inplace: bool = False, proj_dir: Path = None):
         sys.stderr.flush()
 
 
-def build_package(proj_dir: Path = None) -> None:
+def _lint_code(proj_dir: Path = None, linter: str = "pylint"):
+    logger.info("Linting code...")
+    if proj_dir is None:
+        proj_dir = _project_dir()
+    pkg = _project_name(proj_dir)
+    cmd = ".venv/bin/python -m pylint -E {pkg}/"
+    for dir_ in ["test", "tests"]:
+        test = proj_dir / dir_
+        if test.is_dir():
+            cmd += " " + dir_
+    try:
+        with open(os.devnull, "w") as devnull:
+            sp.run(
+                f"cd {proj_dir} && {cmd}",
+                shell=True,
+                check=True,
+                stderr=devnull
+            )
+    except sp.CalledProcessError:
+        logger.error("Please fix errors: {}", cmd)
+        return
+
+
+def build_package(proj_dir: Path = None, linter: str = "pylint") -> None:
     """Build the package using poetry.
     :param dst_dir: The root directory of the project.
     :param proj_dir: The root directory of the Poetry project.
@@ -146,18 +169,7 @@ def build_package(proj_dir: Path = None) -> None:
     if os.path.exists(DIST):
         shutil.rmtree(DIST)
     pkg = _project_name(proj_dir)
-    try:
-        logger.info("Checking code for errors...")
-        with open(os.devnull, "w") as devnull:
-            sp.run(
-                f"cd {proj_dir} && .venv/bin/python -m pylint -E {pkg}",
-                shell=True,
-                check=True,
-                stderr=devnull
-            )
-    except sp.CalledProcessError:
-        logger.error("Please fix errors: .venv/bin/python -m pylint -E {}", pkg)
-        return
+    _lint_code(proj_dir=proj_dir, linter=linter)
     _format_code(proj_dir=proj_dir)
     logger.info("Building the package...")
     sp.run(
