@@ -183,7 +183,7 @@ def find_data_tables(
     :param extensions: Addtional regular expression patterns to use.
     """
     if isinstance(root, str):
-        if re.search("(git@|https://).*\.git", root):
+        if re.search(r"(git@|https://).*\.git", root):
             with tempfile.TemporaryDirectory() as tempdir:
                 sp.run(f"git clone {root} {tempdir}", shell=True, check=True)
                 logger.info(
@@ -257,7 +257,11 @@ def _format_cell(cell: Dict, style_file: str) -> bool:
         return False
     try:
         formatted, _ = FormatCode(code, style_config=style_file)
-    except:
+    except Exception as err:
+        logger.debug(
+            "Failed to format the cell with the following code:\n{}\nThe following error message is thrown:\n{}",
+            code, err
+        )
         return False
     # remove the trailing new line
     formatted = formatted.rstrip("\n")
