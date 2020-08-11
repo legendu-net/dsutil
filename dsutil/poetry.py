@@ -145,7 +145,7 @@ def _lint_code(proj_dir: Path = None, linter: str = "pylint"):
     for dir_ in ["test", "tests"]:
         test = proj_dir / dir_
         if test.is_dir():
-            cmd += " " + dir_
+            cmd += f" {dir_}/"
     try:
         with open(os.devnull, "w") as devnull:
             sp.run(f"cd {proj_dir} && {cmd}", shell=True, check=True, stderr=devnull)
