@@ -121,11 +121,10 @@ def _format_code(inplace: bool = False, proj_dir: Path = None):
     # source dir
     pkg = _project_name(proj_dir)
     cmd.append(str(proj_dir / pkg))
-    # test dir
-    for dir_ in ["test", "tests"]:
-        test = proj_dir / dir_
-        if test.is_dir():
-            cmd.append(str(test))
+    # tests dir
+    test = proj_dir / "tests"
+    if test.is_dir():
+        cmd.append(str(test))
     proc = sp.run(cmd, check=False, stdout=sp.PIPE)
     if proc.returncode:
         cmd[1] = "-ir"
@@ -142,10 +141,10 @@ def _lint_code(proj_dir: Path = None, linter: str = "pylint"):
         proj_dir = _project_dir()
     pkg = _project_name(proj_dir)
     cmd = f".venv/bin/python -m {linter} -E {pkg}/"
-    for dir_ in ["test", "tests"]:
-        test = proj_dir / dir_
-        if test.is_dir():
-            cmd += " " + dir_
+    # the tests dir
+    test = proj_dir / "tests"
+    if test.is_dir():
+        cmd += f" tests/"
     try:
         with open(os.devnull, "w") as devnull:
             sp.run(f"cd {proj_dir} && {cmd}", shell=True, check=True, stderr=devnull)
