@@ -148,12 +148,7 @@ def _lint_code(proj_dir: Path = None, linter: str = "pylint"):
             cmd += " " + dir_
     try:
         with open(os.devnull, "w") as devnull:
-            sp.run(
-                f"cd {proj_dir} && {cmd}",
-                shell=True,
-                check=True,
-                stderr=devnull
-            )
+            sp.run(f"cd {proj_dir} && {cmd}", shell=True, check=True, stderr=devnull)
     except sp.CalledProcessError:
         logger.error("Please fix errors: {}", cmd)
         return
