@@ -52,6 +52,7 @@ def link_if_exists(src, dst=HOME, target_is_directory=True) -> bool:
 
 def update_file(path: Path, pattern: str, replace: str) -> None:
     """Update a text file using regular expression substitution.
+
     :param file: The path to the text file to be updated.
     :param pattern: The pattern to substitute.
     :param replace: The text to replace the patterns to.
@@ -83,6 +84,7 @@ def _count_path_helper(path: str, freq: dict):
 
 def zip_subdirs(root: Union[str, Path]) -> None:
     """Compress subdirectories into zip files.
+
     :param root: The root directory whose subdirs are to be zipped.
     """
     if isinstance(root, str):
@@ -96,7 +98,8 @@ def zip_subdirs(root: Union[str, Path]) -> None:
 
 def flatten_dir(dir_):
     """Flatten a directory,
-        i.e., move files in immediate subdirectories into the current directory. 
+    i.e., move files in immediate subdirectories into the current directory.
+
     :param dir_: The directory to flatten.
     """
     if isinstance(dir_, str):
@@ -143,6 +146,7 @@ def _split_dir_1(desdir, files, index, batch):
 
 def find_images(root_dir: Union[str, Path, List[str], List[Path]]) -> List[Path]:
     """Find all PNG images in a (sequence) of dir(s) or its/their subdirs.
+
     :param root_dir: A (list) of dir(s).
     """
     if isinstance(root_dir, list):
@@ -178,7 +182,7 @@ def find_data_tables(
 
     :param root: The root directory or a GitHub repo URL in which to find data table names.
     :param filter_: A function for filtering identified keywords (via regular expressions).
-        By default, all keywords identified by regular expressions are kept.
+    By default, all keywords identified by regular expressions are kept.
     :param extensions: Addtional text file extensions to use.
     :param extensions: Addtional regular expression patterns to use.
     """
@@ -273,6 +277,7 @@ def _format_cell(cell: Dict, style_file: str) -> bool:
 
 def format_notebook(path: str, style_file: str = ".style.yapf"):
     """Format code in a Jupyter/Lab notebook.
+
     :param path: Path to a notebook.
     :param style_file: [description], defaults to ".style.yapf"
     """
