@@ -50,17 +50,6 @@ def link_if_exists(src, dst=HOME, target_is_directory=True) -> bool:
         return False
 
 
-def update_file(path: Path, pattern: str, replace: str) -> None:
-    """Update a text file using regular expression substitution.
-    :param file: The path to the text file to be updated.
-    :param pattern: The pattern to substitute.
-    :param replace: The text to replace the patterns to.
-    """
-    text = path.read_text()
-    text = re.sub(pattern, replace, text)
-    path.write_text(text)
-
-
 def count_path(paths: Iterable[str], ascending=False) -> pd.Series:
     """Count frequence of paths and their parent paths.
 
@@ -286,3 +275,24 @@ def format_notebook(path: str, style_file: str = ".style.yapf"):
         logger.info("The notebook {} is formatted.", path)
     else:
         logger.info("No change is made to the notebook {}.", path)
+
+
+def update_file(
+    path: Path, regex: Dict[str, str] = None, exact: Dict[str, str] = None
+) -> None:
+    """Update a text file using regular expression substitution.
+    :param regex: A dict containing regular expression patterns
+    and the corresponding replacement text.
+    :param exact: A dict containing exact patterns and the corresponding replacement text.
+    """
+    if isinstance(path, str):
+        path = Path(path)
+    text = path.read_text()
+    if regex:
+        for pattern, replace in regex.items():
+            text = re.sub(pattern, replace, text)
+    if exact:
+        for pattern, replace in exact.items():
+            text = text.replace(pattern, replace)
+    path.write_text(text)
+    
