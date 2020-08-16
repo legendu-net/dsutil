@@ -5,6 +5,7 @@ description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
 [tool.poetry.scripts]
+logf = "dsutil.hadoop:logf.main"
 
 [tool.poetry.dependencies]
 python = ">=3.6"
@@ -14,10 +15,19 @@ loguru = ">=0.3.2"
 toml = ">=0.10.0"
 pylint = ">=2.4.0"
 yapf = ">=0.28.0"
+PyPDF2 = ">=1.26.0"
+requests = ">=2.20.0"
+tqdm = ">=4.40.0"
+opencv-python = ">=4.0.0.0"
+pillow = ">=7.0.0"
+GitPython = ">=3.0.0"
+nbformat = ">=5.0.7"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"
+pylint = ">=2.5.3"
+pytype = ">=2020.0.0"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=1.0.0"]
 build-backend = "poetry.masonry.api"
