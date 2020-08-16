@@ -299,4 +299,3 @@ def update_file(
         for pattern, replace in exact.items():
             text = text.replace(pattern, replace)
     path.write_text(text)
-    
