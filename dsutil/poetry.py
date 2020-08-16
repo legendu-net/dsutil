@@ -2,7 +2,6 @@
 """
 import sys
 import os
-import glob
 import shutil
 from pathlib import Path
 from typing import List
@@ -49,7 +48,7 @@ def _update_version_readme(ver: str, proj_dir: Path) -> None:
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
-    update_file(proj_dir / README, rf"\d+\.\d+\.\d+", f"{ver}")
+    update_file(proj_dir / README, regex={r"\d+\.\d+\.\d+": f"{ver}"})
 
 
 def _update_version_toml(ver: str, proj_dir: Path) -> None:
@@ -57,7 +56,9 @@ def _update_version_toml(ver: str, proj_dir: Path) -> None:
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
-    update_file(proj_dir / TOML, r"version = .\d+\.\d+\.\d+.", f'version = "{ver}"')
+    update_file(
+        proj_dir / TOML, regex={r"version = .\d+\.\d+\.\d+.": f'version = "{ver}"'}
+    )
 
 
 def _update_version_init(ver: str, proj_dir: Path) -> None:
@@ -71,7 +72,8 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
             path = Path(subdir, file)
             if path.suffix == ".py":
                 update_file(
-                    path, r"__version__ = .\d+\.\d+\.\d+.", f'__version__ = "{ver}"'
+                    path,
+                    regex={r"__version__ = .\d+\.\d+\.\d+.": f'__version__ = "{ver}"'}
                 )
 
 
@@ -162,7 +164,6 @@ def build_package(proj_dir: Path = None, linter: str = "pylint") -> None:
         proj_dir = _project_dir()
     if os.path.exists(DIST):
         shutil.rmtree(DIST)
-    pkg = _project_name(proj_dir)
     _lint_code(proj_dir=proj_dir, linter=linter)
     _format_code(proj_dir=proj_dir)
     logger.info("Building the package...")
