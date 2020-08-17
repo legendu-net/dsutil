@@ -299,3 +299,41 @@ def update_file(
         for pattern, replace in exact.items():
             text = text.replace(pattern, replace)
     path.write_text(text)
+
+
+def find_ess_empty(path: Union[str, Path], filter_: Callable = lambda path: str(path).startswith(".")) -> List[Path]:
+    """Find essentially empty sub directories under a directory.
+    """
+    if isinstance(path, str):
+        path = Path(path)
+    ess_empty = {}
+    ess_empty_dir = []
+    _find_ess_empty(path=path, filter_=filter_, ess_empty=ess_empty, ess_empty_dir=ess_empty_dir)
+    return ess_empty_dir
+
+
+def _find_ess_empty(path: Path, filter_: Callable, ess_empty: Dict[Path, bool], ess_empty_dir: List[str]):
+    if is_ess_empty(path=path, filter_=filter_, ess_empty=ess_empty):
+        ess_empty_dir.append(path)
+        return
+    for p in path.iterdir():
+        if p.is_dir():
+            _find_ess_empty(path=p, filter_=filter_, ess_empty=ess_empty, ess_empty_dir=ess_empty_dir)
+
+
+def is_ess_empty(path: Path, filter_: Callable = lambda path: str(path).startswith("."), ess_empty: Dict[Path, bool] = None):
+    if ess_empty is None:
+        ess_empty = {}
+    if isinstance(path, str):
+        path = Path(path)
+    if path in ess_empty:
+        return ess_empty[path]
+    for p in path.iterdir():
+        if p.is_file() and not filter_(p):
+            ess_empty[path] = False
+            return False
+        if p.is_dir() and not is_ess_empty(p, ess_empty, filter_=filter_):
+            ess_empty[path] = False
+            return False
+    ess_empty[path] = True
+    return True
