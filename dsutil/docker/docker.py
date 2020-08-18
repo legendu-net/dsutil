@@ -58,6 +58,7 @@ def push_image(image: str, retry: int = 3, seconds: float = 60) -> Tuple[str, fl
             return _push_image_timing(image)
         except sp.CalledProcessError:
             time.sleep(seconds)
+    return _push_image_timing(image)
 
 
 def _pull_image_timing(image: str) -> Tuple[str, float]:
@@ -80,6 +81,7 @@ def pull_image(image: str, retry: int = 3, seconds: float = 60) -> Tuple[str, fl
             return _pull_image_timing(image)
         except sp.CalledProcessError:
             time.sleep(seconds)
+    return _pull_image_timing(image)
 
 
 class DockerImage:
