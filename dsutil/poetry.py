@@ -143,10 +143,6 @@ def _lint_code(proj_dir: Path = None, linter: str = "pylint"):
         proj_dir = _project_dir()
     pkg = _project_name(proj_dir)
     cmd = f".venv/bin/python -m {linter} -E {pkg}/"
-    # the tests dir
-    test = proj_dir / "tests"
-    if test.is_dir():
-        cmd += f" tests/"
     try:
         with open(os.devnull, "w") as devnull:
             sp.run(f"cd {proj_dir} && {cmd}", shell=True, check=True, stderr=devnull)

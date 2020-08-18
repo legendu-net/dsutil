@@ -85,6 +85,8 @@ def pull_image(image: str, retry: int = 3, seconds: float = 60) -> Tuple[str, fl
 
 
 class DockerImage:
+    """Class representing a Docker Image.
+    """
     DOCKERFILE = "Dockerfile"
 
     def __init__(
