@@ -4,7 +4,7 @@
 import os
 import re
 import shutil
-from typing import Union, Iterable, Dict, List, Set, Callable
+from typing import Union, Iterable, Dict, List, Tuple, Set, Callable
 import math
 from pathlib import Path
 import subprocess as sp
@@ -281,26 +281,6 @@ def format_notebook(path: str, style_file: str = ".style.yapf"):
         logger.info("No change is made to the notebook {}.", path)
 
 
-def update_file(
-    path: Path, regex: Dict[str, str] = None, exact: Dict[str, str] = None
-) -> None:
-    """Update a text file using regular expression substitution.
-    :param regex: A dict containing regular expression patterns
-    and the corresponding replacement text.
-    :param exact: A dict containing exact patterns and the corresponding replacement text.
-    """
-    if isinstance(path, str):
-        path = Path(path)
-    text = path.read_text()
-    if regex:
-        for pattern, replace in regex.items():
-            text = re.sub(pattern, replace, text)
-    if exact:
-        for pattern, replace in exact.items():
-            text = text.replace(pattern, replace)
-    path.write_text(text)
-
-
 def find_ess_empty(
     path: Union[str, Path], filter_: Callable = lambda path: str(path).startswith(".")
 ) -> List[Path]:
@@ -352,3 +332,35 @@ def is_ess_empty(
             return False
     ess_empty[path] = True
     return True
+
+
+def update_file(
+    path: Path,
+    regex: List[Tuple[str, str]] = None,
+    exact: List[Tuple[str, str]] = None,
+    append: Union[str, Iterable[str]] = None,
+    exist_skip: bool = True,
+) -> None:
+    """Update a text file using regular expression substitution.
+    :param regex: A list of tuples containing regular expression patterns
+    and the corresponding replacement text.
+    :param exact: A list of tuples containing exact patterns and the corresponding replacement text.
+    :param append: A string of a list of lines to append.
+    When append is a list of lines, "\n" is automatically added to each line.
+    :param exist_skip: Skip appending if already exists.
+    """
+    if isinstance(path, str):
+        path = Path(path)
+    text = path.read_text()
+    if regex:
+        for pattern, replace in regex:
+            text = re.sub(pattern, replace, text)
+    if exact:
+        for pattern, replace in exact:
+            text = text.replace(pattern, replace)
+    if append:
+        if not isinstance(append, str):
+            append = "\n".join(append)
+        if not exist_skip or append not in text:
+            text += append
+    path.write_text(text)
