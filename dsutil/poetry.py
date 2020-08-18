@@ -48,7 +48,7 @@ def _update_version_readme(ver: str, proj_dir: Path) -> None:
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
-    update_file(proj_dir / README, regex={r"\d+\.\d+\.\d+": f"{ver}"})
+    update_file(proj_dir / README, regex=[(r"\d+\.\d+\.\d+", f"{ver}")])
 
 
 def _update_version_toml(ver: str, proj_dir: Path) -> None:
@@ -57,7 +57,7 @@ def _update_version_toml(ver: str, proj_dir: Path) -> None:
     :param proj_dir: The root directory of the Poetry project.
     """
     update_file(
-        proj_dir / TOML, regex={r"version = .\d+\.\d+\.\d+.": f'version = "{ver}"'}
+        proj_dir / TOML, regex=[(r"version = .\d+\.\d+\.\d+.", f'version = "{ver}"')]
     )
 
 
@@ -73,7 +73,9 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
             if path.suffix == ".py":
                 update_file(
                     path,
-                    regex={r"__version__ = .\d+\.\d+\.\d+.": f'__version__ = "{ver}"'}
+                    regex=[
+                        (r"__version__ = .\d+\.\d+\.\d+.", f'__version__ = "{ver}"')
+                    ]
                 )
 
 
