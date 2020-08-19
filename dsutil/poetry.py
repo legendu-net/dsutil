@@ -67,7 +67,7 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
     :param proj_dir: The root directory of the Poetry project.
     """
     pkg = _project_name(proj_dir)
-    for path in (proj_dir / pkg).glob("**.py"):
+    for path in (proj_dir / pkg).glob("**/*.py"):
         update_file(
             path, regex=[(r"__version__ = .\d+\.\d+\.\d+.", f'__version__ = "{ver}"')]
         )
