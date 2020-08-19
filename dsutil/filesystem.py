@@ -342,6 +342,7 @@ def update_file(
     exist_skip: bool = True,
 ) -> None:
     """Update a text file using regular expression substitution.
+
     :param regex: A list of tuples containing regular expression patterns
     and the corresponding replacement text.
     :param exact: A list of tuples containing exact patterns and the corresponding replacement text.
