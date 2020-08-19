@@ -306,7 +306,7 @@ class DockerImageBuilder:
         tag_build: str = None,
         tag_base: str = "",
         no_cache: Union[str, List[str], Set[str]] = None,
-        copy_ssh_to: str = ""
+        copy_ssh_to: str = "",
     ) -> Tuple[str, float]:
         """Build all Docker images in self.docker_images in order.
         :param tag_build: The tag of built images.
