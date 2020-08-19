@@ -251,7 +251,8 @@ def _format_cell(cell: Dict, style_file: str) -> bool:
         formatted, _ = FormatCode(code, style_config=style_file)
     except Exception as err:
         logger.debug(
-            "Failed to format the cell with the following code:\n{}\nThe following error message is thrown:\n{}",
+            "Failed to format the cell with the following code:\n{}"
+            "\nThe following error message is thrown:\n{}",
             code, err
         )
         return False
@@ -272,11 +273,7 @@ def format_notebook(path: str, style_file: str = ""):
     if not style_file:
         fd, style_file = tempfile.mkstemp()
         with os.fdopen(fd, "w") as fout:
-            fout.write(
-                "[style]\n"
-                "based_on_style = facebook\n"
-                "column_limit = 88"
-            )
+            fout.write("[style]\nbased_on_style = facebook\ncolumn_limit = 88\n")
     notebook = nbformat.read(path, as_version=nbformat.NO_CONVERT)
     nbformat.validate(notebook)
     changed = False
