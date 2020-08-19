@@ -4,7 +4,7 @@ import sys
 import os
 import shutil
 from pathlib import Path
-from typing import List
+from typing import Union, List, Iterable
 import subprocess as sp
 import toml
 from loguru import logger
@@ -133,21 +133,46 @@ def _format_code(inplace: bool = False, proj_dir: Path = None):
         sys.stderr.flush()
 
 
-def _lint_code(proj_dir: Path = None, linter: str = "pylint"):
-    logger.info("Linting code...")
+def _lint_code(proj_dir: Union[Path, None], linter: Union[str, List[str]]):
+    funcs = {
+        "pylint": _lint_code_pylint,
+        "pytype": _lint_code_pytype,
+    }
+    if isinstance(linter, str):
+        linter = [linter]
+    for lint in linter:
+        funcs[lint](proj_dir)
+
+
+def _lint_code_pytype(proj_dir: Union[Path, None]):
+    logger.info("Linting code using pytype ...")
+    if proj_dir is None:
+        proj_dir = _project_dir()
+    cmd = f"PATH={proj_dir}/.venv/bin:$PATH pytype ."
+    try:
+        with open(os.devnull, "w") as devnull:
+            sp.run(cmd, shell=True, check=True, stderr=devnull)
+    except sp.CalledProcessError:
+        logger.error("Please fix errors: {}", cmd)
+
+
+def _lint_code_pylint(proj_dir: Union[Path, None]):
+    logger.info("Linting code using pylint ...")
     if proj_dir is None:
         proj_dir = _project_dir()
     pkg = _project_name(proj_dir)
-    cmd = f".venv/bin/python -m {linter} -E {pkg}/"
+    cmd = f"PATH={proj_dir}/.venv/bin:$PATH pylint -E {pkg}/"
     try:
         with open(os.devnull, "w") as devnull:
-            sp.run(f"cd {proj_dir} && {cmd}", shell=True, check=True, stderr=devnull)
+            sp.run(cmd, shell=True, check=True, stderr=devnull)
     except sp.CalledProcessError:
         logger.error("Please fix errors: {}", cmd)
-        return
 
 
-def build_package(proj_dir: Path = None, linter: str = "pylint") -> None:
+def build_package(
+    proj_dir: Union[Path, None] = None,
+    linter: Union[str, Iterable[str]] = ("pylint", "pytype")
+) -> None:
     """Build the package using poetry.
     :param dst_dir: The root directory of the project.
     :param proj_dir: The root directory of the Poetry project.
