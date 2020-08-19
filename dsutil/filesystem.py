@@ -252,8 +252,7 @@ def _format_cell(cell: Dict, style_file: str) -> bool:
     except Exception as err:
         logger.debug(
             "Failed to format the cell with the following code:\n{}"
-            "\nThe following error message is thrown:\n{}",
-            code, err
+            "\nThe following error message is thrown:\n{}", code, err
         )
         return False
     # remove the trailing new line
