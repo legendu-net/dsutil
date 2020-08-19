@@ -263,12 +263,20 @@ def _format_cell(cell: Dict, style_file: str) -> bool:
     return False
 
 
-def format_notebook(path: str, style_file: str = ".style.yapf"):
+def format_notebook(path: str, style_file: str = ""):
     """Format code in a Jupyter/Lab notebook.
 
     :param path: Path to a notebook.
     :param style_file: [description], defaults to ".style.yapf"
     """
+    if not style_file:
+        fd, style_file = tempfile.mkstemp()
+        with os.fdopen(fd, "w") as fout:
+            fout.write(
+                "[style]\n"
+                "based_on_style = facebook\n"
+                "column_limit = 88"
+            )
     notebook = nbformat.read(path, as_version=nbformat.NO_CONVERT)
     nbformat.validate(notebook)
     changed = False
