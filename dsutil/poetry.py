@@ -69,10 +69,7 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
     pkg = _project_name(proj_dir)
     for path in (proj_dir / pkg).glob("**.py"):
         update_file(
-            path,
-            regex=[
-                (r"__version__ = .\d+\.\d+\.\d+.", f'__version__ = "{ver}"')
-            ]
+            path, regex=[(r"__version__ = .\d+\.\d+\.\d+.", f'__version__ = "{ver}"')]
         )
 
 
