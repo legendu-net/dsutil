@@ -41,7 +41,7 @@ def _push_image_timing(image: str) -> Tuple[str, float]:
     start = timer()
     run_cmd(["docker", "push", image])
     end = timer()
-    return image, end - start
+    return image, end - start, "push"
 
 
 def push_image(image: str, retry: int = 3, seconds: float = 60) -> Tuple[str, float]:
@@ -212,7 +212,7 @@ class DockerImage:
         self.tag_build = tag_build
         self._remove_ssh(copy_ssh_to)
         end = timer()
-        return image, end - start
+        return image, end - start, "build"
 
     def _remove_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
@@ -258,7 +258,7 @@ class DockerImage:
                 image_new = f"{self.name}:{tag_new}"
                 run_cmd(["docker", "tag", image, image_new])
                 data.append(push_image(image=image_new, retry=retry, seconds=seconds))
-        return pd.DataFrame(data, columns=["image", "seconds"])
+        return pd.DataFrame(data, columns=["image", "seconds", "type"])
 
 
 class DockerImageBuilder:
@@ -307,6 +307,7 @@ class DockerImageBuilder:
         tag_base: str = "",
         no_cache: Union[str, List[str], Set[str]] = None,
         copy_ssh_to: str = "",
+        push: bool = True,
     ) -> Tuple[str, float]:
         """Build all Docker images in self.docker_images in order.
         :param tag_build: The tag of built images.
@@ -328,4 +329,7 @@ class DockerImageBuilder:
                 copy_ssh_to=copy_ssh_to
             ) for _, image in self.docker_images.items()
         ]
-        return pd.DataFrame(data, columns=["image", "seconds"])
+        frame = pd.DataFrame(data, columns=["image", "seconds", "type"])
+        if push:
+            frame = pd.concat([frame, self.push()])
+        return frame
