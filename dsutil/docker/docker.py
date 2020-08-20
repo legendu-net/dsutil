@@ -33,7 +33,7 @@ def tag_date(tag: str) -> str:
     return mmddhh if tag in ("", "latest") else f"{tag}_{mmddhh}"
 
 
-def _push_image_timing(image: str) -> Tuple[str, float]:
+def _push_image_timing(image: str) -> Tuple[str, float, str]:
     """Push a Docker image to Docker Hub and time the pushing.
     :param image: The full name of the image to push to Docker Hub.
     :return: The time (in seconds) used to push the Docker image.
@@ -175,7 +175,7 @@ class DockerImage:
         tag_base: str = "",
         no_cache: bool = False,
         copy_ssh_to: str = ""
-    ) -> Tuple[str, float]:
+    ) -> Tuple[str, float, str]:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
