@@ -263,20 +263,28 @@ def _format_cell(cell: Dict, style_file: str) -> bool:
     return False
 
 
-def format_notebook(path: str, style_file: str = ""):
+def format_notebook(path: Union[str, Path], style_file: str = ""):
     """Format code in a Jupyter/Lab notebook.
 
-    :param path: Path to a notebook.
+    :param path: A (list of) path(s) to notebook(s).
     :param style_file: [description], defaults to ".style.yapf"
     """
     if not style_file:
         fd, style_file = tempfile.mkstemp()
         with os.fdopen(fd, "w") as fout:
-            fout.write(
-                "[style]\n"
-                "based_on_style = facebook\n"
-                "column_limit = 88"
-            )
+            fout.write("[style]\n" "based_on_style = facebook\n" "column_limit = 88")
+    if isinstance(path, str):
+        path = Path(path)
+    if isinstance(path, Path):
+        path = [path]
+    for p in path:
+        _format_notebook(p, style_file)
+
+
+def _format_notebook(path: Path, style_file: str):
+    if path.suffix != ".ipynb":
+        raise ValueError(f"{path} is not a notebook!")
+    logger.info("Formatting code in the notebook {}.", path)
     notebook = nbformat.read(path, as_version=nbformat.NO_CONVERT)
     nbformat.validate(notebook)
     changed = False
