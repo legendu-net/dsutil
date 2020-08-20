@@ -284,7 +284,7 @@ def _format_notebook(path: Path, style_file: str):
         path = Path(path)
     if path.suffix != ".ipynb":
         raise ValueError(f"{path} is not a notebook!")
-    logger.info("Formatting code in the notebook {}.", path)
+    logger.info('Formatting code in the notebook "{}".', path)
     notebook = nbformat.read(path, as_version=nbformat.NO_CONVERT)
     nbformat.validate(notebook)
     changed = False
@@ -292,9 +292,9 @@ def _format_notebook(path: Path, style_file: str):
         changed |= _format_cell(cell, style_file=style_file)
     if changed:
         nbformat.write(notebook, path, version=nbformat.NO_CONVERT)
-        logger.info("The notebook {} is formatted.", path)
+        logger.info('The notebook "{}" is formatted.', path)
     else:
-        logger.info("No change is made to the notebook {}.", path)
+        logger.info('No change is made to the notebook "{}".', path)
 
 
 def find_ess_empty(
