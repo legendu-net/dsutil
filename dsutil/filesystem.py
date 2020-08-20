@@ -272,7 +272,7 @@ def format_notebook(path: Union[str, Path], style_file: str = ""):
     if not style_file:
         fd, style_file = tempfile.mkstemp()
         with os.fdopen(fd, "w") as fout:
-            fout.write("[style]\nbased_on_style = facebook\ncolumn_limit = 88")
+            fout.write("[style]\nbased_on_style = facebook\ncolumn_limit = 88\n")
     if isinstance(path, str):
         path = Path(path)
     if isinstance(path, Path):
