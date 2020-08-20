@@ -150,8 +150,7 @@ def _lint_code_pytype(proj_dir: Union[Path, None]):
         proj_dir = _project_dir()
     cmd = f"PATH={proj_dir}/.venv/bin:$PATH pytype ."
     try:
-        with open(os.devnull, "w") as devnull:
-            sp.run(cmd, shell=True, check=True, stderr=devnull)
+        sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
         logger.error("Please fix errors: {}", cmd)
 
@@ -163,8 +162,7 @@ def _lint_code_pylint(proj_dir: Union[Path, None]):
     pkg = _project_name(proj_dir)
     cmd = f"PATH={proj_dir}/.venv/bin:$PATH pylint -E {pkg}/"
     try:
-        with open(os.devnull, "w") as devnull:
-            sp.run(cmd, shell=True, check=True, stderr=devnull)
+        sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
         logger.error("Please fix errors: {}", cmd)
 
