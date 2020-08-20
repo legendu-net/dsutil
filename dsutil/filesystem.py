@@ -273,15 +273,15 @@ def format_notebook(path: Union[str, Path], style_file: str = ""):
         fd, style_file = tempfile.mkstemp()
         with os.fdopen(fd, "w") as fout:
             fout.write("[style]\n" "based_on_style = facebook\n" "column_limit = 88")
-    if isinstance(path, str):
-        path = Path(path)
-    if isinstance(path, Path):
+    if isinstance(path, (str, Path)):
         path = [path]
     for p in path:
         _format_notebook(p, style_file)
 
 
 def _format_notebook(path: Path, style_file: str):
+    if isinstance(path, str):
+        path = Path(path)
     if path.suffix != ".ipynb":
         raise ValueError(f"{path} is not a notebook!")
     logger.info("Formatting code in the notebook {}.", path)
