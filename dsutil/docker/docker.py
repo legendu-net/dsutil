@@ -44,7 +44,7 @@ def _push_image_timing(image: str) -> Tuple[str, float, str]:
     return image, end - start, "push"
 
 
-def push_image(image: str, retry: int = 3, seconds: float = 60) -> Tuple[str, float]:
+def push_image(image: str, retry: int = 3, seconds: float = 60) -> Tuple[str, float, str]:
     """Push a Docker image to Docker Hub. Automatically retry pushing once it fails.
     :param image: The full name of the image to push to Docker Hub.
     :param retry: The total number of times to retry.
