@@ -201,11 +201,7 @@ def build_package(
     _lint_code(proj_dir=proj_dir, linter=linter)
     _format_code(proj_dir=proj_dir)
     logger.info("Building the package...")
-    sp.run(
-        f"cd '{proj_dir}' && poetry env use python3 && poetry build",
-        shell=True,
-        check=True
-    )
+    sp.run(f"cd '{proj_dir}' && poetry build", shell=True, check=True)
 
 
 def install_package(options: List[str] = (), proj_dir: Path = None):
