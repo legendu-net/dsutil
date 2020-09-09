@@ -157,9 +157,10 @@ def _lint_code_pytype(proj_dir: Union[Path, None], pyvenv_path: str):
     logger.info("Linting code using pytype ...")
     if not proj_dir:
         proj_dir = _project_dir()
+    pkg = _project_name(proj_dir)
     if not pyvenv_path:
         pyvenv_path = _pyvenv_path()
-    cmd = f"PATH={pyvenv_path}:{proj_dir}/.venv/bin:$PATH pytype ."
+    cmd = f"PATH={pyvenv_path}:{proj_dir}/.venv/bin:$PATH pytype {proj_dir / pkg} {proj_dir / 'tests'}"
     try:
         sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
