@@ -146,7 +146,10 @@ def _lint_code(proj_dir: Union[Path, None], linter: Union[str, List[str]]):
 
 
 def _pyvenv_path() -> str:
-    with open(".venv/pyvenv.cfg", "r") as fin:
+    path = Path(".venv/pyvenv.cfg")
+    if not path.is_file():
+        return ""
+    with path.open("r") as fin:
         for line in fin:
             if line.startswith("home = "):
                 return line[7:].strip()
@@ -160,7 +163,9 @@ def _lint_code_pytype(proj_dir: Union[Path, None], pyvenv_path: str):
     pkg = _project_name(proj_dir)
     if not pyvenv_path:
         pyvenv_path = _pyvenv_path()
-    cmd = f"PATH={pyvenv_path}:{proj_dir}/.venv/bin:$PATH pytype {proj_dir / pkg} {proj_dir / 'tests'}"
+    if pyvenv_path:
+        pyvenv_path += ":"
+    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH pytype {proj_dir / pkg} {proj_dir / 'tests'}"
     try:
         sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
