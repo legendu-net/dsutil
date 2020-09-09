@@ -179,7 +179,11 @@ def _lint_code_pylint(proj_dir: Union[Path, None], pyvenv_path: str):
     if not pyvenv_path:
         pyvenv_path = _pyvenv_path()
     pkg = _project_name(proj_dir)
-    cmd = f"PATH={pyvenv_path}:{proj_dir}/.venv/bin:$PATH pylint -E {pkg}/"
+    if not pyvenv_path:
+        pyvenv_path = _pyvenv_path()
+    if pyvenv_path:
+        pyvenv_path += ":"
+    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH pylint -E {proj_dir / pkg}"
     try:
         sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
