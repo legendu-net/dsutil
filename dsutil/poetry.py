@@ -140,31 +140,52 @@ def _lint_code(proj_dir: Union[Path, None], linter: Union[str, List[str]]):
     }
     if isinstance(linter, str):
         linter = [linter]
+    pyvenv_path = _pyvenv_path()
     for lint in linter:
-        funcs[lint](proj_dir)
+        funcs[lint](proj_dir, pyvenv_path)
 
 
-def _lint_code_pytype(proj_dir: Union[Path, None]):
+def _pyvenv_path() -> str:
+    path = Path(".venv/pyvenv.cfg")
+    if not path.is_file():
+        return ""
+    with path.open("r") as fin:
+        for line in fin:
+            if line.startswith("home = "):
+                return line[7:].strip()
+    return ""
+
+
+def _lint_code_pytype(proj_dir: Union[Path, None], pyvenv_path: str):
     logger.info("Linting code using pytype ...")
-    if proj_dir is None:
+    if not proj_dir:
         proj_dir = _project_dir()
-    cmd = f"PATH={proj_dir}/.venv/bin:$PATH pytype ."
+    pkg = _project_name(proj_dir)
+    if not pyvenv_path:
+        pyvenv_path = _pyvenv_path()
+    if pyvenv_path:
+        pyvenv_path += ":"
+    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH pytype {proj_dir / pkg} {proj_dir / 'tests'}"
     try:
-        with open(os.devnull, "w") as devnull:
-            sp.run(cmd, shell=True, check=True, stderr=devnull)
+        sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
         logger.error("Please fix errors: {}", cmd)
 
 
-def _lint_code_pylint(proj_dir: Union[Path, None]):
+def _lint_code_pylint(proj_dir: Union[Path, None], pyvenv_path: str):
     logger.info("Linting code using pylint ...")
-    if proj_dir is None:
+    if not proj_dir:
         proj_dir = _project_dir()
+    if not pyvenv_path:
+        pyvenv_path = _pyvenv_path()
     pkg = _project_name(proj_dir)
-    cmd = f"PATH={proj_dir}/.venv/bin:$PATH pylint -E {pkg}/"
+    if not pyvenv_path:
+        pyvenv_path = _pyvenv_path()
+    if pyvenv_path:
+        pyvenv_path += ":"
+    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH pylint -E {proj_dir / pkg}"
     try:
-        with open(os.devnull, "w") as devnull:
-            sp.run(cmd, shell=True, check=True, stderr=devnull)
+        sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
         logger.error("Please fix errors: {}", cmd)
 
@@ -184,11 +205,7 @@ def build_package(
     _lint_code(proj_dir=proj_dir, linter=linter)
     _format_code(proj_dir=proj_dir)
     logger.info("Building the package...")
-    sp.run(
-        f"cd '{proj_dir}' && poetry env use python3 && poetry build",
-        shell=True,
-        check=True
-    )
+    sp.run(f"cd '{proj_dir}' && poetry build", shell=True, check=True)
 
 
 def install_package(options: List[str] = (), proj_dir: Path = None):

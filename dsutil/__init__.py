@@ -4,9 +4,10 @@ from . import datetime
 from . import docker
 from . import git
 from . import misc
+from . import hadoop
 from . import poetry
 from . import pdf
 from . import text
 from . import url
 
-__version__ = "0.23.2"
+__version__ = "0.23.7"
