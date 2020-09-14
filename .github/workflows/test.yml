@@ -28,7 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip3 install -U git+https://github.com/dclong/xinstall@master
-        xinstall docker -ic --user-to-docker `id -un`
+        xinstall --sudo docker -ic --user-to-docker `id -un`
         xinstall pt -ic
         ~/.poetry/bin/poetry env use python3
         ~/.poetry/bin/poetry install
