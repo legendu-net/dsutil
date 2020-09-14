@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         pip3 install -U git+https://github.com/dclong/xinstall@master
-        xinstall pt -ic
+        xinstall --sudo pt -ic
         ~/.poetry/bin/poetry env use python3
         ~/.poetry/bin/poetry install
     - name: Lint with pylint
