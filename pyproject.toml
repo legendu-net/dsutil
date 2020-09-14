@@ -27,6 +27,7 @@ nbformat = ">=5.0.7"
 pytest = ">=3.0"
 pylint = ">=2.5.3"
 pytype = ">=2020.0.0"
+yapf = ">=0.30.0"
 
 [build-system]
 requires = ["poetry>=1.0.0"]
