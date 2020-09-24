@@ -106,7 +106,15 @@ def version(
         _list_version(proj_dir)
 
 
-def _format_code(inplace: bool = False, proj_dir: Path = None):
+def format_code(inplace: bool = False, commit: bool = False, proj_dir: Path = None):
+    """Format code.
+
+    :param inplace: If true (defaults to False), format code inplace.
+    Otherwise, changes are printed to terminal only.
+    :param commit: If true (defaults to False), 
+    commit code formatting changes automatically.
+    :param proj_dir: [description], defaults to None
+    """
     if proj_dir is None:
         proj_dir = _project_dir()
     cmd = ["yapf"]
@@ -131,6 +139,9 @@ def _format_code(inplace: bool = False, proj_dir: Path = None):
         )
         sys.stdout.flush()
         sys.stderr.flush()
+    if inplace and commit:
+        cmd = f"cd {proj_dir} && git add . && git commit -m 'format code' && git push"
+        sp.run(cmd, shell=True, check=False)
 
 
 def _lint_code(proj_dir: Union[Path, None], linter: Union[str, List[str]]):
@@ -203,7 +214,7 @@ def build_package(
     if os.path.exists(DIST):
         shutil.rmtree(DIST)
     _lint_code(proj_dir=proj_dir, linter=linter)
-    _format_code(proj_dir=proj_dir)
+    format_code(proj_dir=proj_dir)
     logger.info("Building the package...")
     sp.run(f"cd '{proj_dir}' && poetry build", shell=True, check=True)
 
