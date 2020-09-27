@@ -91,6 +91,7 @@ def _list_version(proj_dir: Path):
 
 def version(
     ver: str = "",
+    commit: bool = False,
     proj_dir: Path = None,
 ):
     """List or update the version of the package.
@@ -102,6 +103,9 @@ def version(
         proj_dir = _project_dir()
     if ver:
         _update_version(ver=ver, proj_dir=proj_dir)
+        if commit:
+            cmd = f"cd {proj_dir} && git add . && git commit -m 'format code' && git push"
+            sp.run(cmd, shell=True, check=False)
     else:
         _list_version(proj_dir)
 
