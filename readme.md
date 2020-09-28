@@ -23,7 +23,7 @@ This is a Python pacakage that contains misc utils for Data Science.
 
 You can download a copy of the latest release and install it using pip.
 ```
-pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.24.0/dsutil-0.24.0-py3-none-any.whl
+pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.24.1/dsutil-0.24.1-py3-none-any.whl
 ```
 Or you can use the following command to install the latest master branch
 if you have pip 20.0+.
