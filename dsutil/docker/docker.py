@@ -1,4 +1,6 @@
-#from __future__ import annotations
+"""Docker related utils.
+"""
+from __future__ import annotations
 from typing import Union, List, Sequence, Set, Deque, Tuple, Dict, Iterable, Callable
 import tempfile
 from pathlib import Path
@@ -141,7 +143,7 @@ class DockerImage:
         if not self.base_image:
             raise LookupError("The FROM line is not found in the Dockerfile!")
 
-    def get_deps(self, images: Dict[str, "DockerImage"]) -> Deque["DockerImage"]:
+    def get_deps(self, images: Dict[str, DockerImage]) -> Deque[DockerImage]:
         """Get all dependencies of this DockerImage in order.
 
         :param images: A dict containing dependency images.
