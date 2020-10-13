@@ -1,5 +1,5 @@
 #from __future__ import annotations
-from typing import Union, List, Set, Deque, Tuple, Dict, Iterable, Callable
+from typing import Union, List, Sequence, Set, Deque, Tuple, Dict, Iterable, Callable
 import tempfile
 from pathlib import Path
 import time
@@ -288,7 +288,7 @@ class DockerImageBuilder:
         """
         if not self.docker_images:
             for git_url in self.git_urls:
-                deps = DockerImage(git_url=git_url,
+                deps: Sequence[DockerImage] = DockerImage(git_url=git_url,
                                    branch=self.branch).get_deps(self.docker_images)
                 for dep in deps:
                     self.docker_images[dep.git_url] = dep
