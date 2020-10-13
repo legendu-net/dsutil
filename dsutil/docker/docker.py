@@ -299,7 +299,7 @@ class DockerImageBuilder:
 
     def _login_servers(self) -> None:
         servers = set()
-        for _, image in self.docker_images:
+        for _, image in self.docker_images.items():
             if image.base_image.count("/") > 1:
                 servers.add(image.base_image.split("/")[0])
             if image.name.count("/") > 1:
