@@ -8,7 +8,7 @@ authors = ["Benjamin Du <longendu@yahoo.com>"]
 logf = "dsutil.hadoop:logf.main"
 
 [tool.poetry.dependencies]
-python = ">=3.7"
+python = ">=3.7,<3.9"
 dateparser = ">=0.7.1"
 pandas = ">=0.22.0"
 loguru = ">=0.3.2"
@@ -26,7 +26,7 @@ nbformat = ">=5.0.7"
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"
 pylint = ">=2.5.3"
-pytype = ">=2020.0.0"
+pytype = ">=2020.08.10"
 yapf = ">=0.30.0"
 
 [build-system]
