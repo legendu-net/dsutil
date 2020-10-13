@@ -288,8 +288,9 @@ class DockerImageBuilder:
         """
         if not self.docker_images:
             for git_url in self.git_urls:
-                deps: Sequence[DockerImage] = DockerImage(git_url=git_url,
-                                   branch=self.branch).get_deps(self.docker_images)
+                deps: Sequence[DockerImage] = DockerImage(
+                    git_url=git_url, branch=self.branch
+                ).get_deps(self.docker_images)
                 for dep in deps:
                     self.docker_images[dep.git_url] = dep
         self._login_servers()
