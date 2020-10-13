@@ -1,5 +1,7 @@
-#from __future__ import annotations
-from typing import Union, List, Set, Deque, Tuple, Dict, Iterable, Callable
+"""Docker related utils.
+"""
+from __future__ import annotations
+from typing import Union, List, Sequence, Set, Deque, Tuple, Dict, Iterable, Callable
 import tempfile
 from pathlib import Path
 import time
@@ -141,7 +143,7 @@ class DockerImage:
         if not self.base_image:
             raise LookupError("The FROM line is not found in the Dockerfile!")
 
-    def get_deps(self, images: Dict[str, "DockerImage"]) -> Deque["DockerImage"]:
+    def get_deps(self, images: Dict[str, DockerImage]) -> Deque[DockerImage]:
         """Get all dependencies of this DockerImage in order.
 
         :param images: A dict containing dependency images.
@@ -288,10 +290,22 @@ class DockerImageBuilder:
         """
         if not self.docker_images:
             for git_url in self.git_urls:
-                deps = DockerImage(git_url=git_url,
-                                   branch=self.branch).get_deps(self.docker_images)
+                deps: Sequence[DockerImage] = DockerImage(
+                    git_url=git_url, branch=self.branch
+                ).get_deps(self.docker_images)
                 for dep in deps:
                     self.docker_images[dep.git_url] = dep
+        self._login_servers()
+
+    def _login_servers(self) -> None:
+        servers = set()
+        for _, image in self.docker_images:
+            if image.base_image.count("/") > 1:
+                servers.add(image.base_image.split("/")[0])
+            if image.name.count("/") > 1:
+                servers.add(image.name.split("/")[0])
+        for server in servers:
+            run_cmd(f"docker login {server}")
 
     def push(self, tag_tran_fun: Callable = tag_date) -> pd.DataFrame:
         """Push all Docker images in self.docker_images.
