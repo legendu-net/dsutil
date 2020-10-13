@@ -300,10 +300,10 @@ class DockerImageBuilder:
     def _login_servers(self) -> None:
         servers = set()
         for _, image in self.docker_images:
-            if image.base_image.count("/") > 1:
-                servers.add(image.base_image.split("/")[0])
-            if image.name.count("/") > 1:
-                servers.add(image.name.split("/")[0])
+            if image.base_image.count("/") > 1:  # pytype: disable=attribute-error
+                servers.add(image.base_image.split("/")[0])  # pytype: disable=attribute-error
+            if image.name.count("/") > 1:  # pytype: disable=attribute-error
+                servers.add(image.name.split("/")[0])  # pytype: disable=attribute-error
         for server in servers:
             run_cmd(f"docker login {server}")
 
