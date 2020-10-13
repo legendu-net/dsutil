@@ -292,6 +292,17 @@ class DockerImageBuilder:
                                    branch=self.branch).get_deps(self.docker_images)
                 for dep in deps:
                     self.docker_images[dep.git_url] = dep
+        self._login_servers()
+
+    def _login_servers(self) -> None:
+        servers = set()
+        for _, image in self.docker_images:
+            if image.base_image.count("/") > 1:
+                servers.add(image.base_image.split("/")[0])
+            if image.name.count("/") > 1:
+                servers.add(image.name.split("/")[0])
+        for server in servers:
+            run_cmd(f"docker login {server}")
 
     def push(self, tag_tran_fun: Callable = tag_date) -> pd.DataFrame:
         """Push all Docker images in self.docker_images.
