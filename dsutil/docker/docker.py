@@ -305,7 +305,7 @@ class DockerImageBuilder:
             if image.name.count("/") > 1:
                 servers.add(image.name.split("/")[0])
         for server in servers:
-            run_cmd(f"docker login {server}")
+            run_cmd(f"docker login {server}", check=True)
 
     def push(self, tag_tran_fun: Callable = tag_date) -> pd.DataFrame:
         """Push all Docker images in self.docker_images.
