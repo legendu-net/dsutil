@@ -15,7 +15,7 @@ import git
 import pandas as pd
 
 
-def run_cmd(cmd, shell: bool = False, check: bool = False) -> None:
+def run_cmd(cmd: Union[str, List[str]], check: bool = False) -> None:
     """Run a (Docker) command.
     :param cmd: The command to run.
     :param shell: Whether to run the command as a shell subprocess.
@@ -24,7 +24,7 @@ def run_cmd(cmd, shell: bool = False, check: bool = False) -> None:
     """
     msg = " ".join(str(elem) for elem in cmd) if isinstance(cmd, list) else cmd
     logger.debug("Running command: {}", msg)
-    sp.run(cmd, shell=shell, check=check)
+    sp.run(cmd, shell=isinstance(cmd, str), check=check)
 
 
 def tag_date(tag: str) -> str:
@@ -305,7 +305,7 @@ class DockerImageBuilder:
             if image.name.count("/") > 1:
                 servers.add(image.name.split("/")[0])
         for server in servers:
-            run_cmd(f"docker login {server}")
+            run_cmd(f"docker login {server}", check=True)
 
     def push(self, tag_tran_fun: Callable = tag_date) -> pd.DataFrame:
         """Push all Docker images in self.docker_images.
