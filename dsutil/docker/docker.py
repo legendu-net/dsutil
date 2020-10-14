@@ -321,7 +321,7 @@ class DockerImageBuilder:
         self,
         tag_build: str = None,
         tag_base: str = "",
-        no_cache: Union[str, List[str], Set[str]] = None,
+        no_cache: Union[bool, str, List[str], Set[str]] = None,
         copy_ssh_to: str = "",
         push: bool = True,
     ) -> Tuple[str, float]:
@@ -335,7 +335,9 @@ class DockerImageBuilder:
             no_cache = set([no_cache])
         elif isinstance(no_cache, list):
             no_cache = set(no_cache)
-        elif no_cache is None:
+        elif isinstance(no_cache, bool) and no_cache:
+            no_cache = set(image.name for image in self.docker_images.values())
+        else:
             no_cache = set()
         data = [
             image.build(
@@ -343,7 +345,7 @@ class DockerImageBuilder:
                 tag_base=tag_base,
                 no_cache=image.name in no_cache,
                 copy_ssh_to=copy_ssh_to
-            ) for _, image in self.docker_images.items()
+            ) for image in self.docker_images.values()
         ]
         frame = pd.DataFrame(data, columns=["image", "seconds", "type"])
         if push:
