@@ -330,22 +330,34 @@ def _find_ess_empty(
 
 def is_ess_empty(
     path: Path,
-    filter_: Callable = lambda path: str(path).startswith("."),
+    ignore: Union[Callable, None] = None,
     ess_empty: Dict[Path, bool] = None
 ):
+    if not os.access(path, os.R_OK):
+        return False
     if ess_empty is None:
         ess_empty = {}
     if isinstance(path, str):
         path = Path(path)
+    path = path.resolve()
     if path in ess_empty:
         return ess_empty[path]
-    if not os.access(path, os.R_OK):
-        return False
+    if ignore is None:
+        def _ignore(path: Path) -> bool:
+            path = path.resolve()
+            if path.is_file() and path.name.startswith("."):
+                return True
+            if path.is_dir() and path.name in (".ipynb_checkpoints"):
+                return True
+            return False
+        ignore = _ignore
     for p in path.iterdir():
-        if p.is_file() and not filter_(p):
+        if ignore(p):
+            continue
+        if p.is_file():
             ess_empty[path] = False
             return False
-        if p.is_dir() and not is_ess_empty(p, filter_=filter_, ess_empty=ess_empty):
+        if not is_ess_empty(p, ignore=ignore, ess_empty=ess_empty):
             ess_empty[path] = False
             return False
     ess_empty[path] = True
