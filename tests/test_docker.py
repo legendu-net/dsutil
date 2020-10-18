@@ -1,5 +1,6 @@
 """Testing the module dsutil.docker.
 """
+import sys
 import shutil
 import pytest
 import dsutil
