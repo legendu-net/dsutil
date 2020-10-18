@@ -110,7 +110,12 @@ def version(
         _list_version(proj_dir)
 
 
-def format_code(inplace: bool = False, commit: bool = False, proj_dir: Path = None, files: Iterable[Union[Path, str]] = ()):
+def format_code(
+    inplace: bool = False,
+    commit: bool = False,
+    proj_dir: Path = None,
+    files: Iterable[Union[Path, str]] = ()
+):
     """Format code.
 
     :param inplace: If true (defaults to False), format code inplace.
