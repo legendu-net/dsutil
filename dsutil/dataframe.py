@@ -25,7 +25,7 @@ def table_2w(frame: pd.DataFrame, columns: Union[str, List[str], None], na_as=No
     raise TypeError('"frame" must be pandas.Series or pandas.DataFrame.')
 
 
-def read_csv(path: str, **kwargs):
+def read_csv(path: Union[str, Path], **kwargs):
     """Read many CSV files into a DataFrame at once.
     """
     if isinstance(path, str):
