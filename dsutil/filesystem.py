@@ -306,9 +306,7 @@ def _ignore(path: Path) -> bool:
     return False
 
 
-def remove_ess_empty(
-    path: Union[str, Path], ignore: Callable = _ignore
-) -> List[Path]:
+def remove_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> List[Path]:
     """Remove essentially empty directories under a path.
 
     :param path: The path to the directory to check.
@@ -327,9 +325,7 @@ def remove_ess_empty(
     return fail
 
 
-def find_ess_empty(
-    path: Union[str, Path], ignore: Callable = _ignore
-) -> List[Path]:
+def find_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> List[Path]:
     """Find essentially empty sub directories under a directory.
 
     :param path: The path to the directory to check.
@@ -355,17 +351,12 @@ def _find_ess_empty(
     for p in path.iterdir():
         if p.is_dir():
             _find_ess_empty(
-                path=p,
-                ignore=ignore,
-                ess_empty=ess_empty,
-                ess_empty_dir=ess_empty_dir
+                path=p, ignore=ignore, ess_empty=ess_empty, ess_empty_dir=ess_empty_dir
             )
 
 
 def is_ess_empty(
-    path: Path,
-    ignore: Callable = _ignore,
-    ess_empty: Dict[Path, bool] = None
+    path: Path, ignore: Callable = _ignore, ess_empty: Dict[Path, bool] = None
 ):
     """Check if a directory is essentially empty.
 
