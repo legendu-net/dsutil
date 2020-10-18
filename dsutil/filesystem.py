@@ -339,6 +339,8 @@ def is_ess_empty(
         path = Path(path)
     if path in ess_empty:
         return ess_empty[path]
+    if not os.access(path, os.R_OK):
+        return False
     for p in path.iterdir():
         if p.is_file() and not filter_(p):
             ess_empty[path] = False
