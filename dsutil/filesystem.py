@@ -375,6 +375,8 @@ def is_ess_empty(
         ess_empty = {}
     if path in ess_empty:
         return ess_empty[path]
+    if ignore(path):
+        return True
     for p in path.iterdir():
         if ignore(p):
             continue
