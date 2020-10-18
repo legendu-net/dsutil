@@ -297,8 +297,17 @@ def _format_notebook(path: Path, style_file: str):
         logger.info('No change is made to the notebook "{}".\n', path)
 
 
+def _ignore(path: Path) -> bool:
+    path = path.resolve()
+    if path.is_file() and path.name.startswith("."):
+        return True
+    if path.is_dir() and path.name in (".ipynb_checkpoints", ):
+        return True
+    return False
+
+
 def remove_ess_empty(
-    path: Union[str, Path], ignore: Union[Callable, None] = None
+    path: Union[str, Path], ignore: Callable = _ignore
 ) -> List[Path]:
     """Remove essentially empty directories under a path.
 
@@ -319,7 +328,7 @@ def remove_ess_empty(
 
 
 def find_ess_empty(
-    path: Union[str, Path], ignore: Union[Callable, None] = None
+    path: Union[str, Path], ignore: Callable = _ignore
 ) -> List[Path]:
     """Find essentially empty sub directories under a directory.
 
@@ -338,7 +347,7 @@ def find_ess_empty(
 
 
 def _find_ess_empty(
-    path: Path, ignore: Union[Callable, None], ess_empty: Dict[Path, bool], ess_empty_dir: List[str]
+    path: Path, ignore: Callable, ess_empty: Dict[Path, bool], ess_empty_dir: List[str]
 ):
     if is_ess_empty(path=path, ignore=ignore, ess_empty=ess_empty):
         ess_empty_dir.append(path)
@@ -351,15 +360,6 @@ def _find_ess_empty(
                 ess_empty=ess_empty,
                 ess_empty_dir=ess_empty_dir
             )
-
-
-def _ignore(path: Path) -> bool:
-    path = path.resolve()
-    if path.is_file() and path.name.startswith("."):
-        return True
-    if path.is_dir() and path.name in (".ipynb_checkpoints", ):
-        return True
-    return False
 
 
 def is_ess_empty(
