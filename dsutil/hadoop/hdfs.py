@@ -24,7 +24,7 @@ class Hdfs():
             "replicas",
             "userid",
             "groupid",
-            "filesize",
+            "bytes",
             "mdate",
             "mtime",
             "path",
