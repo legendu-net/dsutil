@@ -211,14 +211,14 @@ def _find_data_tables_file(file, filter_, patterns) -> Set[str]:
         file = Path(file)
     text = file.read_text().lower()
     patterns = {
-        "from\s+(\w+)\W*\s*",
-        "from\s+(\w+\.\w+)\W*\s*",
-        "join\s+(\w+)\W*\s*",
-        "join\s+(\w+\.\w+)\W*\s*",
-        "table\((\w+)\)",
-        "table\((\w+\.\w+)\)",
-        '"table":\s*"(\w+)"',
-        '"table":\s*"(\w+\.\w+)"',
+        r"from\s+(\w+)\W*\s*",
+        r"from\s+(\w+\.\w+)\W*\s*",
+        r"join\s+(\w+)\W*\s*",
+        r"join\s+(\w+\.\w+)\W*\s*",
+        r"table\((\w+)\)",
+        r"table\((\w+\.\w+)\)",
+        r'"table":\s*"(\w+)"',
+        r'"table":\s*"(\w+\.\w+)"',
     } | set(patterns)
     tables = chain.from_iterable(re.findall(pattern, text) for pattern in patterns)
     mapping = str.maketrans("", "", "'\"\\")
@@ -297,53 +297,92 @@ def _format_notebook(path: Path, style_file: str):
         logger.info('No change is made to the notebook "{}".\n', path)
 
 
-def find_ess_empty(
-    path: Union[str, Path], filter_: Callable = lambda path: str(path).startswith(".")
-) -> List[Path]:
+def _ignore(path: Path) -> bool:
+    path = path.resolve()
+    if path.is_file() and path.name.startswith("."):
+        return True
+    if path.is_dir() and path.name in (".ipynb_checkpoints", ):
+        return True
+    return False
+
+
+def remove_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> List[Path]:
+    """Remove essentially empty directories under a path.
+
+    :param path: The path to the directory to check.
+    :param ignore: A bool function which returns True on files/directories to ignore.
+    :return: A list of Path objects which failed to be removed.
+    """
+    fail = []
+    for p in find_ess_empty(path, ignore=ignore):
+        try:
+            if p.is_file() or p.is_symlink():
+                p.unlink()
+            else:
+                shutil.rmtree(p)
+        except PermissionError:
+            fail.append(p)
+    return fail
+
+
+def find_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> List[Path]:
     """Find essentially empty sub directories under a directory.
+
+    :param path: The path to the directory to check.
+    :param ignore: A bool function which returns True on files/directories to ignore.
+    :return: A list of directories which are essentially empty.
     """
     if isinstance(path, str):
         path = Path(path)
     ess_empty = {}
     ess_empty_dir = []
     _find_ess_empty(
-        path=path, filter_=filter_, ess_empty=ess_empty, ess_empty_dir=ess_empty_dir
+        path=path, ignore=ignore, ess_empty=ess_empty, ess_empty_dir=ess_empty_dir
     )
     return ess_empty_dir
 
 
 def _find_ess_empty(
-    path: Path, filter_: Callable, ess_empty: Dict[Path, bool], ess_empty_dir: List[str]
+    path: Path, ignore: Callable, ess_empty: Dict[Path, bool], ess_empty_dir: List[str]
 ):
-    if is_ess_empty(path=path, filter_=filter_, ess_empty=ess_empty):
+    if is_ess_empty(path=path, ignore=ignore, ess_empty=ess_empty):
         ess_empty_dir.append(path)
         return
     for p in path.iterdir():
         if p.is_dir():
             _find_ess_empty(
-                path=p,
-                filter_=filter_,
-                ess_empty=ess_empty,
-                ess_empty_dir=ess_empty_dir
+                path=p, ignore=ignore, ess_empty=ess_empty, ess_empty_dir=ess_empty_dir
             )
 
 
 def is_ess_empty(
-    path: Path,
-    filter_: Callable = lambda path: str(path).startswith("."),
-    ess_empty: Dict[Path, bool] = None
+    path: Path, ignore: Callable = _ignore, ess_empty: Dict[Path, bool] = None
 ):
-    if ess_empty is None:
-        ess_empty = {}
+    """Check if a directory is essentially empty.
+
+    :param path: The path to the directory to check.
+    :param ignore: A bool function which returns True on files/directories to ignore.
+    :return: True if the directory is essentially empty and False otherwise.
+    """
+    if not os.access(path, os.R_OK):
+        return False
     if isinstance(path, str):
         path = Path(path)
+    if path.is_symlink():
+        return True
+    path = path.resolve()
+    if ess_empty is None:
+        ess_empty = {}
     if path in ess_empty:
         return ess_empty[path]
+    if ignore(path):
+        return True
     for p in path.iterdir():
-        if p.is_file() and not filter_(p):
-            ess_empty[path] = False
+        if ignore(p):
+            continue
+        if p.is_file():
             return False
-        if p.is_dir() and not is_ess_empty(p, filter_=filter_, ess_empty=ess_empty):
+        if not is_ess_empty(p, ignore=ignore, ess_empty=ess_empty):
             ess_empty[path] = False
             return False
     ess_empty[path] = True

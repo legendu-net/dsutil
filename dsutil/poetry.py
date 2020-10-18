@@ -110,17 +110,20 @@ def version(
         _list_version(proj_dir)
 
 
-def format_code(inplace: bool = False, commit: bool = False, proj_dir: Path = None):
+def format_code(
+    inplace: bool = False,
+    commit: bool = False,
+    proj_dir: Path = None,
+    files: Iterable[Union[Path, str]] = ()
+):
     """Format code.
 
     :param inplace: If true (defaults to False), format code inplace.
     Otherwise, changes are printed to terminal only.
-    :param commit: If true (defaults to False), 
+    :param commit: If true (defaults to False),
     commit code formatting changes automatically.
     :param proj_dir: [description], defaults to None
     """
-    if proj_dir is None:
-        proj_dir = _project_dir()
     cmd = ["yapf"]
     if inplace:
         cmd.append("-ir")
@@ -128,13 +131,18 @@ def format_code(inplace: bool = False, commit: bool = False, proj_dir: Path = No
     else:
         cmd.append("-dr")
         logger.info("Checking code formatting...")
-    # source dir
-    pkg = _project_name(proj_dir)
-    cmd.append(str(proj_dir / pkg))
-    # tests dir
-    test = proj_dir / "tests"
-    if test.is_dir():
-        cmd.append(str(test))
+    if files:
+        cmd.extend(files)
+    else:
+        if proj_dir is None:
+            proj_dir = _project_dir()
+        # source dir
+        pkg = _project_name(proj_dir)
+        cmd.append(str(proj_dir / pkg))
+        # tests dir
+        test = proj_dir / "tests"
+        if test.is_dir():
+            cmd.append(str(test))
     proc = sp.run(cmd, check=False, stdout=sp.PIPE)
     if proc.returncode:
         cmd[1] = "-ir"

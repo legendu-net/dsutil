@@ -1,5 +1,8 @@
+"""Pandas DataFrame related utils.
+"""
 import os
 import re
+from pathlib import Path
 import subprocess as sp
 from typing import List, Sequence, Union
 import pandas as pd
@@ -22,15 +25,11 @@ def table_2w(frame: pd.DataFrame, columns: Union[str, List[str], None], na_as=No
     raise TypeError('"frame" must be pandas.Series or pandas.DataFrame.')
 
 
-def read_csv(path: str, **kwargs):
+def read_csv(path: Union[str, Path], **kwargs):
     """Read many CSV files into a DataFrame at once.
     """
-    if os.path.isfile(path):
+    if isinstance(path, str):
+        path = Path(path)
+    if path.is_file():
         return pd.read_csv(path, **kwargs)
-    frame_list = []
-    if os.path.isdir(path):
-        for file in os.listdir(path):
-            if os.path.splitext(file)[1].lower() == ".csv":
-                file = os.path.join(path, file)
-                frame_list.append(pd.read_csv(file, **kwargs))
-    return pd.concat(frame_list)
+    return pd.concat(pd.read_csv(csv, **kwargs) for csv in path.glob("*.csv"))
