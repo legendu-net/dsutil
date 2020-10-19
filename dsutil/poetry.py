@@ -116,7 +116,7 @@ def add_tag_release(tag: str = "", proj_dir: Union[str, Path, None] = None) -> N
             proj_dir = _project_dir()
         tag = "v" + _project_version(proj_dir)
     sp.run(f"git checkout master && git pull && git tag {tag}", shell=True, check=True)
-    proc = sp.run("git remote", shell=True, capture_output=True)
+    proc = sp.run("git remote", shell=True, check=True, capture_output=True)
     for remote in proc.stdout.decode().strip().split("\n"):
         sp.run(f"git push {remote} {tag}", shell=True, check=True)
 
