@@ -119,6 +119,7 @@ def add_tag_release(proj_dir: Union[str, Path, None] = None) -> None:
     current_branch = proc.stdout.decode().strip()
     # checkout the master branch
     sp.run("git checkout master && git pull", shell=True, check=True)
+    print()
     # get tag
     if proj_dir is None:
         proj_dir = _project_dir()
@@ -134,6 +135,7 @@ def add_tag_release(proj_dir: Union[str, Path, None] = None) -> None:
     proc = sp.run("git remote", shell=True, check=True, capture_output=True)
     for remote in proc.stdout.decode().strip().split("\n"):
         sp.run(f"git push {remote} {tag}", shell=True, check=True)
+    print()
     # checkout the old branch
     sp.run(f"git checkout {current_branch}", shell=True, check=True)
 
