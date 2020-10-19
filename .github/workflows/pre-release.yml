@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - master
-  check_suite:
-    types: 
-      - completed
 
 jobs:
   pre-release:
