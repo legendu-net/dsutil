@@ -115,6 +115,10 @@ def add_tag_release(tag: str = "", proj_dir: Union[str, Path, None] = None) -> N
         if proj_dir is None:
             proj_dir = _project_dir()
         tag = "v" + _project_version(proj_dir)
+    # check whether the tag already exists
+    proc = sp.run(f"git tag -l {tag}", shell=True, check=True, capture_output=True)
+    if proc.stdout:
+        raise ValueError(f"The tag {tag} already exists. Please specify a new tag!")
     # get current branch
     proc = sp.run("git branch --show-current", shell=True, check=True, capture_output=True)
     current_branch = proc.stdout.decode.strip()
