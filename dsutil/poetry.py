@@ -89,6 +89,19 @@ def _list_version(proj_dir: Path):
     print(_project_version(proj_dir))
 
 
+def add_tag(tag: str = "") -> None:
+    """Add a tag to the current commit.
+
+    :param tag: The tag (defaults to the current version of the package) to use.
+    """
+    if not tag:
+        tag = "v" + version()
+    sp.run(f"git tag {tag}", shell=True, check=True)
+    proc = sp.run("git remote", shell=True, capture_output=True)
+    for remote in proc.stdout.decode().strip().split("\n"):
+        sp.run(f"git push {remote} {tag}", shell=True, check=True)
+
+
 def version(
     ver: str = "",
     commit: bool = False,
