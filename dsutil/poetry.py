@@ -126,6 +126,7 @@ def add_tag_release(proj_dir: Union[str, Path, None] = None) -> None:
     tag = "v" + _project_version(proj_dir)
     proc = sp.run(f"git tag -l {tag}", shell=True, check=True, capture_output=True)
     if proc.stdout:
+        sp.run(f"git checkout {current_branch}", shell=True, check=True)
         raise ValueError(
             f"The tag {tag} already exists! Please merge new changes to the master branch first."
         )
