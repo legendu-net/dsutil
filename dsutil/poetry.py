@@ -112,8 +112,6 @@ def add_tag_release(proj_dir: Union[str, Path, None] = None) -> None:
 
     :param tag: The tag (defaults to the current version of the package) to use.
     """
-    if proj_dir is None:
-        proj_dir = _project_dir()
     # get current branch
     proc = sp.run(
         "git branch --show-current", shell=True, check=True, capture_output=True
@@ -122,6 +120,8 @@ def add_tag_release(proj_dir: Union[str, Path, None] = None) -> None:
     # checkout the master branch
     sp.run("git checkout master && git pull", shell=True, check=True)
     # get tag
+    if proj_dir is None:
+        proj_dir = _project_dir()
     tag = "v" + _project_version(proj_dir)
     proc = sp.run(f"git tag -l {tag}", shell=True, check=True, capture_output=True)
     if proc.stdout:
