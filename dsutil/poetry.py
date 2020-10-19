@@ -106,19 +106,19 @@ def version(
         print(_project_version(proj_dir))
 
 
-def add_tag_release(tag: str = "", proj_dir: Union[str, Path, None] = None) -> None:
+def add_tag_release(proj_dir: Union[str, Path, None] = None) -> None:
     """Add a tag to the latest commit on the master branch for release.
+    The tag is decided based on the current version of the project.
 
     :param tag: The tag (defaults to the current version of the package) to use.
     """
-    if not tag:
-        if proj_dir is None:
-            proj_dir = _project_dir()
-        tag = "v" + _project_version(proj_dir)
+    if proj_dir is None:
+        proj_dir = _project_dir()
+    tag = "v" + _project_version(proj_dir)
     # check whether the tag already exists
     proc = sp.run(f"git tag -l {tag}", shell=True, check=True, capture_output=True)
     if proc.stdout:
-        raise ValueError(f"The tag {tag} already exists. Please specify a new tag!")
+        raise ValueError(f"The tag {tag} already exists! Please merge new changes to the master branch first.")
     # get current branch
     proc = sp.run(
         "git branch --show-current", shell=True, check=True, capture_output=True
