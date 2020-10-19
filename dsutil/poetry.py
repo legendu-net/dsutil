@@ -106,8 +106,8 @@ def version(
         print(_project_version(proj_dir))
 
 
-def add_tag(tag: str = "", proj_dir: Union[str, Path, None] = None) -> None:
-    """Add a tag to the current commit.
+def add_tag_release(tag: str = "", proj_dir: Union[str, Path, None] = None) -> None:
+    """Add a tag to the latest commit on the master branch for release.
 
     :param tag: The tag (defaults to the current version of the package) to use.
     """
@@ -115,7 +115,7 @@ def add_tag(tag: str = "", proj_dir: Union[str, Path, None] = None) -> None:
         if proj_dir is None:
             proj_dir = _project_dir()
         tag = "v" + _project_version(proj_dir)
-    sp.run(f"git tag {tag}", shell=True, check=True)
+    sp.run(f"git checkout master && git pull && git tag {tag}", shell=True, check=True)
     proc = sp.run("git remote", shell=True, capture_output=True)
     for remote in proc.stdout.decode().strip().split("\n"):
         sp.run(f"git push {remote} {tag}", shell=True, check=True)
