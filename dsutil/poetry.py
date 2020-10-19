@@ -106,19 +106,36 @@ def version(
         print(_project_version(proj_dir))
 
 
-def add_tag_release(tag: str = "", proj_dir: Union[str, Path, None] = None) -> None:
+def add_tag_release(proj_dir: Union[str, Path, None] = None) -> None:
     """Add a tag to the latest commit on the master branch for release.
+    The tag is decided based on the current version of the project.
 
     :param tag: The tag (defaults to the current version of the package) to use.
     """
-    if not tag:
-        if proj_dir is None:
-            proj_dir = _project_dir()
-        tag = "v" + _project_version(proj_dir)
-    sp.run(f"git checkout master && git pull && git tag {tag}", shell=True, check=True)
+    # get current branch
+    proc = sp.run(
+        "git branch --show-current", shell=True, check=True, capture_output=True
+    )
+    current_branch = proc.stdout.decode().strip()
+    # checkout the master branch
+    sp.run("git checkout master && git pull", shell=True, check=True)
+    # get tag
+    if proj_dir is None:
+        proj_dir = _project_dir()
+    tag = "v" + _project_version(proj_dir)
+    proc = sp.run(f"git tag -l {tag}", shell=True, check=True, capture_output=True)
+    if proc.stdout:
+        raise ValueError(
+            f"The tag {tag} already exists! Please merge new changes to the master branch first."
+        )
+    # tag the master branch
+    sp.run(f"git tag {tag}", shell=True, check=True)
+    # push tag
     proc = sp.run("git remote", shell=True, check=True, capture_output=True)
     for remote in proc.stdout.decode().strip().split("\n"):
         sp.run(f"git push {remote} {tag}", shell=True, check=True)
+    # checkout the old branch
+    sp.run(f"git checkout {current_branch}", shell=True, check=True)
 
 
 def format_code(
