@@ -137,27 +137,14 @@ def find_images(root_dir: Union[str, Path, List[str], List[Path]]) -> List[Path]
 
     :param root_dir: A (list) of dir(s).
     """
-    if isinstance(root_dir, list):
-        images = []
-        for path in root_dir:
-            images.extend(find_images(path))
-        return images
-    if isinstance(root_dir, str):
-        root_dir = Path(root_dir)
+    if isinstance(root_dir, (str, Path)):
+        root_dir = [root_dir]
     images = []
-    _find_images(root_dir, images)
+    for path in root_dir:
+        if isinstance(path, str):
+            path = Path(path)
+        images.extend(path.glob("**.png"))
     return images
-
-
-def _find_images(root_dir: Path, images: List):
-    """Helper function of find_images.
-    """
-    for file in root_dir.iterdir():
-        if file.is_file():
-            if file.suffix == ".png":
-                images.append(file)
-        else:
-            _find_images(file, images)
 
 
 def find_data_tables(
@@ -277,6 +264,21 @@ def format_notebook(path: Union[str, Path], style_file: str = ""):
         path = [path]
     for p in path:
         _format_notebook(p, style_file)
+
+
+def nbconvert_notebooks(root_dir: Union[str, Path]) -> None:
+    """Convert all notebooks under a directory and its subdirectories using nbconvert.
+
+    :param root_dir: The directory containing notebooks to convert.
+    """
+    if isinstance(root_dir, str):
+        root_dir = Path(root_dir)
+    notebooks = root_dir.glob("**.ipynb")
+    for notebook in notebooks:
+        html = notebook.with_suffix(".html")
+        if html.is_file() and html.stat().st_mtime >= notebook.stat().st_mtime:
+            continue
+        sp.run(f"jupyter nbconvert --to html --output {html}", shell=True, check=True)
 
 
 def _format_notebook(path: Path, style_file: str):
