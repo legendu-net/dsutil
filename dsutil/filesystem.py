@@ -364,10 +364,12 @@ def is_ess_empty(
     :param ignore: A bool function which returns True on files/directories to ignore.
     :return: True if the directory is essentially empty and False otherwise.
     """
-    if not os.access(path, os.R_OK):
-        return False
     if isinstance(path, str):
         path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(f"The file {path} does not exist!")
+    if not os.access(path, os.R_OK):
+        return False
     if path.is_symlink():
         return True
     path = path.resolve()
