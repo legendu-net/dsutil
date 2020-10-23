@@ -100,7 +100,7 @@ def version(
     if ver:
         _update_version(ver=ver, proj_dir=proj_dir)
         if commit:
-            cmd = f"cd {proj_dir} && git add . && git commit -m 'bump up version' && git push"
+            cmd = f"cd {proj_dir} && git add .; git commit -m 'bump up version'; git push"
             sp.run(cmd, shell=True, check=False)
     else:
         print(_project_version(proj_dir))
