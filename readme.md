@@ -16,8 +16,9 @@ This is a Python pacakage that contains misc utils for Data Science.
     - html
     - misc
     
-## Requirements
-`dsutil` requires Python 3.6+. 
+## Supported Python Version
+
+Currently, Python 3.7 and 3.8 are supported.
 
 ## Installation
 
