@@ -22,13 +22,20 @@ def get_memory_usage(user: str = USER):
         psutil.STATUS_WAITING,
     )
     try:
-        return sum(p.memory_info().rss for p in psutil.process_iter() 
-            if p.username() == USER and p.status() in STATUS)
+        return sum(
+            p.memory_info().rss for p in psutil.process_iter()
+            if p.username() == USER and p.status() in STATUS
+        )
     except:
         return get_memory_usage(user)
-            
 
-def match_memory_usage(target: float, arr_size: int = 1_000_000, sleep_min: float = 1, sleep_max: float = 30):
+
+def match_memory_usage(
+    target: float,
+    arr_size: int = 1_000_000,
+    sleep_min: float = 1,
+    sleep_max: float = 30
+):
     logger.info("Target memory: {:,.0f}", target)
     # define an template array
     arr = list(range(arr_size))
@@ -52,21 +59,34 @@ def match_memory_usage(target: float, arr_size: int = 1_000_000, sleep_min: floa
             for _ in range(count):
                 dq.pop()
             time.sleep(np.interp(count, xp, yp))
-                
-                
+
+
 def parse_args(args=None, namespace=None):
     """Parse command-line arguments.
     """
-    parser = ArgumentParser(description="Make memory consumption match the specified target.")
+    parser = ArgumentParser(
+        description="Make memory consumption match the specified target."
+    )
     mutex = parser.add_mutually_exclusive_group()
-    mutex.add_argument("-g", dest="target", type=lambda s: int(s) * 1073741824, help="Specify target memory in gigabytes.")
-    mutex.add_argument("-m", dest="target", type=lambda s: int(s) * 1048576, help="Specify target memory in megabytes.")
+    mutex.add_argument(
+        "-g",
+        dest="target",
+        type=lambda s: int(s) * 1073741824,
+        help="Specify target memory in gigabytes."
+    )
+    mutex.add_argument(
+        "-m",
+        dest="target",
+        type=lambda s: int(s) * 1048576,
+        help="Specify target memory in megabytes."
+    )
     return parser.parse_args(args=args, namespace=namespace)
 
 
 def main():
     args = parse_args()
     match_memory_usage(args.target)
+
 
 if __name__ == "__main__":
     main()
