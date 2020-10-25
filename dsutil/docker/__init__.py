@@ -69,6 +69,15 @@ def remove_containers(
     print(containers())
 
 
+def pull():
+    """Automatically pull all valid images.
+    """
+    imgs = images()
+    imgs = imgs[imgs.repository != "<None>" & imgs.tag != "<None>"]
+    for _, (repo, tag, *_) in imgs.iterrows():
+        run_cmd(f"docker pull {repo}:{tag}", shell=True, check=True)
+
+
 def remove_images(
     id_: str = "", name: str = "", tag: str = "", choice: str = ""
 ) -> None:
