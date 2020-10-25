@@ -126,9 +126,7 @@ def images() -> pd.DataFrame:
     return shell.to_frame("docker images", split_by_title=True)
 
 
-def stop(
-    id_: str = "", name: str = "", status: str = "", choice: str = ""
-) -> None:
+def stop(id_: str = "", name: str = "", status: str = "", choice: str = "") -> None:
     """Stop the specified Docker containers.
     :param id_: The id of the container to remove.
     :param name: A (regex) pattern of names of containers to remove.

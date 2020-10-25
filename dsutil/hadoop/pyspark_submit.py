@@ -32,8 +32,9 @@ class SparkSubmit:
         self.email = email
 
     def _spark_log_filter_helper_keyword(
-            self, line: str, keyword: str, mutual_exclusive: List[str],
-            time_delta: datetime.timedelta) -> bool:
+        self, line: str, keyword: str, mutual_exclusive: List[str],
+        time_delta: datetime.timedelta
+    ) -> bool:
         if keyword not in line:
             return False
         now = datetime.datetime.now()
@@ -49,60 +50,64 @@ class SparkSubmit:
         return False
 
     def _spark_log_filter_helper_keywords(
-            self, line: str, keywords: List[str], mutual_exclusive: bool,
-            time_delta: datetime.timedelta) -> bool:
+        self, line: str, keywords: List[str], mutual_exclusive: bool,
+        time_delta: datetime.timedelta
+    ) -> bool:
         mutual_exclusive = keywords if mutual_exclusive else ()
         for keyword in keywords:
             if self._spark_log_filter_helper_keyword(
-                    line=line,
-                    keyword=keyword,
-                    mutual_exclusive=mutual_exclusive,
-                    time_delta=time_delta):
+                line=line,
+                keyword=keyword,
+                mutual_exclusive=mutual_exclusive,
+                time_delta=time_delta
+            ):
                 return True
         return False
 
     def _spark_log_filter(self, line: str) -> bool:
         line = line.strip().lower()
         if self._spark_log_filter_helper_keywords(
-                line=line,
-                keywords=["warn client", "uploading"],
-                mutual_exclusive=False,
-                time_delta=datetime.timedelta(seconds=0)):
+            line=line,
+            keywords=["warn client", "uploading"],
+            mutual_exclusive=False,
+            time_delta=datetime.timedelta(seconds=0)
+        ):
             return True
         if self._spark_log_filter_helper_keywords(
-                line=line,
-                keywords=["queue: ", "tracking url: "],
-                mutual_exclusive=False,
-                time_delta=datetime.timedelta(days=1)):
+            line=line,
+            keywords=["queue: ", "tracking url: "],
+            mutual_exclusive=False,
+            time_delta=datetime.timedelta(days=1)
+        ):
             return True
         if self._spark_log_filter_helper_keywords(
-                line=line,
-                keywords=["exception", "user class threw", "caused by"],
-                mutual_exclusive=False,
-                time_delta=datetime.timedelta(seconds=1)):
+            line=line,
+            keywords=["exception", "user class threw", "caused by"],
+            mutual_exclusive=False,
+            time_delta=datetime.timedelta(seconds=1)
+        ):
             return True
         if self._spark_log_filter_helper_keywords(
-                line=line,
-                keywords=[
-                    "state: accepted", "state: running", "state: finished"
-                ],
-                mutual_exclusive=True,
-                time_delta=datetime.timedelta(minutes=10)):
+            line=line,
+            keywords=["state: accepted", "state: running", "state: finished"],
+            mutual_exclusive=True,
+            time_delta=datetime.timedelta(minutes=10)
+        ):
             return True
         if self._spark_log_filter_helper_keywords(
-                line=line,
-                keywords=[
-                    "final status: undefined", "final status: succeeded",
-                    "final status: failed"
-                ],
-                mutual_exclusive=True,
-                time_delta=datetime.timedelta(minutes=3)):
+            line=line,
+            keywords=[
+                "final status: undefined", "final status: succeeded",
+                "final status: failed"
+            ],
+            mutual_exclusive=True,
+            time_delta=datetime.timedelta(minutes=3)
+        ):
             return True
         return False
 
     @staticmethod
-    def _print_filter(line: str,
-                      log_filter: Union[Callable, None] = None) -> bool:
+    def _print_filter(line: str, log_filter: Union[Callable, None] = None) -> bool:
         if not line:
             return False
         if log_filter is None:
@@ -203,14 +208,16 @@ def _files(config: Dict) -> str:
                 process = sp.run(
                     f"/apache/hadoop/bin/hdfs dfs -test -f {path}",
                     shell=True,
-                    check=False)
+                    check=False
+                )
                 if process.returncode == 0:
                     files.append(path)
                     break
         else:
             logger.warning(
-                "None of the specified configuration file for {} exists.\n    ",
-                key, "\n".join("    " + path for path in paths))
+                "None of the specified configuration file for {} exists.\n    ", key,
+                "\n".join("    " + path for path in paths)
+            )
     return ",".join(files)
 
 
@@ -222,12 +229,14 @@ def submit(args: Namespace):
     config["files"] = _files(config)
     if "jars" not in config:
         config["jars"] = ()
-    opts = ("files", "master", "deploy-mode", "queue", "num-executors",
-            "executor-memory", "driver-memory", "executor-cores", "archives")
+    opts = (
+        "files", "master", "deploy-mode", "queue", "num-executors", "executor-memory",
+        "driver-memory", "executor-cores", "archives"
+    )
     lines = [config["spark-submit"]] + [
         f"--{opt} {config[opt]}" for opt in opts if opt in config
     ] + [f"--conf {k}={v}" for k, v in config["conf"].items()
-         ] + [f"--jars {jar}" for jar in config["jars"]] + args.cmd
+        ] + [f"--jars {jar}" for jar in config["jars"]] + args.cmd
     for idx in range(1, len(lines)):
         lines[idx] = " " * 4 + lines[idx]
     SparkSubmit(email=config["email"]).submit(" \\\n".join(lines) + "\n")
@@ -237,14 +246,16 @@ def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
     """
     parser = ArgumentParser(description="Submit Spark application.")
-    parser.add_argument("-c",
-                        "--config",
-                        dest="config",
-                        required=True,
-                        help="The configuration file to use.")
-    parser.add_argument(dest="cmd",
-                        nargs="+",
-                        help="The command to submit to Spark to run.")
+    parser.add_argument(
+        "-c",
+        "--config",
+        dest="config",
+        required=True,
+        help="The configuration file to use."
+    )
+    parser.add_argument(
+        dest="cmd", nargs="+", help="The command to submit to Spark to run."
+    )
     args = parser.parse_args(args=args, namespace=namespace)
     return args
 
