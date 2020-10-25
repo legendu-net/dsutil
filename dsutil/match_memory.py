@@ -64,6 +64,9 @@ def parse_args(args=None, namespace=None):
     return parser.parse_args(args=args, namespace=namespace)
 
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
     match_memory_usage(args.target)
+
+if __name__ == "__main__":
+    main()
