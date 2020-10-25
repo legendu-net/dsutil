@@ -193,7 +193,7 @@ class DockerImage:
         then the tag of the base image is as specified in the Dockerfile.
         :param no_cache: If True, no cache is used when building the Docker image;
         otherwise, cache is used.
-        :param copy_ssh_keys: If True, SSH keys are copied into a directory named ssh 
+        :param copy_ssh_keys: If True, SSH keys are copied into a directory named ssh
         under the current local Git repository. 
         :return: A tuple of the format (image_name_built, time_taken).
         """

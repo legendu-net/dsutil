@@ -124,3 +124,41 @@ def images() -> pd.DataFrame:
     :return: A DataFrame containing all Docker images.
     """
     return shell.to_frame("docker images", split_by_title=True)
+
+
+def stop(
+    id_: str = "", name: str = "", status: str = "", choice: str = ""
+) -> None:
+    """Stop the specified Docker containers.
+    :param id_: The id of the container to remove.
+    :param name: A (regex) pattern of names of containers to remove.
+    :param exited: Whether to remove exited containers.
+    :param choice: One of "y" (auto yes), "n" (auto no) 
+        or "i" (interactive, i.e., ask for confirmation on each case).
+    """
+    if id_:
+        run_cmd(["docker", "stop", id_])
+    if name:
+        run_cmd(["docker", "stop", name])
+    if status:
+        conts = containers()
+        conts = conts[conts.status.str.contains(status)]
+        if conts.empty:
+            return
+        print("\n", conts, "\n")
+        sys.stdout.flush()
+        sys.stderr.flush()
+        if not choice:
+            choice = input(
+                "Do you want to stop the above containers? (y - Yes, n - [No], i - interactive): "
+            )
+        for row in conts.itertuples():
+            if choice == "y":
+                run_cmd(["docker", "stop", row.container_id])
+            elif choice == "i":
+                choice_i = input(
+                    f"Do you want to stop the container '{row.names}'? (y/N): "
+                )
+                if choice_i == "y":
+                    run_cmd(["docker", "stop", row.container_id])
+    print(containers())
