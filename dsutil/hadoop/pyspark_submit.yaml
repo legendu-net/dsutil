@@ -1,0 +1,35 @@
+spark-submit: /apache/spark2.3/bin/spark-submit
+files:
+  hive-site.xml: 
+    - file:///apache/hive/conf/hive-site.xml
+  ssl-client.xml: 
+    - file:///apache/hadoop/etc/hadoop/ssl-client.xml
+  hdfs-site.xml: 
+    - file:///apache/hadoop/etc/hadoop/hdfs-site.xml
+  core-site.xml: 
+    - file:///apache/hadoop/etc/hadoop/core-site.xml
+  federation-mapping.xml:
+    - file:///apache/hadoop/etc/hadoop/federation-mapping.xml
+    - file:///apache/fed-test-confs/conf/federation-mapping.xml
+master: yarn
+deploy-mode: cluster
+queue: your-queue
+num-executors: 300
+executor-memory: 20G
+driver-memory: 30G
+executor-cores: 4
+archives:
+conf: 
+  spark.yarn.maxAppAttempts: 1
+  spark.dynamicAllocation.enabled: true
+  spark.dynamicAllocation.maxExecutors: 1000
+  spark.network.timeout: 300s
+  spark.driver.maxResultSize: 8g
+  spark.executor.memoryOverhead: 4G
+  spark.sql.shuffle.partitions: 1000
+  spark.pyspark.driver.python: ./env/bin/python3
+  spark.pyspark.python: ./env/bin/python3
+email:
+  host:
+  from:
+  to:
