@@ -7,6 +7,7 @@ authors = ["Benjamin Du <longendu@yahoo.com>"]
 [tool.poetry.scripts]
 logf = "dsutil.hadoop:logf.main"
 pyspark_submit = "dsutil.hadoop:pyspark_submit.main"
+match_memory = "dsutil:match_memory.main"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<3.9"
@@ -24,6 +25,7 @@ pillow = ">=7.0.0"
 GitPython = ">=3.0.0"
 nbformat = ">=5.0.7"
 notifiers = ">=1.2.1"
+psutil = ">=5.7.3"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"
