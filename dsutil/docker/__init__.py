@@ -75,7 +75,7 @@ def pull():
     imgs = images()
     imgs = imgs[imgs.repository != "<None>" & imgs.tag != "<None>"]
     for _, (repo, tag, *_) in imgs.iterrows():
-        run_cmd(f"docker pull {repo}:{tag}", shell=True, check=True)
+        run_cmd(f"docker pull {repo}:{tag}")
 
 
 def remove_images(
