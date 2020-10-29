@@ -63,7 +63,8 @@ def nbconvert_notebooks(root_dir: Union[str, Path], cache: bool = False) -> None
     notebooks = root_dir.glob("**.ipynb")
     for notebook in notebooks:
         html = notebook.with_suffix(".html")
-        if cache and html.is_file() and html.stat().st_mtime >= notebook.stat().st_mtime:
+        if cache and html.is_file(
+        ) and html.stat().st_mtime >= notebook.stat().st_mtime:
             continue
         sp.run(f"jupyter nbconvert --to html --output {html}", shell=True, check=True)
 
