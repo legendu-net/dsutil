@@ -60,7 +60,7 @@ def nbconvert_notebooks(root_dir: Union[str, Path], cache: bool = False) -> None
     """
     if isinstance(root_dir, str):
         root_dir = Path(root_dir)
-    notebooks = root_dir.glob("**.ipynb")
+    notebooks = root_dir.glob("**/*.ipynb")
     for notebook in notebooks:
         html = notebook.with_suffix(".html")
         if cache and html.is_file(
