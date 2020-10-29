@@ -4,10 +4,10 @@
 import os
 from typing import Union, Dict
 from pathlib import Path
-import subprocess as sp
 import tempfile
 import nbformat
 from loguru import logger
+from nbconvert import HTMLExporter
 from yapf.yapflib.yapf_api import FormatCode
 HOME = Path.home()
 
@@ -61,12 +61,14 @@ def nbconvert_notebooks(root_dir: Union[str, Path], cache: bool = False) -> None
     if isinstance(root_dir, str):
         root_dir = Path(root_dir)
     notebooks = root_dir.glob("**/*.ipynb")
+    exporter = HTMLExporter()
     for notebook in notebooks:
         html = notebook.with_suffix(".html")
         if cache and html.is_file(
         ) and html.stat().st_mtime >= notebook.stat().st_mtime:
             continue
-        sp.run(f"jupyter nbconvert --to html --output {html}", shell=True, check=True)
+        code, _ = exporter.from_notebook_node(nbformat.read(notebook, as_version=4))
+        html.write_text(code, encoding="utf-8")
 
 
 def _format_notebook(path: Path, style_file: str):
