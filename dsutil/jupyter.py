@@ -66,7 +66,7 @@ def nbconvert_notebooks(root_dir: Union[str, Path], cache: bool = False) -> None
         if cache and html.is_file(
         ) and html.stat().st_mtime >= notebook.stat().st_mtime:
             continue
-        sp.run(f"jupyter nbconvert --to html --output {html}", shell=True, check=True)
+        sp.run(f"jupyter nbconvert {notebook} --to html --output {html}", shell=True, check=True)
 
 
 def _format_notebook(path: Path, style_file: str):
