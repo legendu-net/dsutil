@@ -68,7 +68,7 @@ def nbconvert_notebooks(root_dir: Union[str, Path], cache: bool = False) -> None
         ) and html.stat().st_mtime >= notebook.stat().st_mtime:
             continue
         code, _ = exporter.from_notebook_node(nbformat.read(notebook, as_version=4))
-        html.write_text(code)
+        html.write_text(code, encoding="utf-8")
 
 
 def _format_notebook(path: Path, style_file: str):
