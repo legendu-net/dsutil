@@ -118,7 +118,7 @@ class SparkSubmit:
             return True
         return False
 
-    def submit(self, cmd: str):
+    def submit(self, cmd: str, attachments: Union[None, List[str]] = None):
         """Submit a Spark job.
         """
         logger.info("Submitting Spark job...\n{}", cmd)
@@ -144,16 +144,22 @@ class SparkSubmit:
         else:
             subject = "Spark Application Submission Failed"
         if self.email:
-            notifiers.get_notifier("email").notify(
-                from_=self.email["from"],
-                to=self.email["to"],
-                subject=subject,
-                message=cmd + "\n".join(stdout),
-                host=self.email["host"],
-                username="",
-                password="",
-                attachments=self._attachments(cmd),
-            )
+            param = {
+                "from_": self.email["from"],
+                "to": self.email["to"],
+                "subject": subject,
+                "message": cmd + "\n".join(stdout),
+                "host": self.email["host"],
+                "username": "",
+                "password": "",
+            }
+            if attachments:
+                if isinstance(attachments, str):
+                    attachments = [attachments]
+                if not isinstance(attachments, list):
+                    attachments = list(attachments)
+                param["attachments"] = attachments
+            notifiers.get_notifier("email").notify(**param)
         if status == "FAILED":
             self._notify_log(app_id, subject)
 
@@ -168,12 +174,6 @@ class SparkSubmit:
             username="",
             password="",
         )
-
-    @staticmethod
-    def _attachments(cmd: str):
-        """Identify attachments to send with the email.
-        """
-        return cmd.strip().split("\n")[-1].split(" ")[:1]
 
     @staticmethod
     def _app_id(stdout: List[str]):
@@ -239,7 +239,7 @@ def submit(args: Namespace):
         ] + [f"--jars {jar}" for jar in config["jars"]] + args.cmd
     for idx in range(1, len(lines)):
         lines[idx] = " " * 4 + lines[idx]
-    SparkSubmit(email=config["email"]).submit(" \\\n".join(lines) + "\n")
+    SparkSubmit(email=config["email"]).submit(" \\\n".join(lines) + "\n", args.cmd[:1])
 
 
 def parse_args(args=None, namespace=None) -> Namespace:
