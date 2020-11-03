@@ -16,6 +16,7 @@ TOML = "pyproject.toml"
 
 def _project_dir() -> Path:
     """Get the root directory of the Poetry project.
+
     :return: The root directory of the Poetry project.
     """
     path = Path.cwd()
@@ -30,6 +31,7 @@ def _project_dir() -> Path:
 
 def _project_name(proj_dir: Path) -> str:
     """Get the name of the project.
+
     :param proj_dir: The root directory of the Poetry project.
     :return: The name of the project.
     """
@@ -38,6 +40,7 @@ def _project_name(proj_dir: Path) -> str:
 
 def _project_version(proj_dir: Path) -> str:
     """Get the version of the project.
+
     :param proj_dir: The root directory of the Poetry project.
     """
     return toml.load(proj_dir / TOML)["tool"]["poetry"]["version"]
@@ -45,6 +48,7 @@ def _project_version(proj_dir: Path) -> str:
 
 def _update_version_readme(ver: str, proj_dir: Path) -> None:
     """Update the version information in readme.
+
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
@@ -53,6 +57,7 @@ def _update_version_readme(ver: str, proj_dir: Path) -> None:
 
 def _update_version_toml(ver: str, proj_dir: Path) -> None:
     """Update the version information in the TOML file.
+
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
@@ -63,6 +68,7 @@ def _update_version_toml(ver: str, proj_dir: Path) -> None:
 
 def _update_version_init(ver: str, proj_dir: Path) -> None:
     """Update the version information in the file __init__.py.
+
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
@@ -75,6 +81,7 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
 
 def _update_version(ver: str, proj_dir: Path) -> None:
     """Update versions in files.
+
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
@@ -91,6 +98,7 @@ def version(
     proj_dir: Path = None,
 ):
     """List or update the version of the package.
+
     :param ver: The new version to use.
         If empty, then the current version of the package is printed.
     :param proj_dir: The root directory of the Poetry project.
@@ -249,6 +257,7 @@ def build_package(
     linter: Union[str, Iterable[str]] = ("pylint", "pytype")
 ) -> None:
     """Build the package using poetry.
+
     :param dst_dir: The root directory of the project.
     :param proj_dir: The root directory of the Poetry project.
     """
@@ -264,6 +273,7 @@ def build_package(
 
 def install_package(options: List[str] = (), proj_dir: Path = None):
     """Install the built package.
+
     :param options: A list of options to pass to pip3.
     """
     if proj_dir is None:
