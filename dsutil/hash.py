@@ -27,6 +27,7 @@ def rmd5(path: Union[str, Path], output: Union[str, Path] = "") -> str:
 
 def _rmd5(path: Path, res: List[Tuple[str, str]]) -> None:
     """Helper function of rmd5.
+
     :param path: The Path object of a file or directory.
     :param res: A list to record the result.
     """

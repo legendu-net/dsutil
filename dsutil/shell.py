@@ -26,6 +26,7 @@ def to_frame_space(
     lines: List[str] = ()
 ) -> pd.DataFrame:
     """Construct a pandas DataFrame from a List with the first row as header.
+
     :param lines: The output of the shell command.
     :param split: A regular expression pattern for splitting a line into fields.
     :param header: An integer, list of string or None specifiying the header of the data frame.
@@ -58,6 +59,7 @@ def to_frame_title(cmd="", split=r"  +", lines: List[str] = ()):
     """Convert the result of a shell command to a DataFrame.
     The headers are splitted by a regular expression
     while the columns are splitted by the right-most position of the headers.
+
     :param lines: The output of the shell command.
     :param split: A regular expression pattern for splitting headers.
     :param cmd: A shell command.

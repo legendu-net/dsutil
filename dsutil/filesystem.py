@@ -19,6 +19,7 @@ HOME = Path.home()
 def copy_if_exists(src, dst=HOME) -> bool:
     """Copy a file.
     No exception is thrown if the source file does not exist.
+
     :param src: The path of the source file.
     :param dst: The path of the destination file.
     """
@@ -34,6 +35,7 @@ def copy_if_exists(src, dst=HOME) -> bool:
 def link_if_exists(src, dst=HOME, target_is_directory=True) -> bool:
     """Make a symbolic link of a file.
     No exception is thrown if the source file does not exist.
+
     :param src: The path of the source file.
     :param dst: The path of the destination file.
     """
@@ -105,9 +107,9 @@ def _flatten_dir(dir_):
 
 def split_dir(dir_: Union[str, Path], batch: int, wildcard: str = "*") -> None:
     """Split files in a directory into sub-directories.
-        This function is for the convenience of splitting a directory 
-        with a large number of files into smaller directories 
-        so that those subdirs can zipped (into relatively smaller files) and uploaded to cloud quickly.
+    This function is for the convenience of splitting a directory 
+    with a large number of files into smaller directories 
+    so that those subdirs can zipped (into relatively smaller files) and uploaded to cloud quickly.
 
     :param dir_: The root directory whose files are to be splitted into sub-directories.
     :param wildcard: A wild card pattern specifying files to be included.

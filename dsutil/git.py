@@ -35,10 +35,10 @@ def _changes_status(status, changes: List[str]) -> None:
 
 
 def check(path: str = ".", file_mode: bool = False) -> None:
-    """
-    Check status of git repositories.
+    """Check status of git repositories.
     Git submodule is not supported currently.
-    @param path the path of the directory under which Git repositories are to be checked.
+
+    :param path: The path of the directory under which Git repositories are to be checked.
     """
     path = Path(path).resolve()
     logger.info(f'Checking status of Git repositories under "{path}"...')

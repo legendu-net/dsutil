@@ -8,6 +8,7 @@ import cv2
 
 def video_to_image(video, frames_per_image: int = 60, output: str = "frame_{:0>7}.png"):
     """Extract images from a video.
+
     :param video: The path to a video file.
     :param frames_per_image: Extract 1 image every frames_per_image.
     :param output: The pattern of the output files for the extracted images.
@@ -28,6 +29,7 @@ def resize_image(
     size: Tuple[int]
 ) -> None:
     """Resize images to a given size.
+
     :param paths: The paths to images to be resized.
     :param desdir: The directory to save resized images.
         Notice that both '.' and '""' stand for the current directory.
@@ -61,6 +63,7 @@ def _is_approx_close(x, y, threshold=0.4):
 
 def is_approx_close(red: int, green: int, blue: int, threshold: float = 0.4):
     """Check whether the 3 channels have approximately close values.
+
     :param red: The red channel.
     :param green: The green channel.
     :param blue: The blue channel.
@@ -75,6 +78,7 @@ def is_approx_close(red: int, green: int, blue: int, threshold: float = 0.4):
 def deshade_arr_1(arr, threshold=0.4):
     """Deshade a poker card (i.e., get rid of the shading effec on a poker card)
         by checking whether the 3 channels have relative close values.
+
     :param arr: A numpy.ndarray representation of the image to be deshaded.
     :param threshold: The threshold (absolute deviation from 1) 
         to consider a ratio (of 2 channels) to be close to 1.
@@ -94,6 +98,7 @@ def deshade_arr_1(arr, threshold=0.4):
 def deshade_arr_2(arr, cutoff=30):
     """Deshade a poker card (i.e., get rid of the shading effec on a poker card)
         by checking whether the 3 channels all have values larger than a threshold.
+
     :param arr: A numpy.ndarray representation of the image to be deshaded.
     :param cutoff: The cutoff value of 3 channels.
         If the 3 channels all have value no less than this cutoff, 
@@ -115,6 +120,7 @@ def deshade_arr_2(arr, cutoff=30):
 def deshade_arr_3(arr, threshold=0.4, cutoff=30):
     """Deshade a poker card (i.e., get rid of the shading effec on a poker card)
         by combining methods in deshade_arr_1 and deshade_arr_2.
+
     :param arr: A numpy.ndarray representation of the image to be deshaded.
     :param threshold: The threshold (absolute deviation from 1) 
         to consider a ratio (of 2 channels) to be close to 1.
