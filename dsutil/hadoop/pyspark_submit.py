@@ -9,6 +9,7 @@ from argparse import Namespace, ArgumentParser
 from pathlib import Path
 import subprocess as sp
 import re
+import time
 import datetime
 import yaml
 from loguru import logger
@@ -164,6 +165,8 @@ class SparkSubmit:
             self._notify_log(app_id, subject)
 
     def _notify_log(self, app_id, subject):
+        logger.info("Waiting for 300 seconds for the log to be available...")
+        time.sleep(300)
         sp.run(f"logf fetch {app_id}", shell=True, check=True)
         notifiers.get_notifier("email").notify(
             from_=self.email["from"],
