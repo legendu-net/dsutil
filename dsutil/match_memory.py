@@ -47,7 +47,10 @@ def match_memory_usage(
     yp = (sleep_max, sleep_min)
     while True:
         mem = get_memory_usage(USER)
-        logger.info("Current used memory by {}: {:,} out of which {:,} is contributed by the memory matcher", USER, mem, size * len(dq))
+        logger.info(
+            "Current used memory by {}: {:,} out of which {:,} is contributed by the memory matcher",
+            USER, mem, size * len(dq)
+        )
         diff = (target - mem) / size
         if diff > 0:
             logger.info("Consuming more memory ...")
