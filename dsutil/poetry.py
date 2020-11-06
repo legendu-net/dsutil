@@ -254,7 +254,8 @@ def _lint_code_pylint(proj_dir: Union[Path, None], pyvenv_path: str):
 
 def build_package(
     proj_dir: Union[Path, None] = None,
-    linter: Union[str, Iterable[str]] = ("pylint", "pytype")
+    linter: Union[str, Iterable[str]] = ("pylint", "pytype"),
+    test: bool = True
 ) -> None:
     """Build the package using poetry.
 
@@ -267,6 +268,9 @@ def build_package(
         shutil.rmtree(DIST)
     _lint_code(proj_dir=proj_dir, linter=linter)
     format_code(proj_dir=proj_dir)
+    if test:
+        logger.info("Running unit tests...")
+        sp.run(f"cd '{proj_dir}' && poetry run pytest", shell=True, check=True)
     logger.info("Building the package...")
     sp.run(f"cd '{proj_dir}' && poetry build", shell=True, check=True)
 
