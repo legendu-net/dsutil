@@ -5,7 +5,7 @@ the password is encrypted and saved into a profile that is readable/writable onl
 If an user authenticate without specifying password,
 the saved password is used so that users do not have to type in password to authenticate every time.
 """
-from typing import Union, Dict
+from typing import Union, Dict, Any
 import os
 from pathlib import Path
 import json
@@ -142,7 +142,7 @@ def parse_args(args=None, namespace=None):
     return parser.parse_args(args, namespace)
 
 
-def _read_config(config: Union[Path, str, None]) -> Dict[str, str]:
+def _read_config(config: Union[Path, str, None]) -> Dict[str, Any]:
     if not config:
         return {}
     if isinstance(config, str):
