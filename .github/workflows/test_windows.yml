@@ -35,5 +35,6 @@ jobs:
         poetry install --no-dev
     - name: Test with pytest
       run: |
+        pip3 install pytest
         $env:Path += ";$env:Userprofile\.poetry\bin"
         poetry run pytest
