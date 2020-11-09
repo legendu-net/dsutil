@@ -161,10 +161,10 @@ def main() -> None:
     if not password:
         raise ExceptionNoPassword()
     config = _read_config(args.config)
-    authenticate(password, config.email)
+    authenticate(password, config["email"])
     if args.minute:
         while True:
-            authenticate(read_passwd(), config.email)
+            authenticate(read_passwd(), config["email"])
             time.sleep(args.minute * 60)
 
 
