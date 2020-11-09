@@ -32,9 +32,11 @@ jobs:
         xinstall pt -ic --python python
         $env:Path += ";$env:Userprofile\.poetry\bin"
         poetry env use python
-        poetry install
+        poetry install --no-dev
+        pip3 install pytest
+        poetry build
+        pip3 install dist/dsutil-*.whl
     - name: Test with pytest
       run: |
-        pip3 install pytest
         $env:Path += ";$env:Userprofile\.poetry\bin"
         poetry run pytest
