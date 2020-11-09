@@ -34,8 +34,6 @@ jobs:
         poetry env use python
         poetry install --no-dev
         pip3 install pytest
-        pwd
-        dir
         pip3 install ./
     - name: Test with pytest
       run: |
