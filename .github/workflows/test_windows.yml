@@ -34,8 +34,7 @@ jobs:
         poetry env use python
         poetry install --no-dev
         pip3 install pytest
-        poetry build
-        pip3 install dist/dsutil-*.whl
+        pip3 install dsutil/
     - name: Test with pytest
       run: |
         $env:Path += ";$env:Userprofile\.poetry\bin"
