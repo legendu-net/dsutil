@@ -114,7 +114,7 @@ def version(
         print(_project_version(proj_dir))
 
 
-def add_tag_release(proj_dir: Union[str, Path, None] = None) -> None:
+def add_tag_release(proj_dir: Union[str, Path, None] = None, tag: str = "") -> None:
     """Add a tag to the latest commit on the master branch for release.
     The tag is decided based on the current version of the project.
 
@@ -129,9 +129,10 @@ def add_tag_release(proj_dir: Union[str, Path, None] = None) -> None:
     sp.run("git checkout master && git pull", shell=True, check=True)
     print()
     # get tag
-    if proj_dir is None:
-        proj_dir = _project_dir()
-    tag = "v" + _project_version(proj_dir)
+    if not tag:
+        if proj_dir is None:
+            proj_dir = _project_dir()
+        tag = "v" + _project_version(proj_dir)
     proc = sp.run(f"git tag -l {tag}", shell=True, check=True, capture_output=True)
     if proc.stdout:
         sp.run(f"git checkout {current_branch}", shell=True, check=True)
