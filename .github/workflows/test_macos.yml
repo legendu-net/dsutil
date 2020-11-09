@@ -32,6 +32,8 @@ jobs:
         xinstall pt -ic
         ~/.poetry/bin/poetry env use python3
         ~/.poetry/bin/poetry install
+        brew install libmagic
+        brew link libmagic
     - name: Test with pytest
       run: |
         ~/.poetry/bin/poetry run pytest
