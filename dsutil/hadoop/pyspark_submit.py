@@ -162,7 +162,7 @@ class SparkSubmit:
                 param["attachments"] = attachments
             notifiers.get_notifier("email").notify(**param)
         if status == "FAILED":
-            self._notify_log(app_id, subject)
+            self._notify_log(app_id, "Re: " + subject)
 
     def _notify_log(self, app_id, subject):
         logger.info("Waiting for 300 seconds for the log to be available...")
