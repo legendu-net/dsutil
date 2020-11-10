@@ -25,6 +25,10 @@ def update_shebang(script_dir: Union[Path, str], shebang: str):
     """
     if isinstance(script_dir, str):
         script_dir = Path(script_dir)
+    if not shebang.startswith("#!"):
+        shebang = "#!" + shebang
+    if not shebang.endswith("\n"):
+        shebang += "\n"
     magic = Magic(mime=True, uncompress=True)
     for path in script_dir.iterdir():
         if path.is_file() and magic.from_file(str(path)).startswith("text/"):
