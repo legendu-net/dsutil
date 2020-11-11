@@ -171,7 +171,10 @@ class DockerImage:
                 shutil.rmtree(ssh_dst)
             except FileNotFoundError:
                 pass
-            shutil.copytree(Path.home() / ".ssh", ssh_dst)
+            for path in (Path.home() / ".ssh").iterdir():
+                if path.is_file():
+                    shutil.copy2(path, ssh_dst)
+                    (ssh_dst / path.name).chmod(0o600)
 
     def build(
         self,

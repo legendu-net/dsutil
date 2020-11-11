@@ -22,7 +22,7 @@ jobs:
       - name: Build Package
         run: |
           ~/.poetry/bin/poetry build
-          ls -lha
+          ls -lha dist/
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
