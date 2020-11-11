@@ -228,7 +228,7 @@ def _submit_local(args, config: Dict[str, Any]):
     if not config.get("spark-submit-local", ""):
         return
     lines = [
-        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
         config["spark-submit-local"]
     ]
     if config["jars"]:
@@ -250,7 +250,7 @@ def _submit_cluster(args, config: Dict[str, Any]):
     )
     lines = [config["spark-submit"]] + [
         f"--{opt} {config[opt]}" for opt in opts if opt in config
-    ] + [f"--conf {k}={v}" for k, v in config["conf"].items()] 
+    ] + [f"--conf {k}={v}" for k, v in config["conf"].items()]
     if config["jars"]:
         lines.append(f"--jars {config['jars']}")
     lines.extend(args.cmd)
