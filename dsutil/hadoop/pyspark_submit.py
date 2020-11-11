@@ -2,9 +2,9 @@
 # encoding: utf-8
 """A module makes it easy to run Scala/Python Spark job.
 """
+from typing import Union, List, Dict, Callable, Any
 import os
 import sys
-from typing import Union, List, Dict, Callable
 from argparse import Namespace, ArgumentParser
 from pathlib import Path
 import subprocess as sp
@@ -224,6 +224,41 @@ def _files(config: Dict) -> str:
     return ",".join(files)
 
 
+def _submit_local(args, config: Dict[str, Any]):
+    if not config.get("spark-submit-local", ""):
+        return
+    lines = [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 
+        config["spark-submit-local"]
+    ]
+    if config["jars"]:
+        lines.append(f"--jars {config['jars']}")
+    lines.append("--conf spark.yarn.maxAppAttempts=1")
+    for conf, val in config["conf"]:
+        if conf in ("spark.pyspark.driver.python", "spark.pyspark.python"):
+            lines.append(f"--conf {conf}={val}")
+    lines.extend(args.cmd)
+    for idx in range(2, len(lines)):
+        lines[idx] = " " * 4 + lines[idx]
+    SparkSubmit().submit(" \\\n".join(lines) + "\n", args.cmd[:1])
+
+
+def _submit_cluster(args, config: Dict[str, Any]):
+    opts = (
+        "files", "master", "deploy-mode", "queue", "num-executors", "executor-memory",
+        "driver-memory", "executor-cores", "archives"
+    )
+    lines = [config["spark-submit"]] + [
+        f"--{opt} {config[opt]}" for opt in opts if opt in config
+    ] + [f"--conf {k}={v}" for k, v in config["conf"].items()] 
+    if config["jars"]:
+        lines.append(f"--jars {config['jars']}")
+    lines.extend(args.cmd)
+    for idx in range(1, len(lines)):
+        lines[idx] = " " * 4 + lines[idx]
+    SparkSubmit(email=config["email"]).submit(" \\\n".join(lines) + "\n", args.cmd[:1])
+
+
 def submit(args: Namespace):
     """Submit the Spark job.
     """
@@ -231,18 +266,11 @@ def submit(args: Namespace):
         config = yaml.load(fin, Loader=yaml.FullLoader)
     config["files"] = _files(config)
     if "jars" not in config:
-        config["jars"] = ()
-    opts = (
-        "files", "master", "deploy-mode", "queue", "num-executors", "executor-memory",
-        "driver-memory", "executor-cores", "archives"
-    )
-    lines = [config["spark-submit"]] + [
-        f"--{opt} {config[opt]}" for opt in opts if opt in config
-    ] + [f"--conf {k}={v}" for k, v in config["conf"].items()
-        ] + [f"--jars {jar}" for jar in config["jars"]] + args.cmd
-    for idx in range(1, len(lines)):
-        lines[idx] = " " * 4 + lines[idx]
-    SparkSubmit(email=config["email"]).submit(" \\\n".join(lines) + "\n", args.cmd[:1])
+        config["jars"] = ""
+    if isinstance(config["jars"], (list, tuple)):
+        config["jars"] = ",".join(config["jars"])
+    _submit_local(args, config)
+    _submit_cluster(args, config)
 
 
 def parse_args(args=None, namespace=None) -> Namespace:
