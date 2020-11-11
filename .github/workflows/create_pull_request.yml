@@ -12,4 +12,5 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           title: Merge dev into master
-          branch: master
+          branch: dev
+          base: master
