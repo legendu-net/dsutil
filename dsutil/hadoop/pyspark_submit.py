@@ -244,6 +244,8 @@ def _submit_local(args, config: Dict[str, Any]):
 
 
 def _submit_cluster(args, config: Dict[str, Any]):
+    if not config.get("spark-submit", ""):
+        return
     opts = (
         "files", "master", "deploy-mode", "queue", "num-executors", "executor-memory",
         "driver-memory", "executor-cores", "archives"
