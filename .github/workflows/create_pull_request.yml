@@ -8,9 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: pr_dev_master
+        with:
+          ref: master
+      - name: Reset master branch
+        run: |
+          git fetch origin master:master
+          git reset --soft origin/master
+      - name: Create pull request from dev to master
         uses: peter-evans/create-pull-request@v3
         with:
           title: Merge dev into master
-          branch: dev-bot
+          branch: dev
           base: master
