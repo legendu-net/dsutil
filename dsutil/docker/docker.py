@@ -166,6 +166,9 @@ class DockerImage:
 
     def _copy_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
+            ssh_src = Path.home() / ".ssh"
+            if not ssh_src.is_dir():
+                return
             ssh_dst = self.path / copy_ssh_to
             try:
                 shutil.rmtree(ssh_dst)
@@ -173,7 +176,7 @@ class DockerImage:
                 pass
             ssh_dst.mkdir()
             ssh_dst.chmod(0o700)
-            for path in (Path.home() / ".ssh").iterdir():
+            for path in ssh_src.iterdir():
                 if path.is_file():
                     shutil.copy2(path, ssh_dst)
                     (ssh_dst / path.name).chmod(0o600)
