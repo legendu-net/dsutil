@@ -164,6 +164,7 @@ class DockerImage:
                 break
         return deps
 
+
     def _copy_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
             ssh_src = Path.home() / ".ssh"
@@ -175,10 +176,10 @@ class DockerImage:
                 shutil.rmtree(ssh_dst)
             except FileNotFoundError:
                 pass
-            shutil.copytree(ssh_src, ssh_dst)
-            for path in ssh_dst.iterdir():
-                if path.is_socket():
-                    path.unlink()
+            def _ignore_socket(dir_, files):
+                dir_ = Path(dir_)
+                return [file for file in files if (dir_ / file).is_socket()]
+            shutil.copytree(ssh_src, ssh_dst, ignore=_ignore_socket)
             logger.info("~/.ssh has been copied to {}", ssh_dst)
 
     def build(
