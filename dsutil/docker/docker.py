@@ -88,6 +88,11 @@ def pull_image(image: str, retry: int = 3, seconds: float = 60) -> Tuple[str, fl
     return _pull_image_timing(image)
 
 
+def _ignore_socket(dir_, files):
+    dir_ = Path(dir_)
+    return [file for file in files if (dir_ / file).is_socket()]
+
+
 class DockerImage:
     """Class representing a Docker Image.
     """
@@ -175,12 +180,7 @@ class DockerImage:
                 shutil.rmtree(ssh_dst)
             except FileNotFoundError:
                 pass
-            ssh_dst.mkdir()
-            ssh_dst.chmod(0o700)
-            for path in ssh_src.iterdir():
-                if path.is_file():
-                    shutil.copy2(path, ssh_dst)
-                    (ssh_dst / path.name).chmod(0o600)
+            shutil.copytree(ssh_src, ssh_dst, ignore=_ignore_socket)
             logger.info("~/.ssh has been copied to {}", ssh_dst)
 
     def build(
