@@ -169,7 +169,6 @@ class DockerImage:
                 break
         return deps
 
-
     def _copy_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
             ssh_src = Path.home() / ".ssh"
