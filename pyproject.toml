@@ -35,6 +35,7 @@ pytest = ">=3.0"
 pylint = ">=2.5.3"
 pytype = ">=2020.08.10"
 yapf = ">=0.30.0"
+pyspark = ">=3.0.1"
 
 [build-system]
 requires = ["poetry>=1.0.0"]

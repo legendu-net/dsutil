@@ -1,10 +1,13 @@
-def calc_global_rank(args: Namespace) -> DataFrame:
+from pyspark.sql import DataFrame, Window
+from pyspark.sql.functions import col, spark_partition_id, rank, coalesce, lit, max, sum
+
+
+def calc_global_rank(item: DataFrame) -> DataFrame:
     """Calculate global ranks.
     This function uses a smart algorithm to avoding shuffling all items
     to a single node which causes OOM.
     :return: A DataFrame containing item metrics from both marketing and site.
     """
-    item = combine_market_site(args)
     # calculate local rank
     wspec1 = Window.partitionBy("part_id").orderBy(
         col("col1").desc(),
