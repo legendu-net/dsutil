@@ -171,6 +171,8 @@ class DockerImage:
                 shutil.rmtree(ssh_dst)
             except FileNotFoundError:
                 pass
+            ssh_dst.mkdir()
+            ssh_dst.chmod(0o700)
             for path in (Path.home() / ".ssh").iterdir():
                 if path.is_file():
                     shutil.copy2(path, ssh_dst)

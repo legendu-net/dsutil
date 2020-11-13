@@ -1,7 +1,12 @@
 [MASTER]
+ignore=.venv,.ipynb_checkpoints
 unsafe-load-any-extension=no
-extension-pkg-whitelist=numpy,cv2
-generated-members=cv2.*
+extension-pkg-whitelist=numpy,cv2,pyspark
+generated-members=sqlite3.*,cv2.*,pyspark.*
+ignored-modules=pyspark.sql.functions
 
 [TYPECHECK]
 ignored-classes=Namespace
+
+[MESSAGES CONTROL]
+disable=C0330
