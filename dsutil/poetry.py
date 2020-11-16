@@ -123,7 +123,11 @@ def _get_tag(proj_dir):
     return "v" + _project_version(proj_dir)
 
 
-def add_tag_release(proj_dir: Union[str, Path, None] = None, tag: str = "", release_branch: str = "master") -> None:
+def add_tag_release(
+    proj_dir: Union[str, Path, None] = None,
+    tag: str = "",
+    release_branch: str = "master"
+) -> None:
     """Add a tag to the latest commit on the master branch for release.
     The tag is decided based on the current version of the project.
 
