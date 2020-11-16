@@ -138,7 +138,6 @@ def add_tag_release(
     # add tag to the release branch
     repo.git.checkout(release_branch)
     repo.remote().pull(repo.active_branch)
-    print()
     tag = tag if tag else _get_tag(proj_dir)
     try:
         repo.create_tag(tag)
@@ -148,7 +147,6 @@ def add_tag_release(
             f"The tag {tag} already exists! Please merge new changes to the {release_branch} branch first."
         ) from err
     repo.remote().push(tag)
-    print()
     # switch back to the old branch
     repo.git.checkout(current_branch)
 
