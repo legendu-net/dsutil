@@ -196,7 +196,7 @@ def format_code(
         sys.stderr.flush()
     if inplace and commit:
         repo = git.Repo(proj_dir)
-        repo.index.add(".")
+        repo.git.add(".")
         repo.index.commit("format code")
         repo.remote().push(repo.active_branch)
 
