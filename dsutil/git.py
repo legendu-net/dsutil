@@ -41,7 +41,7 @@ def check(path: str = ".", file_mode: bool = False) -> None:
     :param path: The path of the directory under which Git repositories are to be checked.
     """
     path = Path(path).resolve()
-    logger.info(f'Checking status of Git repositories under "{path}"...')
+    logger.info('Checking status of Git repositories under "{}"...', path)
     _check_helper(path=path, file_mode=file_mode)
 
 
