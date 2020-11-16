@@ -13,6 +13,7 @@ import tempfile
 from tqdm import tqdm
 import pandas as pd
 from loguru import logger
+import git
 HOME = Path.home()
 
 
@@ -164,9 +165,9 @@ def find_data_tables(
     if isinstance(root, str):
         if re.search(r"(git@|https://).*\.git", root):
             with tempfile.TemporaryDirectory() as tempdir:
-                sp.run(f"git clone {root} {tempdir}", shell=True, check=True)
+                git.Repo.clone_from(root, tempdir, branch="master")
                 logger.info(
-                    f"The repo {root} is cloned to the local directory {tempdir}."
+                    "The repo {} is cloned to the local directory {}.", root, tempdir
                 )
                 return find_data_tables(tempdir, filter_=filter_)
         root = Path(root)

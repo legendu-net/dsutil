@@ -8,6 +8,7 @@ from typing import Union, List, Iterable
 import subprocess as sp
 import toml
 from loguru import logger
+import git
 from .filesystem import update_file
 DIST = "dist"
 README = "readme.md"
@@ -108,46 +109,48 @@ def version(
     if ver:
         _update_version(ver=ver, proj_dir=proj_dir)
         if commit:
-            cmd = f"cd {proj_dir} && git add .; git commit -m 'bump up version'; git push"
-            sp.run(cmd, shell=True, check=False)
+            repo = git.Repo(proj_dir)
+            repo.git.add(".")
+            repo.index.commit("bump up version")
+            repo.remote().push(repo.active_branch)
     else:
         print(_project_version(proj_dir))
 
 
-def add_tag_release(proj_dir: Union[str, Path, None] = None, tag: str = "") -> None:
+def _get_tag(proj_dir):
+    if proj_dir is None:
+        proj_dir = _project_dir()
+    return "v" + _project_version(proj_dir)
+
+
+def add_tag_release(
+    proj_dir: Union[str, Path, None] = None,
+    tag: str = "",
+    release_branch: str = "master"
+) -> None:
     """Add a tag to the latest commit on the master branch for release.
     The tag is decided based on the current version of the project.
 
     :param tag: The tag (defaults to the current version of the package) to use.
     """
-    # get current branch
-    proc = sp.run(
-        "git branch --show-current", shell=True, check=True, capture_output=True
-    )
-    current_branch = proc.stdout.decode().strip()
-    # checkout the master branch
-    sp.run("git checkout master && git pull", shell=True, check=True)
+    repo = git.Repo(proj_dir)
+    current_branch = repo.active_branch
+    # add tag to the release branch
+    repo.git.checkout(release_branch)
+    repo.remote().pull(repo.active_branch)
     print()
-    # get tag
-    if not tag:
-        if proj_dir is None:
-            proj_dir = _project_dir()
-        tag = "v" + _project_version(proj_dir)
-    proc = sp.run(f"git tag -l {tag}", shell=True, check=True, capture_output=True)
-    if proc.stdout:
-        sp.run(f"git checkout {current_branch}", shell=True, check=True)
+    tag = tag if tag else _get_tag(proj_dir)
+    try:
+        repo.create_tag(tag)
+    except git.GitCommandError as err:
+        repo.git.checkout(current_branch)
         raise ValueError(
-            f"The tag {tag} already exists! Please merge new changes to the master branch first."
-        )
-    # tag the master branch
-    sp.run(f"git tag {tag}", shell=True, check=True)
-    # push tag
-    proc = sp.run("git remote", shell=True, check=True, capture_output=True)
-    for remote in proc.stdout.decode().strip().split("\n"):
-        sp.run(f"git push {remote} {tag}", shell=True, check=True)
+            f"The tag {tag} already exists! Please merge new changes to the {release_branch} branch first."
+        ) from err
+    repo.remote().push(tag)
     print()
-    # checkout the old branch
-    sp.run(f"git checkout {current_branch}", shell=True, check=True)
+    # switch back to the old branch
+    repo.git.checkout(current_branch)
 
 
 def format_code(
@@ -192,8 +195,10 @@ def format_code(
         sys.stdout.flush()
         sys.stderr.flush()
     if inplace and commit:
-        cmd = f"cd {proj_dir} && git add . && git commit -m 'format code' && git push"
-        sp.run(cmd, shell=True, check=False)
+        repo = git.Repo(proj_dir)
+        repo.git.add(".")
+        repo.index.commit("format code")
+        repo.remote().push(repo.active_branch)
 
 
 def _lint_code(proj_dir: Union[Path, None], linter: Union[str, List[str]]):
