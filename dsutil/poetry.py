@@ -110,7 +110,7 @@ def version(
         _update_version(ver=ver, proj_dir=proj_dir)
         if commit:
             repo = git.Repo(proj_dir)
-            repo.index.add(".")
+            repo.git.add(".")
             repo.index.commit("bump up version")
             repo.remote().push(repo.active_branch)
     else:
