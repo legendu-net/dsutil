@@ -112,7 +112,8 @@ def version(
             repo = git.Repo(proj_dir)
             repo.git.add(".")
             repo.index.commit("bump up version")
-            repo.remote().push(repo.active_branch)
+            for remote in repo.remotes:
+                remote.push(repo.active_branch)
     else:
         print(_project_version(proj_dir))
 
@@ -137,8 +138,8 @@ def add_tag_release(
     current_branch = repo.active_branch
     # add tag to the release branch
     repo.git.checkout(release_branch)
-    repo.remote().pull(repo.active_branch)
-    print()
+    for remote in repo.remotes:
+        remote.pull(repo.active_branch)
     tag = tag if tag else _get_tag(proj_dir)
     try:
         repo.create_tag(tag)
@@ -147,8 +148,8 @@ def add_tag_release(
         raise ValueError(
             f"The tag {tag} already exists! Please merge new changes to the {release_branch} branch first."
         ) from err
-    repo.remote().push(tag)
-    print()
+    for remote in repo.remotes:
+        remote.push(tag)
     # switch back to the old branch
     repo.git.checkout(current_branch)
 
@@ -198,7 +199,8 @@ def format_code(
         repo = git.Repo(proj_dir)
         repo.git.add(".")
         repo.index.commit("format code")
-        repo.remote().push(repo.active_branch)
+        for remote in repo.remotes:
+            remote.push(repo.active_branch)
 
 
 def _lint_code(proj_dir: Union[Path, None], linter: Union[str, List[str]]):
