@@ -2,9 +2,9 @@ name: Test Code on Windows
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   test_code:
@@ -28,7 +28,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip3 install -U git+https://github.com/dclong/xinstall@master
+        pip3 install -U git+https://github.com/dclong/xinstall@main
         xinstall pt -ic --python python
         $env:Path += ";$env:Userprofile\.poetry\bin"
         poetry env use python
