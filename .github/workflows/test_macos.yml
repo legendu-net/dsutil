@@ -1,11 +1,9 @@
 name: Test Code on macOS
-
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
-
+    branches: [ main ]
 jobs:
   test_code:
     runs-on: ${{matrix.os}}
@@ -27,7 +25,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip3 install -U git+https://github.com/dclong/xinstall@master
+        pip3 install -U git+https://github.com/dclong/xinstall@main
         xinstall --sudo docker -ic --user-to-docker ""
         xinstall pt -ic
         ~/.poetry/bin/poetry env use python3
