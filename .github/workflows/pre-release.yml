@@ -1,10 +1,8 @@
 name: pre-release
-
 on:
   push:
     branches:
-      - master
-
+      - main
 jobs:
   pre-release:
     name: Pre Release
@@ -17,7 +15,7 @@ jobs:
           python-version: 3.7
       - name: Install Poetry
         run: |
-          pip3 install -U git+https://github.com/dclong/xinstall@master
+          pip3 install -U git+https://github.com/dclong/xinstall@main
           xinstall pt -ic
       - name: Build Package
         run: |
