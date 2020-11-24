@@ -2,7 +2,7 @@ name: Lint Code
 
 on:
   push:
-    branches: [ dev, master ]
+    branches: [ dev, main ]
   pull_request:
     branches: [ dev ]
 
@@ -20,7 +20,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip3 install -U git+https://github.com/dclong/xinstall@master
+        pip3 install -U git+https://github.com/dclong/xinstall@main
         xinstall --sudo pt -ic
         ~/.poetry/bin/poetry env use python3
         ~/.poetry/bin/poetry install

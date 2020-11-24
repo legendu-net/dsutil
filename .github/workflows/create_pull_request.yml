@@ -9,13 +9,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: master
-      - name: Reset master branch with dev changes
+          ref: main
+      - name: Reset main branch with dev changes
         run: |
           git fetch origin dev:dev
           git reset --hard dev
-      - name: Create pull request from dev to master
+      - name: Create pull request from dev to main
         uses: peter-evans/create-pull-request@v3
         with:
-          title: Merge dev into master
+          title: Merge dev into main
           branch: dev
