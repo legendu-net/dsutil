@@ -1,12 +1,13 @@
 [tool.poetry]
 name = "dsutil"
-version = "0.38.0"
+version = "0.38.1"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
 [tool.poetry.scripts]
 logf = "dsutil.hadoop:logf.main"
 pyspark_submit = "dsutil.hadoop:pyspark_submit.main"
+pykinit = "dsutil.hadoop:kerberos.main"
 match_memory = "dsutil:match_memory.main"
 
 [tool.poetry.dependencies]
