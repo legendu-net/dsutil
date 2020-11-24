@@ -8,7 +8,7 @@ the saved password is used so that users do not have to type in password to auth
 from typing import Union, Dict, Any
 import os
 from pathlib import Path
-import json
+import yaml
 import base64
 from argparse import ArgumentParser
 import subprocess as sp
@@ -62,7 +62,7 @@ def _warn_passwd_expiration(process, email: Dict[str, str]):
         line for line in lines
         if line.strip().startswith("Warning: Your password will expire")
     )
-    if msg:
+    if msg and email:
         subject = "Your Hadoop cluster password is expiring!"
         notifiers.get_notifier("email").notify(
             from_=email["from"],
@@ -91,29 +91,31 @@ def authenticate(password: str, email: Dict[str, str]) -> None:
         subject = SUBJECT.format("succeeded")
         msg = MSG.format("succeeded")
         logger.info(msg)
-        notifiers.get_notifier("email").notify(
-            from_=email["from"],
-            to=email["to"],
-            subject=subject,
-            message=msg,
-            host=email["host"],
-            username="",
-            password="",
-        )
+        if email:
+            notifiers.get_notifier("email").notify(
+                from_=email["from"],
+                to=email["to"],
+                subject=subject,
+                message=msg,
+                host=email["host"],
+                username="",
+                password="",
+            )
         _warn_passwd_expiration(process, email)
     except sp.CalledProcessError:
         subject = SUBJECT.format("failed")
         msg = MSG.format("failed")
         logger.warning(msg)
-        notifiers.get_notifier("email").notify(
-            from_=email["from"],
-            to=email["to"],
-            subject=subject,
-            message=msg,
-            host=email["host"],
-            username="",
-            password="",
-        )
+        if email:
+            notifiers.get_notifier("email").notify(
+                from_=email["from"],
+                to=email["to"],
+                subject=subject,
+                message=msg,
+                host=email["host"],
+                username="",
+                password="",
+            )
 
 
 def parse_args(args=None, namespace=None):
@@ -148,7 +150,7 @@ def _read_config(config: Union[Path, str, None]) -> Dict[str, Any]:
     if isinstance(config, str):
         config = Path(config)
     with config.open("r") as fin:
-        return json.load(fin)
+        return yaml.load(fin, Loader=yaml.FullLoader)
 
 
 def main() -> None:
