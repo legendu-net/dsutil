@@ -123,10 +123,11 @@ def parse_args(args=None, namespace=None):
     """
     parser = ArgumentParser(description="Easy kinit authentication.")
     parser.add_argument(
-        "-u", 
-        "--user", 
-        dest="user", 
-        default="", help="The name of the user to authenticate."
+        "-u",
+        "--user",
+        dest="user",
+        default="",
+        help="The name of the user to authenticate."
     )
     parser.add_argument(
         "-p", "--password", dest="password", default="", help="the user's password."
