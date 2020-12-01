@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 # encoding: utf-8
-
+from typing import Union
 import os
 import sys
-from argparse import ArgumentParser
 import glob
 import re
+from pathlib import Path
+from argparse import ArgumentParser
+from loguru import logger
 
 
 def strip_margin(text: str) -> str:
@@ -181,3 +183,27 @@ def select(file, columns, delimiter, output: str = ""):
             for line in fin:
                 fields = line.split(delimiter)
                 fout.write(delimiter.join([fields[i] for i in index]) + "\n")
+
+
+def prune_json(input: Union[str, Path], output: Union[str, Path] = ""):
+    logger.info("Pruning the JSON fiel at {}...", input)
+    if isinstance(input, str):
+        input = Path(input)
+    if isinstance(output, str):
+        if output:
+            output = Path(output)
+        else:
+            output = input.with_name(input.stem + "_prune.json")
+    skip = False
+    with input.open("r") as fin, output.open("w") as fout:
+        for line in fin:
+            line = line.strip()
+            if line == '"value_counts": {':
+                skip = True
+                continue
+            if skip:
+                if line in ("}", "},"):
+                    skip = False
+            else:
+                fout.write(line)
+    logger.info("The pruned JSON file is written to {}.", output)

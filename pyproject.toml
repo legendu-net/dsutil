@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dsutil"
-version = "0.38.3"
+version = "0.39.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
@@ -30,6 +30,7 @@ psutil = ">=5.7.3"
 nbconvert = ">=6.0.7"
 PyYAML = ">=5.3.1"
 python-magic = ">=0.4.0"
+pandas-profiling = ">=2.9.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"

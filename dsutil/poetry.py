@@ -270,6 +270,8 @@ def build_package(
     :param dst_dir: The root directory of the project.
     :param proj_dir: The root directory of the Poetry project.
     """
+    if not shutil.which("poetry"):
+        raise FileNotFoundError("The command poetry is not found!")
     if proj_dir is None:
         proj_dir = _project_dir()
     if os.path.exists(DIST):
