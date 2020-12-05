@@ -8,7 +8,7 @@ authors = ["Benjamin Du <longendu@yahoo.com>"]
 logf = "dsutil.hadoop:logf.main"
 pyspark_submit = "dsutil.hadoop:pyspark_submit.main"
 pykinit = "dsutil.hadoop:kerberos.main"
-match_memory = "dsutil:match_memory.main"
+match_memory = "dsutil:memory.main"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<3.9"
