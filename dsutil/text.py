@@ -10,24 +10,6 @@ from argparse import ArgumentParser
 from loguru import logger
 
 
-def strip_margin(text: str) -> str:
-    """Remove all leading white spaces in each row of a string.
-    This function is same as Scala's stripMargin method of String.
-    For example, the input string is:
-    select a
-        from table_a
-    Then the output should be:
-    select a
-    from table_a
-
-    :param text: the input string
-    :return: A new string with all white spaces at the beginning of each row removed.
-    """
-    indent = len(min(re.findall(r"\n[ \t]*(?=\S)", text) or [""]))
-    pattern = r"\n[ \t]{%d}" % (indent - 1)
-    return re.sub(pattern, "\n", text)
-
-
 def has_header(files, num_files: int = 5):
     """Check whether the files have headers.
  
@@ -98,42 +80,6 @@ def merge(files, output: str = "", n: int = 5):
         _merge_without_header(files, output)
 
 
-def merge_args(args=None, namespace=None):
-    """Parse arguments for the function dedup_header.
-    """
-    parser = ArgumentParser(
-        description="Merge text file with proper handling of headers."
-    )
-    parser.add_argument(
-        "-f",
-        "--files",
-        dest="files",
-        nargs="+",
-        required=True,
-        help="the files (Linux-style wildcards are supported) to merge."
-    )
-    parser.add_argument(
-        "-o",
-        "--output",
-        dest="output",
-        required=False,
-        default="",
-        help="the (optional) output file."
-    )
-    parser.add_argument(
-        "-n",
-        "--num-deciding-header",
-        dest="n",
-        type=int,
-        required=False,
-        default=5,
-        help="the number of non-empty files for deciding whether there are headers."
-    )
-    args = parser.parse_args(args=args, namespace=namespace)
-    files = [file for pattern in args.files for file in glob.glob(pattern)]
-    merge(files, args.output, args.n)
-
-
 def dedup_header(file, output: str = ""):
     """Dedup headers in a file (due to the hadoop getmerge command).
     Only the header on the first line is kept and headers (identical line to the first line) 
@@ -146,25 +92,6 @@ def dedup_header(file, output: str = ""):
         for line in fin:
             if line != header:
                 fout.write(line)
-
-
-def dedup_header_args(args=None, namespace=None):
-    """Parse arguments for the function dedup_header.
-    """
-    parser = ArgumentParser(description="Dedup headers in a text file.")
-    parser.add_argument(
-        "-f", "--file", dest="file", required=True, help="the file to dedup."
-    )
-    parser.add_argument(
-        "-o",
-        "--output",
-        dest="output",
-        required=False,
-        default="",
-        help="the (optional) output file."
-    )
-    args = parser.parse_args(args=args, namespace=namespace)
-    dedup_header(args.file, args.output)
 
 
 def select(file, columns, delimiter, output: str = ""):

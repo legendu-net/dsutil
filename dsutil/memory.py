@@ -30,6 +30,12 @@ def get_memory_usage(user: str = USER):
         return get_memory_usage(user)
 
 
+def monitor_memory_usage(seconds: float = 1, user: str = USER):
+    while True:
+        time.sleep(seconds)
+        logger.info("Memory used by {}: {:,}", user, get_memory_usage(user=user))
+
+
 def match_memory_usage(
     target: float,
     arr_size: int = 1_000_000,

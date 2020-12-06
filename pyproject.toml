@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dsutil"
-version = "0.39.0"
+version = "0.40.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
@@ -8,7 +8,7 @@ authors = ["Benjamin Du <longendu@yahoo.com>"]
 logf = "dsutil.hadoop:logf.main"
 pyspark_submit = "dsutil.hadoop:pyspark_submit.main"
 pykinit = "dsutil.hadoop:kerberos.main"
-match_memory = "dsutil:match_memory.main"
+match_memory = "dsutil:memory.main"
 
 [tool.poetry.dependencies]
 python = ">=3.7,<3.9"
@@ -31,6 +31,7 @@ nbconvert = ">=6.0.7"
 PyYAML = ">=5.3.1"
 python-magic = ">=0.4.0"
 pandas-profiling = ">=2.9.0"
+sqlparse = ">=0.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"
