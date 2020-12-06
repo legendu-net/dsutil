@@ -31,6 +31,7 @@ nbconvert = ">=6.0.7"
 PyYAML = ">=5.3.1"
 python-magic = ">=0.4.0"
 pandas-profiling = ">=2.9.0"
+sqlparse = ">=0.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"
