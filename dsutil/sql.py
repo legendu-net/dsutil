@@ -7,7 +7,8 @@ import sqlparse
 def format(path: Union[Path, str]):
     if isinstance(path, str):
         path = Path(path)
-    query = sqlparse.format(path.read_text(),
+    query = sqlparse.format(
+        path.read_text(),
         keyword_case="upper",
         identifier_case="lower",
         strip_comments=False,
