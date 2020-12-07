@@ -32,7 +32,7 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     """
     client = docker.from_env()
     seconds = timeit.timeit(
-        lambda: client.push(repo, tag), timer=time.perf_counter_ns, number=1
+        lambda: client.images.push(repo, tag), timer=time.perf_counter_ns, number=1
     ) / 1E9
     return repo, tag, seconds, "push"
 
@@ -59,7 +59,7 @@ def _retry_docker(task: Callable,
 def _pull_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     client = docker.from_env()
     seconds = timeit.timeit(
-        lambda: client.pull(repo, tag), timer=time.perf_counter_ns, number=1
+        lambda: client.images.pull(repo, tag), timer=time.perf_counter_ns, number=1
     ) / 1E9
     return repo, tag, seconds, "pull"
 

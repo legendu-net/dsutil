@@ -136,7 +136,7 @@ def pull():
     imgs = images()
     imgs = imgs[imgs.repository != "<None>" & imgs.tag != "<None>"]
     for _, (repo, tag, *_) in imgs.iterrows():
-        client.pull(repo, tag)
+        client.images.pull(repo, tag)
 
 
 def remove_images(
