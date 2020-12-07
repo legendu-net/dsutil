@@ -201,7 +201,7 @@ class DockerImage:
         self._update_base_tag(tag_build, tag_base)
         # TODO: path might have issues ...
         docker.from_env().images.build(
-            path=self.path,
+            path=str(self.path),
             tag=f"{self.name}:{tag_build}",
             nocache=no_cache,
             rm=True,
