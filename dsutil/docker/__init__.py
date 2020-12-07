@@ -81,7 +81,7 @@ def remove(aggressive: bool = False, choice: str = "") -> None:
     remove_images(tag="none", choice=choice)
     if aggressive:
         remove_images(tag="[a-z]*_?[0-9]{4}", choice=choice)
-        imgs = images().groupby("image_id").apply(
+        imgs = images().groupby("image_id").apply( # pylint: disable=E1101
             lambda frame: frame.query("tag == 'next'") if frame.shape[0] > 1 else None
         )
         _remove_images(imgs, choice=choice)
