@@ -200,7 +200,7 @@ class DockerImage:
         logger.info("Building the Docker image {}...", self.name)
         self._update_base_tag(tag_build, tag_base)
         # TODO: path might have issues ...
-        docker.from_env().build(
+        docker.from_env().images.build(
             path=self.path,
             tag=f"{self.name}:{tag_build}",
             nocache=no_cache,
