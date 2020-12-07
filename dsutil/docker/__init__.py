@@ -12,6 +12,7 @@ import re
 import subprocess as sp
 import pandas as pd
 from loguru import logger
+import docker
 from .. import shell
 from .builder import DockerImage, DockerImageBuilder
 
