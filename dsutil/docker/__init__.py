@@ -22,9 +22,7 @@ def images():
     for image in docker.from_env().images.list():
         repository = image.attrs["RepoDigests"][0].split("@")[0]
         image_id = image.short_id[7:]
-        created = datetime.datetime.strptime(
-            image.attrs["Created"][:-4], "%Y-%m-%dT%H:%M:%S.%f"
-        )
+        created = image.attrs["Created"]
         size = image.attrs["Size"]
         if image.tags:
             for tag in image.tags:
@@ -53,22 +51,13 @@ def images():
 def containers():
     data = [
         {
-            "container_id":
-                cont.short_id,
-            "image":
-                cont.image.tags[0] if cont.image.tags else cont.image.short_id[7:],
-            "command":
-                cont.attrs["Cmd"],
-            "created":
-                datetime.datetime.strptime(
-                    cont.attrs["Created"], "%Y-%m-%dT%H:%M:%S.%f"
-                ),
-            "status":
-                cont.status,
-            "ports":
-                cont.ports,
-            "name":
-                cont.name,
+            "container_id": cont.short_id,
+            "image": cont.image.tags[0] if cont.image.tags else cont.image.short_id[7:],
+            "command": cont.attrs["Cmd"],
+            "created": cont.attrs["Created"],
+            "status": cont.status,
+            "ports": cont.ports,
+            "name": cont.name,
         } for cont in docker.from_env().containers.list(all=True)
     ]
     return pd.DataFrame(data)
