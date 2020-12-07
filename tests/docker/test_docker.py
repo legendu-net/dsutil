@@ -4,8 +4,20 @@ import sys
 import shutil
 from pathlib import Path
 import pytest
-import dsutil
+import dsutil.docker
 BASE_DIR = Path(__file__).parent
+
+
+@pytest.mark.skipif(sys.platform == "darwin", reason="Skip test for Mac OS")
+def test_images():
+    if shutil.which("docker"):
+        dsutil.docker.images()
+
+
+@pytest.mark.skipif(sys.platform == "darwin", reason="Skip test for Mac OS")
+def test_containers():
+    if shutil.which("docker"):
+        dsutil.docker.containers()
 
 
 @pytest.mark.skipif(sys.platform == "darwin", reason="Skip test for Mac OS")
@@ -26,6 +38,6 @@ def test_DockerImageBuilder():
         return
     images = [
         "https://github.com/dclong/docker-python-portable.git",
-        ]
+    ]
     builder = dsutil.docker.DockerImageBuilder(images, branch="master")
     builder.build(tag_build="unittest")

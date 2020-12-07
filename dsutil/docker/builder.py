@@ -5,14 +5,15 @@ from typing import Union, List, Sequence, Set, Deque, Tuple, Dict, Iterable, Cal
 import tempfile
 from pathlib import Path
 import time
-from timeit import default_timer as timer
+import timeit
 import datetime
 import subprocess as sp
 from collections import deque
 import shutil
 from loguru import logger
-import git
 import pandas as pd
+import git
+import docker
 client = docker.from_env()
 
 
@@ -30,11 +31,15 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     :param tag: The tag of the Docker image to push.
     :return: The time (in seconds) used to push the Docker image.
     """
-    seconds = timeit.timeit(lambda: client.push(repo, tag), timer=timeit.perf_counter_ns, number=1) / 1E9
+    seconds = timeit.timeit(
+        lambda: client.push(repo, tag), timer=time.perf_counter_ns, number=1
+    ) / 1E9
     return repo, tag, seconds, "push"
 
 
-def _retry_docker(task: Callable, retry: int = 3, seconds: float = 60) -> Tuple[str, str, float, str]:
+def _retry_docker(task: Callable,
+                  retry: int = 3,
+                  seconds: float = 60) -> Tuple[str, str, float, str]:
     """Retry a Docker API on failure (for a few times).
     :param task: The task to run.
     :param retry: The total number of times to retry.
@@ -51,8 +56,10 @@ def _retry_docker(task: Callable, retry: int = 3, seconds: float = 60) -> Tuple[
     return task()
 
 
-def _pull_image_timing(repo: str, tag: str) -> Tuple[str, float]:
-    seconds = timeit.timeit(lambda: client.pull(repo, tag), timer=timeit.perf_counter_ns, number=1) / 1E9
+def _pull_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
+    seconds = timeit.timeit(
+        lambda: client.pull(repo, tag), timer=time.perf_counter_ns, number=1
+    ) / 1E9
     return repo, tag, seconds, "pull"
 
 
@@ -157,7 +164,7 @@ class DockerImage:
         tag_base: str = "",
         no_cache: bool = False,
         copy_ssh_to: str = ""
-    ) -> Tuple[str, float, str]:
+    ) -> Tuple[str, str, float, str]:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
@@ -175,7 +182,7 @@ class DockerImage:
         under the current local Git repository. 
         :return: A tuple of the format (image_name_built, time_taken).
         """
-        start = timer()
+        start = time.perf_counter_ns()
         self.clone_repo()
         self._copy_ssh(copy_ssh_to)
         if tag_build is None:
@@ -188,16 +195,22 @@ class DockerImage:
         elif tag_build == "":
             tag_build = "latest"
         if self.is_root:
-            #pull_image(self.base_image)
-            _retry_docker(lambda: _pull_image_timing(repo, tag))
+            _retry_docker(lambda: _pull_image_timing(*self.base_image.split(":")))
         logger.info("Building the Docker image {}...", self.name)
         self._update_base_tag(tag_build, tag_base)
         # TODO: path might have issues ...
-        client.build(path=self.path, tag=f"{self.name}:{tag_build}", nocache=no_cache, rm=True, pull=False, cache_from=None)
+        client.build(
+            path=self.path,
+            tag=f"{self.name}:{tag_build}",
+            nocache=no_cache,
+            rm=True,
+            pull=False,
+            cache_from=None
+        )
         self.tag_build = tag_build
         self._remove_ssh(copy_ssh_to)
-        end = timer()
-        return self.name, tag_build, end - start, "build"
+        end = time.perf_counter_ns()
+        return self.name, tag_build, (end - start) / 1E9, "build"
 
     def _remove_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
@@ -235,15 +248,22 @@ class DockerImage:
         :return: A pandas DataFrame with 2 columns "image" (name of the built Docker image) 
         and "seconds" (time taken to build the Docker image).
         """
-        image = f"{self.name}:{self.tag_build}"
         data = [
-            _retry_docker(lambda: _push_image_timing(repo, tag), retry, seconds)
+            _retry_docker(
+                lambda: _push_image_timing(self.name, self.tag_build), retry, seconds
+            )
         ]
         if tag_tran_fun:
             tag_new = tag_tran_fun(self.tag_build)
             if tag_new != self.tag_build:
-                client.tag(image, self.name, tag_new, force=True)
-                data.append(_retry_docker(lambda: _push_image_timing(self.name, tag_new), retry, seconds))
+                client.tag(
+                    f"{self.name}:{self.tag_build}", self.name, tag_new, force=True
+                )
+                data.append(
+                    _retry_docker(
+                        lambda: _push_image_timing(self.name, tag_new), retry, seconds
+                    )
+                )
         return pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
 
 
