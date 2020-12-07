@@ -257,8 +257,8 @@ class DockerImage:
         if tag_tran_fun:
             tag_new = tag_tran_fun(self.tag_build)
             if tag_new != self.tag_build:
-                docker.from_env().tag(
-                    f"{self.name}:{self.tag_build}", self.name, tag_new, force=True
+                docker.from_env().images.get(f"{self.name}:{self.tag_build}").tag(
+                    self.name, tag_new, force=True
                 )
                 data.append(
                     _retry_docker(

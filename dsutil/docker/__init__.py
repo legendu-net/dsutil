@@ -81,7 +81,6 @@ def remove(aggressive: bool = False, choice: str = "") -> None:
     remove_images(tag="none", choice=choice)
     if aggressive:
         remove_images(tag="[a-z]*_?[0-9]{4}", choice=choice)
-        # TODO
         imgs = images().groupby("image_id").apply(
             lambda frame: frame.query("tag == 'next'") if frame.shape[0] > 1 else None
         )
