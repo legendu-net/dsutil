@@ -12,8 +12,55 @@ import re
 import subprocess as sp
 import pandas as pd
 from loguru import logger
+import docker
 from .. import shell
-from .docker import run_cmd, DockerImage, DockerImageBuilder
+from .builder import DockerImage, DockerImageBuilder
+
+
+def images():
+    data = []
+    for image in docker.from_env().images.list():
+        repository = image.attrs["RepoDigests"][0].split("@")[0]
+        image_id = image.short_id[7:]
+        created = image.attrs["Created"]
+        size = image.attrs["Size"]
+        if image.tags:
+            for tag in image.tags:
+                data.append(
+                    {
+                        "repository": repository,
+                        "tag": tag.split(":")[1],
+                        "image_id": image_id,
+                        "created": created,
+                        "size": size
+                    }
+                )
+        else:
+            data.append(
+                {
+                    "repository": repository,
+                    "tag": None,
+                    "image_id": image_id,
+                    "created": created,
+                    "size": size
+                }
+            )
+    return pd.DataFrame(data)
+
+
+def containers():
+    data = [
+        {
+            "container_id": cont.short_id,
+            "image": cont.image.tags[0] if cont.image.tags else cont.image.short_id[7:],
+            "command": cont.attrs["Cmd"],
+            "created": cont.attrs["Created"],
+            "status": cont.status,
+            "ports": cont.ports,
+            "name": cont.name,
+        } for cont in docker.from_env().containers.list(all=True)
+    ]
+    return pd.DataFrame(data)
 
 
 def remove(aggressive: bool = False, choice: str = "") -> None:
@@ -23,12 +70,12 @@ def remove(aggressive: bool = False, choice: str = "") -> None:
     remove_images(tag="none", choice=choice)
     if aggressive:
         remove_images(tag="[a-z]*_?[0-9]{4}", choice=choice)
-        imgs = images().groupby("image_id").apply(
+        imgs = images().groupby("image_id").apply( # pylint: disable=E1101
             lambda frame: frame.query("tag == 'next'") if frame.shape[0] > 1 else None
         )
         _remove_images(imgs, choice=choice)
-    print(containers())
-    print(images())
+    sp.run("docker ps", shell=True, check=True)
+    sp.run("docker images", shell=True, check=True)
 
 
 def remove_containers(
@@ -41,10 +88,11 @@ def remove_containers(
     :param choice: One of "y" (auto yes), "n" (auto no) 
         or "i" (interactive, i.e., ask for confirmation on each case).
     """
+    client = docker.from_env()
     if id_:
-        run_cmd(["docker", "rm", id_])
+        client.remove_container(id_)
     if name:
-        run_cmd(["docker", "rm", name])
+        client.remove_container(name)
     if status:
         conts = containers()
         conts = conts[conts.status.str.contains(status)]
@@ -59,23 +107,24 @@ def remove_containers(
             )
         for row in conts.itertuples():
             if choice == "y":
-                run_cmd(["docker", "rm", row.container_id])
+                client.remove_container(row.container_id)
             elif choice == "i":
                 choice_i = input(
                     f"Do you want to remove the container '{row.names}'? (y/N): "
                 )
                 if choice_i == "y":
-                    run_cmd(["docker", "rm", row.container_id])
-    print(containers())
+                    client.remove_container(row.container_id)
+    sp.run("docker ps", shell=True, check=True)
 
 
 def pull():
     """Automatically pull all valid images.
     """
+    client = docker.from_env()
     imgs = images()
     imgs = imgs[imgs.repository != "<None>" & imgs.tag != "<None>"]
     for _, (repo, tag, *_) in imgs.iterrows():
-        run_cmd(f"docker pull {repo}:{tag}")
+        client.images.pull(repo, tag)
 
 
 def remove_images(
@@ -93,7 +142,7 @@ def remove_images(
         _remove_images(imgs[imgs.repository.str.contains(name)], choice=choice)
     if tag:
         _remove_images(imgs[imgs.tag.str.contains(tag)], choice=choice)
-    print(images())
+    sp.run("docker images", shell=True, check=True)
 
 
 def _remove_images(imgs, choice: str = ""):
@@ -107,32 +156,18 @@ def _remove_images(imgs, choice: str = ""):
         choice = input(
             "Do you want to remove the above images? (y - Yes, n - [No], i - interactive): "
         )
+    client = docker.from_env()
     for row in imgs.itertuples():
         image_name = row.repository + ":" + row.tag
         image = row.image_id if row.tag == "<none>" else image_name
         if choice == "y":
-            run_cmd(["docker", "rmi", image])
+            client.remove_image(image)
         elif choice == "i":
             choice_i = input(
                 f"Do you want to remove the image '{image_name}'? (y - Yes, n - [No]):"
             )
             if choice_i == "y":
-                run_cmd(["docker", "rmi", image])
-
-
-def containers() -> pd.DataFrame:
-    """Get all Docker containers.
-    :return: A DataFrame containing all Docker containers.
-    """
-    frame = shell.to_frame("docker ps -a", split_by_title=True)
-    return frame
-
-
-def images() -> pd.DataFrame:
-    """Get all Docker images.
-    :return: A DataFrame containing all Docker images.
-    """
-    return shell.to_frame("docker images", split_by_title=True)
+                client.remove_image(image)
 
 
 def stop(id_: str = "", name: str = "", status: str = "", choice: str = "") -> None:
@@ -143,10 +178,11 @@ def stop(id_: str = "", name: str = "", status: str = "", choice: str = "") -> N
     :param choice: One of "y" (auto yes), "n" (auto no)
         or "i" (interactive, i.e., ask for confirmation on each case).
     """
+    client = docker.from_env()
     if id_:
-        run_cmd(["docker", "stop", id_])
+        client.stop(id_)
     if name:
-        run_cmd(["docker", "stop", name])
+        client.stop(name)
     if status:
         conts = containers()
         conts = conts[conts.status.str.contains(status)]
@@ -161,11 +197,11 @@ def stop(id_: str = "", name: str = "", status: str = "", choice: str = "") -> N
             )
         for row in conts.itertuples():
             if choice == "y":
-                run_cmd(["docker", "stop", row.container_id])
+                client.stop(row.container_id)
             elif choice == "i":
                 choice_i = input(
                     f"Do you want to stop the container '{row.names}'? (y/N): "
                 )
                 if choice_i == "y":
-                    run_cmd(["docker", "stop", row.container_id])
-    print(containers())
+                    client.stop(row.container_id)
+    sp.run("docker ps", shell=True, check=True)

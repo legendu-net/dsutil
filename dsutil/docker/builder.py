@@ -5,26 +5,15 @@ from typing import Union, List, Sequence, Set, Deque, Tuple, Dict, Iterable, Cal
 import tempfile
 from pathlib import Path
 import time
-from timeit import default_timer as timer
+import timeit
 import datetime
 import subprocess as sp
 from collections import deque
 import shutil
 from loguru import logger
-import git
 import pandas as pd
-
-
-def run_cmd(cmd: Union[str, List[str]], check: bool = False) -> None:
-    """Run a (Docker) command.
-    :param cmd: The command to run.
-    :param shell: Whether to run the command as a shell subprocess.
-    :param check: Whether to check for errors. 
-        If so, exceptions are thrown on errors.
-    """
-    msg = " ".join(str(elem) for elem in cmd) if isinstance(cmd, list) else cmd
-    logger.debug("Running command: {}", msg)
-    sp.run(cmd, shell=isinstance(cmd, str), check=check)
+import git
+import docker
 
 
 def tag_date(tag: str) -> str:
@@ -35,57 +24,44 @@ def tag_date(tag: str) -> str:
     return mmddhh if tag in ("", "latest") else f"{tag}_{mmddhh}"
 
 
-def _push_image_timing(image: str) -> Tuple[str, float, str]:
+def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     """Push a Docker image to Docker Hub and time the pushing.
-    :param image: The full name of the image to push to Docker Hub.
+    :param repo: The local repository of the Docker image.
+    :param tag: The tag of the Docker image to push.
     :return: The time (in seconds) used to push the Docker image.
     """
-    start = timer()
-    run_cmd(["docker", "push", image])
-    end = timer()
-    return image, end - start, "push"
+    client = docker.from_env()
+    seconds = timeit.timeit(
+        lambda: client.images.push(repo, tag), timer=time.perf_counter_ns, number=1
+    ) / 1E9
+    return repo, tag, seconds, "push"
 
 
-def push_image(image: str,
-               retry: int = 3,
-               seconds: float = 60) -> Tuple[str, float, str]:
-    """Push a Docker image to Docker Hub. Automatically retry pushing once it fails.
-    :param image: The full name of the image to push to Docker Hub.
+def _retry_docker(task: Callable,
+                  retry: int = 3,
+                  seconds: float = 60) -> Tuple[str, str, float, str]:
+    """Retry a Docker API on failure (for a few times).
+    :param task: The task to run.
     :param retry: The total number of times to retry.
     :param seconds: The number of seconds to wait before retrying.
-    :return: The time (in seconds) used to push the Docker image.
+    :return: The time (in seconds) used to run the task.
     """
     if retry <= 1:
-        return _push_image_timing(image)
+        return task()
     for _ in range(retry):
         try:
-            return _push_image_timing(image)
-        except sp.CalledProcessError:
+            return task()
+        except docker.errors.APIError:
             time.sleep(seconds)
-    return _push_image_timing(image)
+    return task()
 
 
-def _pull_image_timing(image: str) -> Tuple[str, float]:
-    start = timer()
-    run_cmd(["docker", "pull", image])
-    end = timer()
-    return image, end - start
-
-
-def pull_image(image: str, retry: int = 3, seconds: float = 60) -> Tuple[str, float]:
-    """Pull a Docker image from Docker Hub. Automatically retry pulling once.
-    :param image: The full name of the image to push from Docker Hub.
-    :return: The time (in seconds) to wait before retrying.
-    """
-    logger.info("Pulling the Docker image {}...", image)
-    if retry <= 1:
-        return _pull_image_timing(image)
-    for _ in range(retry):
-        try:
-            return _pull_image_timing(image)
-        except sp.CalledProcessError:
-            time.sleep(seconds)
-    return _pull_image_timing(image)
+def _pull_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
+    client = docker.from_env()
+    seconds = timeit.timeit(
+        lambda: client.images.pull(repo, tag), timer=time.perf_counter_ns, number=1
+    ) / 1E9
+    return repo, tag, seconds, "pull"
 
 
 def _ignore_socket(dir_, files):
@@ -189,7 +165,7 @@ class DockerImage:
         tag_base: str = "",
         no_cache: bool = False,
         copy_ssh_to: str = ""
-    ) -> Tuple[str, float, str]:
+    ) -> Tuple[str, str, float, str]:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
@@ -207,7 +183,7 @@ class DockerImage:
         under the current local Git repository. 
         :return: A tuple of the format (image_name_built, time_taken).
         """
-        start = timer()
+        start = time.perf_counter_ns()
         self.clone_repo()
         self._copy_ssh(copy_ssh_to)
         if tag_build is None:
@@ -220,18 +196,22 @@ class DockerImage:
         elif tag_build == "":
             tag_build = "latest"
         if self.is_root:
-            pull_image(self.base_image)
+            _retry_docker(lambda: _pull_image_timing(*self.base_image.split(":")))
         logger.info("Building the Docker image {}...", self.name)
         self._update_base_tag(tag_build, tag_base)
-        image = f"{self.name}:{tag_build}"
-        cmd = ["docker", "build", "-t", image, str(self.path)]
-        if no_cache:
-            cmd.append("--no-cache")
-        run_cmd(cmd, check=True)
+        # TODO: path might have issues ...
+        docker.from_env().images.build(
+            path=str(self.path),
+            tag=f"{self.name}:{tag_build}",
+            nocache=no_cache,
+            rm=True,
+            pull=False,
+            cache_from=None
+        )
         self.tag_build = tag_build
         self._remove_ssh(copy_ssh_to)
-        end = timer()
-        return image, end - start, "build"
+        end = time.perf_counter_ns()
+        return self.name, tag_build, (end - start) / 1E9, "build"
 
     def _remove_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
@@ -269,15 +249,23 @@ class DockerImage:
         :return: A pandas DataFrame with 2 columns "image" (name of the built Docker image) 
         and "seconds" (time taken to build the Docker image).
         """
-        image = f"{self.name}:{self.tag_build}"
-        data = [push_image(image=image, retry=retry, seconds=seconds)]
+        data = [
+            _retry_docker(
+                lambda: _push_image_timing(self.name, self.tag_build), retry, seconds
+            )
+        ]
         if tag_tran_fun:
             tag_new = tag_tran_fun(self.tag_build)
             if tag_new != self.tag_build:
-                image_new = f"{self.name}:{tag_new}"
-                run_cmd(["docker", "tag", image, image_new])
-                data.append(push_image(image=image_new, retry=retry, seconds=seconds))
-        return pd.DataFrame(data, columns=["image", "seconds", "type"])
+                docker.from_env().images.get(f"{self.name}:{self.tag_build}").tag(
+                    self.name, tag_new, force=True
+                )
+                data.append(
+                    _retry_docker(
+                        lambda: _push_image_timing(self.name, tag_new), retry, seconds
+                    )
+                )
+        return pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
 
 
 class DockerImageBuilder:
@@ -320,7 +308,7 @@ class DockerImageBuilder:
             if image.name.count("/") > 1:
                 servers.add(image.name.split("/")[0])
         for server in servers:
-            run_cmd(f"docker login {server}", check=True)
+            sp.run(f"docker login {server}", shell=True, check=True)
 
     def push(self, tag_tran_fun: Callable = tag_date) -> pd.DataFrame:
         """Push all Docker images in self.docker_images.
@@ -362,7 +350,7 @@ class DockerImageBuilder:
                 copy_ssh_to=copy_ssh_to
             ) for image in self.docker_images.values()
         ]
-        frame = pd.DataFrame(data, columns=["image", "seconds", "type"])
+        frame = pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
         if push:
             frame = pd.concat([frame, self.push()])
         return frame
