@@ -32,7 +32,7 @@ def test_copy_ssh():
     builder._copy_ssh("ssh")
 
 
-@pytest.mark.linux
+@pytest.mark.skipif(sys.platform in ("darwin", "win32"), reason="Only test on Linux")
 def test_DockerImageBuilder():
     if not shutil.which("docker"):
         return
