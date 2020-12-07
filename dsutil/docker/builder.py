@@ -14,7 +14,6 @@ from loguru import logger
 import pandas as pd
 import git
 import docker
-client = docker.from_env()
 
 
 def tag_date(tag: str) -> str:
@@ -31,6 +30,7 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     :param tag: The tag of the Docker image to push.
     :return: The time (in seconds) used to push the Docker image.
     """
+    client = docker.from_env()
     seconds = timeit.timeit(
         lambda: client.push(repo, tag), timer=time.perf_counter_ns, number=1
     ) / 1E9
@@ -57,6 +57,7 @@ def _retry_docker(task: Callable,
 
 
 def _pull_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
+    client = docker.from_env()
     seconds = timeit.timeit(
         lambda: client.pull(repo, tag), timer=time.perf_counter_ns, number=1
     ) / 1E9
@@ -199,7 +200,7 @@ class DockerImage:
         logger.info("Building the Docker image {}...", self.name)
         self._update_base_tag(tag_build, tag_base)
         # TODO: path might have issues ...
-        client.build(
+        docker.from_env().build(
             path=self.path,
             tag=f"{self.name}:{tag_build}",
             nocache=no_cache,
@@ -256,7 +257,7 @@ class DockerImage:
         if tag_tran_fun:
             tag_new = tag_tran_fun(self.tag_build)
             if tag_new != self.tag_build:
-                client.tag(
+                docker.from_env().tag(
                     f"{self.name}:{self.tag_build}", self.name, tag_new, force=True
                 )
                 data.append(

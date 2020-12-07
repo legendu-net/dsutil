@@ -13,12 +13,12 @@ import subprocess as sp
 import pandas as pd
 from loguru import logger
 from .. import shell
-from .builder import client, DockerImage, DockerImageBuilder
+from .builder import DockerImage, DockerImageBuilder
 
 
 def images():
     data = []
-    for image in client.images.list():
+    for image in docker.from_env().images.list():
         repository = image.attrs["RepoDigests"][0].split("@")[0]
         image_id = image.short_id[7:]
         created = datetime.datetime.strptime(
@@ -68,7 +68,7 @@ def containers():
                 cont.ports,
             "name":
                 cont.name,
-        } for cont in client.containers.list(all=True)
+        } for cont in docker.from_env().containers.list(all=True)
     ]
     return pd.DataFrame(data)
 
@@ -99,6 +99,7 @@ def remove_containers(
     :param choice: One of "y" (auto yes), "n" (auto no) 
         or "i" (interactive, i.e., ask for confirmation on each case).
     """
+    client = docker.from_env()
     if id_:
         client.remove_container(id_)
     if name:
@@ -130,6 +131,7 @@ def remove_containers(
 def pull():
     """Automatically pull all valid images.
     """
+    client = docker.from_env()
     imgs = images()
     imgs = imgs[imgs.repository != "<None>" & imgs.tag != "<None>"]
     for _, (repo, tag, *_) in imgs.iterrows():
@@ -165,6 +167,7 @@ def _remove_images(imgs, choice: str = ""):
         choice = input(
             "Do you want to remove the above images? (y - Yes, n - [No], i - interactive): "
         )
+    client = docker.from_env()
     for row in imgs.itertuples():
         image_name = row.repository + ":" + row.tag
         image = row.image_id if row.tag == "<none>" else image_name
@@ -186,6 +189,7 @@ def stop(id_: str = "", name: str = "", status: str = "", choice: str = "") -> N
     :param choice: One of "y" (auto yes), "n" (auto no)
         or "i" (interactive, i.e., ask for confirmation on each case).
     """
+    client = docker.from_env()
     if id_:
         client.stop(id_)
     if name:
