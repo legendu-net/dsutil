@@ -93,7 +93,12 @@ class Hdfs():
         cmd = f"{self.bin} dfs -ls {path}/part-* | wc -l"
         return int(sp.check_output(cmd, shell=True))
 
-    def get(self, hdfs_path: str, local_dir: Union[str, Path] = "", is_file: bool = False) -> None:
+    def get(
+        self,
+        hdfs_path: str,
+        local_dir: Union[str, Path] = "",
+        is_file: bool = False
+    ) -> None:
         """Download data from HDFS into a local directory. 
         :param hdfs_path: The HDFS path (can be both a file or a directory) to copy.
         :param local_dir: The local directory to copy HDFS files into.
@@ -106,7 +111,9 @@ class Hdfs():
         else:
             cmd = f"{self.bin} dfs -get {hdfs_path}/* {local_dir}"
         sp.run(cmd, shell=True, check=True)
-        print(f"Content of the HDFS path {hdfs_path} has been fetch into the local directory {local_dir}")
+        print(
+            f"Content of the HDFS path {hdfs_path} has been fetch into the local directory {local_dir}"
+        )
 
     @staticmethod
     def _file_size_1(path: str, size: int, dir_size: Dict[str, int]):
@@ -150,8 +157,11 @@ class Hdfs():
         sp.run(cmd, shell=True, check=True)
         print(f"The HDFS path {path} has been created.")
 
-    def put(self,
-        local_path: Union[str, Path], hdfs_path: str, create_hdfs_path: bool = False
+    def put(
+        self,
+        local_path: Union[str, Path],
+        hdfs_path: str,
+        create_hdfs_path: bool = False
     ) -> None:
         """Copy data from local to HDFS.
         :param local_path: A local path to copy to HDFS.
@@ -162,7 +172,9 @@ class Hdfs():
             self.mkdir(hdfs_path)
         cmd = f"{self.bin} dfs -put -f {local_path} {hdfs_path}"
         sp.run(cmd, shell=True, check=True)
-        print(f"The local path {local_path} has been uploaded into the HDFS path {hdfs_path}")
+        print(
+            f"The local path {local_path} has been uploaded into the HDFS path {hdfs_path}"
+        )
 
     def fetch_partition_names(path: str, extension: str = ".parquet") -> List[str]:
         """Get Parquet partition names (with the parent directory) under a HDFS path.
@@ -170,4 +182,7 @@ class Hdfs():
         :return: A list of the partition names (with the parent directory).
         """
         paths = self.ls(path).path
-        return [path.rsplit("/", maxsplit=1)[-1] for path in paths if path.endswith(extension)]
+        return [
+            path.rsplit("/", maxsplit=1)[-1]
+            for path in paths if path.endswith(extension)
+        ]

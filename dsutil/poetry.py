@@ -308,16 +308,11 @@ def clean(proj_dir: Path = None):
     if proj_dir is None:
         proj_dir = _project_dir()
     paths = [
-        ".venv",
-        ".mypy_cache",
-        "dbay.egg-info",
-        "core",
-        "dist",
-        ".pytest_cache",
+        ".venv", ".mypy_cache", "dbay.egg-info", "core", "dist", ".pytest_cache",
         ".pytype"
     ]
     for path in paths:
-        path = proj_dir / path 
+        path = proj_dir / path
         if path.exists():
             try:
                 path.unlink()
