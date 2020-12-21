@@ -2,6 +2,16 @@ from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, spark_partition_id, rank, coalesce, lit, max, sum
 
 
+def sample(frame: DataFrame, ratio: Union[float, int], total: Union[int, None] = None) -> DataFrame:
+    if isinstance(ratio, int):
+        if total is None:
+            total = frame.count()
+        ratio /= total
+    if ratio >= 1:
+        return frame
+    return frame.sample(ratio)
+
+
 def calc_global_rank(item: DataFrame) -> DataFrame:
     """Calculate global ranks.
     This function uses a smart algorithm to avoding shuffling all items
