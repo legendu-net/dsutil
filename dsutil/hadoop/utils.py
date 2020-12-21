@@ -1,8 +1,13 @@
+from typing import Union
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, spark_partition_id, rank, coalesce, lit, max, sum
 
 
-def sample(frame: DataFrame, ratio: Union[float, int], total: Union[int, None] = None) -> DataFrame:
+def sample(
+    frame: DataFrame,
+    ratio: Union[float, int],
+    total: Union[int, None] = None
+) -> DataFrame:
     if isinstance(ratio, int):
         if total is None:
             total = frame.count()

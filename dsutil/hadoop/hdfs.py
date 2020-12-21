@@ -1,7 +1,8 @@
 """Wrapping HDFS commands.
 """
+from typing import List, Dict, Union
+from pathlib import Path
 import os
-from typing import Dict
 import subprocess as sp
 import pandas as pd
 from loguru import logger
@@ -12,8 +13,8 @@ from ..filesystem import count_path
 class Hdfs():
     """A class abstring the hdfs command.
     """
-    def __init__(self, path: str = "/apache/hadoop/bin/hdfs"):
-        self.path = path
+    def __init__(self, bin: str = "/apache/hadoop/bin/hdfs"):
+        self.bin = bin
 
     def ls(self, path: str, recursive: bool = False) -> pd.DataFrame:
         """Return the results of hdfs dfs -ls /hdfs/path as a DataFrame.
@@ -29,7 +30,7 @@ class Hdfs():
             "mtime",
             "path",
         ]
-        cmd = f'{self.path} dfs -ls {"-R" if recursive else ""} {path}'
+        cmd = f'{self.bin} dfs -ls {"-R" if recursive else ""} {path}'
         logger.info("Running command: {}. Might take several minutes.", cmd)
         frame = to_frame(cmd, split=r" +", skip=0, header=cols)
         frame.mtime = pd.to_datetime(frame.mdate + " " + frame.mtime)
@@ -40,7 +41,7 @@ class Hdfs():
         """Return the results of hdfs dfs -count -q -v /hdfs/path as a DataFrame.
         :param path: A HDFS path.
         """
-        cmd = f"{self.path} dfs -count -q -v {path}"
+        cmd = f"{self.bin} dfs -count -q -v {path}"
         frame = to_frame(cmd, split=r" +", header=0)
         frame.columns = frame.columns.str.lower()
         return frame
@@ -62,7 +63,7 @@ class Hdfs():
         return self._du_helper(path)
 
     def _du_helper(self, path: str) -> pd.DataFrame:
-        cmd = f"{self.path} dfs -du {path}"
+        cmd = f"{self.bin} dfs -du {path}"
         frame = to_frame(cmd, split=r" +", header=["size", "path"])
         return frame
 
@@ -72,7 +73,7 @@ class Hdfs():
         :return: True if the HDFS path exists and False otherwise.
         """
         # TODO: double check the implementation is good!
-        cmd = f"{self.path} dfs -test -e {path}"
+        cmd = f"{self.bin} dfs -test -e {path}"
         try:
             sp.run(cmd, shell=True, check=True)
             return True
@@ -83,23 +84,37 @@ class Hdfs():
         """Remove a HDFS path.
         :param path: A HDFS path.
         """
-        cmd = f"{self.path} dfs -rm -r {path}"
+        cmd = f"{self.bin} dfs -rm -r {path}"
         sp.run(cmd, shell=True, check=True)
 
     def num_partitions(self, path: str) -> int:
         """Get the number of partitions of a HDFS path.
         :param path: A HDFS path.
         """
-        cmd = f"{self.path} dfs -ls {path}/part-* | wc -l"
+        cmd = f"{self.bin} dfs -ls {path}/part-* | wc -l"
         return int(sp.check_output(cmd, shell=True))
 
-    def get(self, path: str, dst_dir: str = "") -> None:
-        """Download a HDFS path to local.
-        :param path: A HDFS path.
-        :param dst_dir: The local directory to download the HDFS path to.
+    def get(
+        self,
+        hdfs_path: str,
+        local_dir: Union[str, Path] = "",
+        is_file: bool = False
+    ) -> None:
+        """Download data from HDFS into a local directory. 
+        :param hdfs_path: The HDFS path (can be both a file or a directory) to copy.
+        :param local_dir: The local directory to copy HDFS files into.
         """
-        cmd = f"{self.path} dfs -get {path} {dst_dir}"
+        if isinstance(local_dir, str):
+            local_dir = Path(local_dir)
+        local_dir.mkdir(parents=True, exist_ok=True)
+        if is_file:
+            cmd = f"{self.bin} dfs -get {hdfs_path} {local_dir}"
+        else:
+            cmd = f"{self.bin} dfs -get {hdfs_path}/* {local_dir}"
         sp.run(cmd, shell=True, check=True)
+        print(
+            f"Content of the HDFS path {hdfs_path} has been fetch into the local directory {local_dir}"
+        )
 
     @staticmethod
     def _file_size_1(path: str, size: int, dir_size: Dict[str, int]):
@@ -133,3 +148,44 @@ class Hdfs():
         files.reset_index(inplace=True)
         files.insert(6, "metabytes", round(files.bytes / 1E6, 2))
         return files.sort_values("bytes", ascending=False)
+
+    def mkdir(self, path: str) -> None:
+        """Create a HDFS path.
+
+        :param path: The HDFS path to create.
+        """
+        cmd = f"{self.bin} dfs -mkdir -p {path}"
+        sp.run(cmd, shell=True, check=True)
+        print(f"The HDFS path {path} has been created.")
+
+    def put(
+        self,
+        local_path: Union[str, Path],
+        hdfs_path: str,
+        create_hdfs_path: bool = False
+    ) -> None:
+        """Copy data from local to HDFS.
+        :param local_path: A local path to copy to HDFS.
+        :param hdfs_path: The HDFS path/directory to copy data into.
+        :param create_hdfs_path: If true, create the HDFS path if not exists.
+        """
+        if create_hdfs_path:
+            self.mkdir(hdfs_path)
+        cmd = f"{self.bin} dfs -put -f {local_path} {hdfs_path}"
+        sp.run(cmd, shell=True, check=True)
+        print(
+            f"The local path {local_path} has been uploaded into the HDFS path {hdfs_path}"
+        )
+
+    def fetch_partition_names(self,
+                              path: str,
+                              extension: str = ".parquet") -> List[str]:
+        """Get Parquet partition names (with the parent directory) under a HDFS path.
+        :param path: A HDFS path.
+        :return: A list of the partition names (with the parent directory).
+        """
+        paths = self.ls(path).path
+        return [
+            path.rsplit("/", maxsplit=1)[-1]
+            for path in paths if path.endswith(extension)
+        ]

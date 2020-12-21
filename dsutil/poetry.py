@@ -302,3 +302,19 @@ def install_package(options: List[str] = (), proj_dir: Path = None):
     cmd = ["pip3", "install", "--user", "--upgrade", pkg[0]]
     cmd.extend(options)
     sp.run(cmd, check=True)
+
+
+def clean(proj_dir: Path = None):
+    if proj_dir is None:
+        proj_dir = _project_dir()
+    paths = [
+        ".venv", ".mypy_cache", "dbay.egg-info", "core", "dist", ".pytest_cache",
+        ".pytype"
+    ]
+    for path in paths:
+        path = proj_dir / path
+        if path.exists():
+            try:
+                path.unlink()
+            except:
+                logger.error("Failed to remove the path: {}", path)
