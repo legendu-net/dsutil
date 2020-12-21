@@ -1,3 +1,4 @@
+from typing import Union
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, spark_partition_id, rank, coalesce, lit, max, sum
 
