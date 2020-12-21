@@ -128,7 +128,11 @@ def pull():
 
 
 def remove_images(
-    id_: str = "", name: str = "", tag: str = "", frame: Union[pd.DataFrame, None] = None, choice: str = ""
+    id_: str = "",
+    name: str = "",
+    tag: str = "",
+    frame: Union[pd.DataFrame, None] = None,
+    choice: str = ""
 ) -> None:
     """Remove specified Docker images.
     :param id_: The id of the image to remove.
