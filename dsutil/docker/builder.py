@@ -187,7 +187,7 @@ class DockerImage:
         self.clone_repo()
         self._copy_ssh(copy_ssh_to)
         if tag_build is None:
-            if self.branch == "master":
+            if self.branch in ("master", "main"):
                 tag_build = "latest"
             elif self.branch == "dev":
                 tag_build = "next"
