@@ -128,20 +128,24 @@ def pull():
 
 
 def remove_images(
-    id_: str = "", name: str = "", tag: str = "", choice: str = ""
+    id_: str = "", name: str = "", tag: str = "", frame: Union[pd.DataFrame, None] = None, choice: str = ""
 ) -> None:
     """Remove specified Docker images.
     :param id_: The id of the image to remove.
     :param name: A (regex) pattern of names of images to remove.
     :param tag: Remove images whose tags containing specified tag.
     """
-    imgs = images()
     if id_:
+        imgs = images()
         _remove_images(imgs[imgs.image_id.str.contains(id_)], choice=choice)
     if name:
+        imgs = images()
         _remove_images(imgs[imgs.repository.str.contains(name)], choice=choice)
     if tag:
+        imgs = images()
         _remove_images(imgs[imgs.tag.str.contains(tag)], choice=choice)
+    if frame is not None:
+        _remove_images(frame, choice=choice)
     sp.run("docker images", shell=True, check=True)
 
 
