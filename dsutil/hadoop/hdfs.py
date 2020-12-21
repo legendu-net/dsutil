@@ -1,6 +1,7 @@
 """Wrapping HDFS commands.
 """
-from typing import List, Dict
+from typing import List, Dict, Union
+from pathlib import Path
 import os
 import subprocess as sp
 import pandas as pd
@@ -176,7 +177,9 @@ class Hdfs():
             f"The local path {local_path} has been uploaded into the HDFS path {hdfs_path}"
         )
 
-    def fetch_partition_names(path: str, extension: str = ".parquet") -> List[str]:
+    def fetch_partition_names(self,
+                              path: str,
+                              extension: str = ".parquet") -> List[str]:
         """Get Parquet partition names (with the parent directory) under a HDFS path.
         :param path: A HDFS path.
         :return: A list of the partition names (with the parent directory).
