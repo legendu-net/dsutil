@@ -7,6 +7,7 @@ import os
 import sys
 from argparse import Namespace, ArgumentParser
 from pathlib import Path
+import shutil
 import subprocess as sp
 import re
 import time
@@ -119,7 +120,7 @@ class SparkSubmit:
             return True
         return False
 
-    def submit(self, cmd: str, attachments: Union[None, List[str]] = None):
+    def submit(self, cmd: str, attachments: Union[None, List[str]] = None) -> bool:
         """Submit a Spark job.
         """
         logger.info("Submitting Spark job...\n{}", cmd)
@@ -162,7 +163,10 @@ class SparkSubmit:
                 param["attachments"] = attachments
             notifiers.get_notifier("email").notify(**param)
         if status == "FAILED":
-            self._notify_log(app_id, "Re: " + subject)
+            if self.email:
+                self._notify_log(app_id, "Re: " + subject)
+            return False
+        return True
 
     def _notify_log(self, app_id, subject):
         logger.info("Waiting for 300 seconds for the log to be available...")
@@ -224,7 +228,7 @@ def _files(config: Dict) -> str:
     return ",".join(files)
 
 
-def _submit_local(args, config: Dict[str, Any]):
+def _submit_local(args, config: Dict[str, Any]) -> bool:
     if not config.get("spark-submit-local", ""):
         return
     lines = [
@@ -234,16 +238,16 @@ def _submit_local(args, config: Dict[str, Any]):
     if config["jars"]:
         lines.append(f"--jars {config['jars']}")
     lines.append("--conf spark.yarn.maxAppAttempts=1")
-    for conf, val in config["conf"]:
-        if conf in ("spark.pyspark.driver.python", "spark.pyspark.python"):
-            lines.append(f"--conf {conf}={val}")
+    python = shutil.which("python3")
+    lines.append(f"--conf spark.pyspark.driver.python={python}")
+    lines.append(f"--conf spark.pyspark.python={python}")
     lines.extend(args.cmd)
     for idx in range(2, len(lines)):
         lines[idx] = " " * 4 + lines[idx]
-    SparkSubmit().submit(" \\\n".join(lines) + "\n", args.cmd[:1])
+    return SparkSubmit().submit(" \\\n".join(lines) + "\n", args.cmd[:1])
 
 
-def _submit_cluster(args, config: Dict[str, Any]):
+def _submit_cluster(args, config: Dict[str, Any]) -> bool:
     if not config.get("spark-submit", ""):
         return
     opts = (
@@ -258,10 +262,11 @@ def _submit_cluster(args, config: Dict[str, Any]):
     lines.extend(args.cmd)
     for idx in range(1, len(lines)):
         lines[idx] = " " * 4 + lines[idx]
-    SparkSubmit(email=config["email"]).submit(" \\\n".join(lines) + "\n", args.cmd[:1])
+    return SparkSubmit(email=config["email"]
+                      ).submit(" \\\n".join(lines) + "\n", args.cmd[:1])
 
 
-def submit(args: Namespace):
+def submit(args: Namespace) -> None:
     """Submit the Spark job.
     """
     with open(args.config, "r") as fin:
@@ -271,8 +276,8 @@ def submit(args: Namespace):
         config["jars"] = ""
     if isinstance(config["jars"], (list, tuple)):
         config["jars"] = ",".join(config["jars"])
-    _submit_local(args, config)
-    _submit_cluster(args, config)
+    if _submit_local(args, config):
+        _submit_cluster(args, config)
 
 
 def parse_args(args=None, namespace=None) -> Namespace:

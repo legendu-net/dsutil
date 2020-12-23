@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dsutil"
-version = "0.43.0"
+version = "0.44.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
@@ -11,7 +11,7 @@ pykinit = "dsutil.hadoop:kerberos.main"
 match_memory = "dsutil:memory.main"
 
 [tool.poetry.dependencies]
-python = ">=3.7,<3.9"
+python = ">=3.7,<3.10"
 dateparser = ">=0.7.1"
 pandas = ">=0.22.0"
 loguru = ">=0.3.2"
@@ -36,7 +36,7 @@ docker = ">=4.4.0"
 [tool.poetry.dev-dependencies]
 pytest = ">=3.0"
 pylint = ">=2.5.3"
-pytype = ">=2020.08.10"
+pytype = { version = ">=2020.08.10", python = "<3.9" }
 yapf = ">=0.30.0"
 pyspark = ">=3.0.1"
 
