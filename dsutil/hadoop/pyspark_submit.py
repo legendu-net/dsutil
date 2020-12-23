@@ -167,7 +167,6 @@ class SparkSubmit:
             return False
         return True
 
-
     def _notify_log(self, app_id, subject):
         logger.info("Waiting for 300 seconds for the log to be available...")
         time.sleep(300)
@@ -262,7 +261,8 @@ def _submit_cluster(args, config: Dict[str, Any]) -> bool:
     lines.extend(args.cmd)
     for idx in range(1, len(lines)):
         lines[idx] = " " * 4 + lines[idx]
-    return SparkSubmit(email=config["email"]).submit(" \\\n".join(lines) + "\n", args.cmd[:1])
+    return SparkSubmit(email=config["email"]
+                      ).submit(" \\\n".join(lines) + "\n", args.cmd[:1])
 
 
 def submit(args: Namespace) -> None:
