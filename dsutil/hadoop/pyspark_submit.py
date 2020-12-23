@@ -7,6 +7,7 @@ import os
 import sys
 from argparse import Namespace, ArgumentParser
 from pathlib import Path
+import shutil
 import subprocess as sp
 import re
 import time
@@ -162,7 +163,7 @@ class SparkSubmit:
                 param["attachments"] = attachments
             notifiers.get_notifier("email").notify(**param)
         if status == "FAILED":
-            if sellf.email:
+            if self.email:
                 self._notify_log(app_id, "Re: " + subject)
             return False
         return True
