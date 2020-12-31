@@ -206,6 +206,7 @@ def format_code(
 def _lint_code(proj_dir: Union[Path, None], linter: Union[str, List[str]]):
     funcs = {
         "pylint": _lint_code_pylint,
+        "flake8": _lint_code_flake8,
         "pytype": _lint_code_pytype,
     }
     if isinstance(linter, str):
@@ -253,7 +254,25 @@ def _lint_code_pylint(proj_dir: Union[Path, None], pyvenv_path: str):
         pyvenv_path = _pyvenv_path()
     if pyvenv_path:
         pyvenv_path += ":"
-    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH pylint -E {proj_dir / pkg}"
+    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH pylint {proj_dir / pkg}"
+    try:
+        sp.run(cmd, shell=True, check=True)
+    except sp.CalledProcessError:
+        logger.error("Please fix errors: {}", cmd)
+
+
+def _lint_code_flake8(proj_dir: Union[Path, None], pyvenv_path: str):
+    logger.info("Linting code using flake8 ...")
+    if not proj_dir:
+        proj_dir = _project_dir()
+    if not pyvenv_path:
+        pyvenv_path = _pyvenv_path()
+    pkg = _project_name(proj_dir)
+    if not pyvenv_path:
+        pyvenv_path = _pyvenv_path()
+    if pyvenv_path:
+        pyvenv_path += ":"
+    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH flake8 {proj_dir / pkg}"
     try:
         sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
@@ -262,7 +281,7 @@ def _lint_code_pylint(proj_dir: Union[Path, None], pyvenv_path: str):
 
 def build_package(
     proj_dir: Union[Path, None] = None,
-    linter: Union[str, Iterable[str]] = ("pylint", "pytype"),
+    linter: Union[str, Iterable[str]] = ("pylint", "flake8", "pytype"),
     test: bool = True
 ) -> None:
     """Build the package using poetry.
