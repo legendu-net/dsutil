@@ -249,7 +249,9 @@ def _submit_local(args, config: Dict[str, Any]) -> bool:
 
 def _submit_cluster(args, config: Dict[str, Any]) -> bool:
     if not config.get("spark-submit", ""):
-        raise LookupError("The field spark-submit is not defined in the configuration file!")
+        raise LookupError(
+            "The field spark-submit is not defined in the configuration file!"
+        )
     opts = (
         "files", "master", "deploy-mode", "queue", "num-executors", "executor-memory",
         "driver-memory", "executor-cores", "archives"

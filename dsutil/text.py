@@ -69,12 +69,12 @@ def merge(files, output: str = "", n: int = 5) -> None:
     if isinstance(files, str):
         files = [os.path.join(files, f) for f in os.listdir(files)]
         merge(files, output=output, n=n)
-        return 
+        return
     if not n:
         n = min(10, len(files))
     if has_header(files, n):
         _merge_with_headers(files, output)
-        return 
+        return
     _merge_without_header(files, output)
 
 
