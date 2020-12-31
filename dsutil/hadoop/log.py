@@ -1,3 +1,5 @@
+"""Module for log filtering.
+"""
 import sys
 import os
 import re
@@ -8,16 +10,20 @@ DASH_50 = "-" * 50
 
 
 class LogCluster:
-    """
-    clustering similar lines
+    """Clustering similar lines
     """
     def __init__(self):
         self.cluster = []
 
-    def similarity(self, line1, line2):
+    @staticmethod
+    def similarity(line1, line2):
+        """Calcualte similarity between 2 lines.
+        """
         return SequenceMatcher(None, line1, line2).ratio()
 
     def add(self, line, line_num):
+        """Add a line.
+        """
         LINE = "L{line_num}: {line}\n"
         similarity = max(
             (self.similarity(line, target) for target in self.cluster), default=0
@@ -26,12 +32,16 @@ class LogCluster:
             self.cluster.append(LINE.format(line=line, line_num=line_num))
 
     def write(self, fout):
+        """Write deduplicated log to a file.
+        """
         fout.write(DASH_50 + "SUMMARY" + DASH_50 + "\n")
         for line in self.cluster:
             fout.write(line)
 
 
 class LogFilter:
+    """A class for log filtering.
+    """
     KEYWORDS = (
         "Exception",
         "Error",
@@ -88,7 +98,9 @@ class LogFilter:
             line = pattern.sub("", line)
         return line
 
-    def dump_queue(self, lines):
+    def _dump_queue(self, lines):
+        """Dump content in the queue.
+        """
         lines.append("-" * 100 + "\n")
         lines.extend(self.queue)
         self.queue.clear()
@@ -106,7 +118,9 @@ class LogFilter:
                 return True
         return False
 
-    def calc_rows(self):
+    def _calc_rows(self):
+        """Count the total number of rows.
+        """
         if self.num_rows is not None:
             return
         print('Calculating total number of rows ...')
@@ -115,7 +129,9 @@ class LogFilter:
         self.step = max(self.num_rows // 1000, 1000)
 
     def filter(self):
-        self.calc_rows()
+        """Filter informative liens from a Spark application log.
+        """
+        self._calc_rows()
         lines = [DASH_50 + 'START' + DASH_50 + '\n']
         with open(self._log_file, 'r') as fin:
             dump_flag = -1
@@ -133,7 +149,7 @@ class LogFilter:
                 elif not keep and dump_flag >= 0:
                     dump_flag += 1
                     if dump_flag == self.context_size:
-                        self.dump_queue(lines)
+                        self._dump_queue(lines)
                         dump_flag = -1
                 else:
                     dump_flag = 0
@@ -151,7 +167,7 @@ class LogFilter:
                     sys.stdout.write(msg)
             print('\n')
             lines.append(DASH_50 + 'EOF' + DASH_50 + '\n')
-            self.dump_queue(lines)
+            self._dump_queue(lines)
         # dedup to get a summary
         cluster = LogCluster()
         for line in self.unique:

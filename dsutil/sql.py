@@ -1,3 +1,5 @@
+"""SQL related utils.
+"""
 from typing import Union
 from pathlib import Path
 import subprocess as sp
@@ -5,6 +7,10 @@ import sqlparse
 
 
 def format(path: Union[Path, str]):
+    """Format a SQL file.
+
+    :param path: The path to a SQL file.
+    """
     if isinstance(path, str):
         path = Path(path)
     query = sqlparse.format(

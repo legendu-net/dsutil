@@ -39,7 +39,7 @@ def to_frame(
     lines = [line for idx, line in enumerate(lines) if idx not in skip]
     if split_by_header:
         return _to_frame_title(split=split, lines=lines)
-    return _to_frame_space(split=split, header=header, skip=skip, lines=lines)
+    return _to_frame_space(split=split, header=header, lines=lines)
 
 
 def _to_frame_space(

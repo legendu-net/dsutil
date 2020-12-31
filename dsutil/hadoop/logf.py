@@ -1,3 +1,5 @@
+"""Script for fetch and filtering Spark application logs.
+"""
 import re
 import argparse
 import subprocess as sp
@@ -134,6 +136,8 @@ def _subparser_filter(subparsers):
 
 
 def main():
+    """The main function for script usage.
+    """
     args = parse_args()
     args.func(args)
 

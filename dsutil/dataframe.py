@@ -37,6 +37,12 @@ def read_csv(path: Union[str, Path], **kwargs):
 def dump_profile(
     df: Union[pd.DataFrame, str, Path], title: str, output_dir: Union[str, Path]
 ):
+    """Run pandas profiling on a DataFrame and dump the report into files.
+
+    :param df: A pandas DataFrame.
+    :param title: The title of the generated report.
+    :param output_dir: The output directory for reports.
+    """
     if isinstance(df, str):
         df = Path(df)
     if isinstance(df, Path):

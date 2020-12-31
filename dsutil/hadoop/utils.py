@@ -1,3 +1,5 @@
+"""Utils functions for Hadoop.
+"""
 from typing import Union
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, spark_partition_id, rank, coalesce, lit, max, sum
@@ -8,6 +10,11 @@ def sample(
     ratio: Union[float, int],
     total: Union[int, None] = None
 ) -> DataFrame:
+    """Sample rows from a PySpark DataFrame.
+
+    :param frame: The PySpark DataFrame from which to sample rows.
+    :param total: The total number of rows in the DataFrame.
+    """
     if isinstance(ratio, int):
         if total is None:
             total = frame.count()
