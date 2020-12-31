@@ -199,7 +199,6 @@ class DockerImage:
             _retry_docker(lambda: _pull_image_timing(*self.base_image.split(":")))
         logger.info("Building the Docker image {}...", self.name)
         self._update_base_tag(tag_build, tag_base)
-        # TODO: path might have issues ...
         docker.from_env().images.build(
             path=str(self.path),
             tag=f"{self.name}:{tag_build}",

@@ -230,7 +230,7 @@ def _files(config: Dict) -> str:
 
 def _submit_local(args, config: Dict[str, Any]) -> bool:
     if not config.get("spark-submit-local", ""):
-        return
+        return True
     lines = [
         "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
         config["spark-submit-local"]
@@ -249,7 +249,7 @@ def _submit_local(args, config: Dict[str, Any]) -> bool:
 
 def _submit_cluster(args, config: Dict[str, Any]) -> bool:
     if not config.get("spark-submit", ""):
-        return
+        raise LookupError("The field spark-submit is not defined in the configuration file!")
     opts = (
         "files", "master", "deploy-mode", "queue", "num-executors", "executor-memory",
         "driver-memory", "executor-cores", "archives"

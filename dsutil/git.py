@@ -49,9 +49,9 @@ def _check_helper(path: Path, file_mode: bool = False) -> None:
     if (path / ".git").is_dir():
         _check_git_repos(path, file_mode=file_mode)
         return
-    for path in path.iterdir():
-        if path.is_dir():
-            _check_helper(path, file_mode=file_mode)
+    for p in path.iterdir():
+        if p.is_dir():
+            _check_helper(p, file_mode=file_mode)
 
 
 def _git_current_branch(gcmd) -> bytes:

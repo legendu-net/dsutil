@@ -8,14 +8,14 @@ the saved password is used so that users do not have to type in password to auth
 from typing import Union, Dict, Any
 import os
 from pathlib import Path
-import yaml
-import base64
-from argparse import ArgumentParser
-import subprocess as sp
+import socket
+import datetime
 import getpass
 import time
-import datetime
-import socket
+import subprocess as sp
+import base64
+from argparse import ArgumentParser, Namespace
+import yaml
 from loguru import logger
 import notifiers
 PROFILE = Path.home() / ".kinit_profile"
@@ -118,7 +118,7 @@ def authenticate(password: str, email: Dict[str, str], user: str = "") -> None:
             )
 
 
-def parse_args(args=None, namespace=None):
+def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments for the script.
     """
     parser = ArgumentParser(description="Easy kinit authentication.")
