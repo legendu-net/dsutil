@@ -55,7 +55,7 @@ def resize_image(
 
 def _is_approx_close(x, y, threshold=0.4):
     """Helper function of is_approx_close.
-        Check whether the 2 values x and y are relative close. 
+        Check whether the 2 values x and y are relative close.
     """
     ratio = (x + 0.01) / (y + 0.01)
     return 1 - threshold <= ratio <= 1 + threshold
@@ -135,8 +135,7 @@ def deshade_arr_3(arr, threshold=0.4, cutoff=30):
             r = arr[i, j, 0]
             g = arr[i, j, 1]
             b = arr[i, j, 2]
-            if min(r, g, b) >= cutoff and \
-                is_approx_close(r, g, b, threshold=threshold):
+            if min(r, g, b) >= cutoff and is_approx_close(r, g, b, threshold=threshold):
                 arr[i, j, :] = (255, 255, 255)
     return arr
 

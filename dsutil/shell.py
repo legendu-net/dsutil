@@ -1,8 +1,7 @@
-import os
 import re
 import pandas as pd
 import subprocess as sp
-from typing import List, Sequence, Union
+from typing import List, Union
 
 
 def to_frame(

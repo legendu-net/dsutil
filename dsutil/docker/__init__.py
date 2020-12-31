@@ -1,19 +1,10 @@
 """Docker related utils.
 """
 import sys
-import time
-from timeit import default_timer as timer
-import datetime
-from typing import List, Callable, Union
-import shutil
-import tempfile
-from pathlib import Path
-import re
+from typing import Union
 import subprocess as sp
 import pandas as pd
-from loguru import logger
 import docker
-from .. import shell
 from .builder import DockerImage, DockerImageBuilder
 
 
@@ -70,7 +61,7 @@ def remove(aggressive: bool = False, choice: str = "") -> None:
     remove_images(tag="none", choice=choice)
     if aggressive:
         remove_images(tag="[a-z]*_?[0-9]{4}", choice=choice)
-        imgs = images().groupby("image_id").apply( # pylint: disable=E1101
+        imgs = images().groupby("image_id").apply(  # pylint: disable=E1101
             lambda frame: frame.query("tag == 'next'") if frame.shape[0] > 1 else None
         )
         _remove_images(imgs, choice=choice)

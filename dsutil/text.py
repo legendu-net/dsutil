@@ -3,16 +3,13 @@
 from typing import Union
 import os
 import sys
-import glob
-import re
 from pathlib import Path
-from argparse import ArgumentParser
 from loguru import logger
 
 
 def has_header(files, num_files: int = 5):
     """Check whether the files have headers.
- 
+
     :param files: the list of files to check.
     :param n: the number of non-empty files to use to decide whether there are header lines.
     """
