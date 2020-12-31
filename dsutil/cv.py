@@ -55,7 +55,7 @@ def resize_image(
 
 def _is_approx_close(x, y, threshold=0.4):
     """Helper function of is_approx_close.
-        Check whether the 2 values x and y are relative close. 
+        Check whether the 2 values x and y are relative close.
     """
     ratio = (x + 0.01) / (y + 0.01)
     return 1 - threshold <= ratio <= 1 + threshold
@@ -67,7 +67,7 @@ def is_approx_close(red: int, green: int, blue: int, threshold: float = 0.4):
     :param red: The red channel.
     :param green: The green channel.
     :param blue: The blue channel.
-    :param threshold: The threshold (absolute deviation from 1) 
+    :param threshold: The threshold (absolute deviation from 1)
         to consider a ratio (of 2 channels) to be close to 1.
     """
     return _is_approx_close(red, green, threshold=threshold) and \
@@ -80,7 +80,7 @@ def deshade_arr_1(arr, threshold=0.4):
         by checking whether the 3 channels have relative close values.
 
     :param arr: A numpy.ndarray representation of the image to be deshaded.
-    :param threshold: The threshold (absolute deviation from 1) 
+    :param threshold: The threshold (absolute deviation from 1)
         to consider a ratio (of 2 channels) to be close to 1.
     """
     arr = arr.copy()
@@ -101,8 +101,8 @@ def deshade_arr_2(arr, cutoff=30):
 
     :param arr: A numpy.ndarray representation of the image to be deshaded.
     :param cutoff: The cutoff value of 3 channels.
-        If the 3 channels all have value no less than this cutoff, 
-        then it is considered as shading effect. 
+        If the 3 channels all have value no less than this cutoff,
+        then it is considered as shading effect.
     """
     arr = arr.copy()
     nrow, ncol, _ = arr.shape
@@ -122,11 +122,11 @@ def deshade_arr_3(arr, threshold=0.4, cutoff=30):
         by combining methods in deshade_arr_1 and deshade_arr_2.
 
     :param arr: A numpy.ndarray representation of the image to be deshaded.
-    :param threshold: The threshold (absolute deviation from 1) 
+    :param threshold: The threshold (absolute deviation from 1)
         to consider a ratio (of 2 channels) to be close to 1.
     :param cutoff: The cutoff value of 3 channels.
-        If the 3 channels all have value no less than this cutoff, 
-        then it is considered as shading effect. 
+        If the 3 channels all have value no less than this cutoff,
+        then it is considered as shading effect.
     """
     arr = arr.copy()
     nrow, ncol, _ = arr.shape
@@ -135,8 +135,7 @@ def deshade_arr_3(arr, threshold=0.4, cutoff=30):
             r = arr[i, j, 0]
             g = arr[i, j, 1]
             b = arr[i, j, 2]
-            if min(r, g, b) >= cutoff and \
-                is_approx_close(r, g, b, threshold=threshold):
+            if min(r, g, b) >= cutoff and is_approx_close(r, g, b, threshold=threshold):
                 arr[i, j, :] = (255, 255, 255)
     return arr
 

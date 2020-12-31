@@ -230,7 +230,9 @@ def _ignore(path: Path) -> bool:
     path = path.resolve()
     if path.is_file() and path.name.startswith("."):
         return True
-    if path.is_dir() and path.name in (".ipynb_checkpoints", ):
+    if path.is_dir() and path.name in (
+        ".ipynb_checkpoints", ".mypy_cache", ".mtj.tmp", "__pycache__"
+    ):
         return True
     return False
 

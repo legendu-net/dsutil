@@ -70,7 +70,7 @@ def match_memory_usage(
             time.sleep(np.interp(count, xp, yp))
 
 
-def parse_args(args=None, namespace=None):
+def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
     """
     parser = ArgumentParser(

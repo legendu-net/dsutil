@@ -3,16 +3,13 @@
 from typing import Union
 import os
 import sys
-import glob
-import re
 from pathlib import Path
-from argparse import ArgumentParser
 from loguru import logger
 
 
-def has_header(files, num_files: int = 5):
+def has_header(files, num_files: int = 5) -> bool:
     """Check whether the files have headers.
- 
+
     :param files: the list of files to check.
     :param n: the number of non-empty files to use to decide whether there are header lines.
     """
@@ -37,7 +34,7 @@ def has_header(files, num_files: int = 5):
     return True
 
 
-def _merge_with_headers(files, output: str = ""):
+def _merge_with_headers(files, output: str = "") -> None:
     """Merge files with headers. Keep only one header.
     """
     with open(output, "wb") if output else sys.stdout.buffer as out:
@@ -51,7 +48,7 @@ def _merge_with_headers(files, output: str = ""):
                     out.write(line)
 
 
-def _merge_without_header(files, output: str = ""):
+def _merge_without_header(files, output: str = "") -> None:
     """Merge files without header.
     """
     with open(output, "wb") if output else sys.stdout.buffer as fout:
@@ -62,7 +59,7 @@ def _merge_without_header(files, output: str = ""):
                 fout.write(b"\n")
 
 
-def merge(files, output: str = "", n: int = 5):
+def merge(files, output: str = "", n: int = 5) -> None:
     """Merge files. If there are headers in files, keep only one header in the single merged file.
 
     :param files: list of files.
@@ -71,13 +68,14 @@ def merge(files, output: str = "", n: int = 5):
     """
     if isinstance(files, str):
         files = [os.path.join(files, f) for f in os.listdir(files)]
-        return merge(files, output=output, n=n)
+        merge(files, output=output, n=n)
+        return
     if not n:
         n = min(10, len(files))
     if has_header(files, n):
         _merge_with_headers(files, output)
-    else:
-        _merge_without_header(files, output)
+        return
+    _merge_without_header(files, output)
 
 
 def dedup_header(file, output: str = ""):

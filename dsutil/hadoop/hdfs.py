@@ -72,7 +72,6 @@ class Hdfs():
         :param path: A HDFS path.
         :return: True if the HDFS path exists and False otherwise.
         """
-        # TODO: double check the implementation is good!
         cmd = f"{self.bin} dfs -test -e {path}"
         try:
             sp.run(cmd, shell=True, check=True)

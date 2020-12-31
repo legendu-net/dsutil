@@ -11,11 +11,10 @@ def extract_pages(file: str, subfiles: Mapping[str, Sequence[int]]) -> None:
     :param subfiles: A dictionary specifying sub PDF files
     and the corresponding list of pages from the raw PDF file.
     """
-    fin = open(file, "rb")
-    reader = PdfFileReader(fin)
-    for file, indexes in subfiles.items():
-        _extract_pages(reader, indexes, file)
-    fin.close()
+    with open(file, "rb") as fin:
+        reader = PdfFileReader(fin)
+        for subfile, indexes in subfiles.items():
+            _extract_pages(reader, indexes, subfile)
 
 
 def _extract_pages(reader: PdfFileReader, indexes: Sequence[int], output: str) -> None:
