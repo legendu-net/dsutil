@@ -1,3 +1,5 @@
+"""Miscellaneous utils.
+"""
 from typing import Any, Sized
 
 

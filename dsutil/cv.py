@@ -1,3 +1,5 @@
+"""Computer vision related utils.
+"""
 from typing import Union, Tuple, Iterable
 from pathlib import Path
 from tqdm import tqdm
@@ -141,18 +143,43 @@ def deshade_arr_3(arr, threshold=0.4, cutoff=30):
 
 
 def deshade_1(img, threshold=0.4):
+    """Deshade an image (i.e., get rid of the shading effec on an image.)
+        by checking whether the 3 channels have relative close values.
+
+    :param img: An image to deshade.
+    :param threshold: The threshold (absolute deviation from 1)
+        to consider a ratio (of 2 channels) to be close to 1.
+    """
     arr = np.array(img)
     arr = deshade_arr_1(arr, threshold=threshold)
     return Image.fromarray(arr)
 
 
 def deshade_2(img, cutoff=30):
+    """Deshade an image (i.e., get rid of the shading effec on an image)
+        by checking whether the 3 channels all have values larger than a threshold.
+
+    :param img: An image to deshade.
+    :param cutoff: The cutoff value of 3 channels.
+        If the 3 channels all have value no less than this cutoff,
+        then it is considered as shading effect.
+    """
     arr = np.array(img)
     arr = deshade_arr_2(arr, cutoff=cutoff)
     return Image.fromarray(arr)
 
 
 def deshade_3(img, threshold=0.4, cutoff=30):
+    """Deshade an image (i.e., get rid of the shading effec on an image)
+        by combining methods in deshade_arr_1 and deshade_arr_2.
+
+    :param img: An image to deshade.
+    :param threshold: The threshold (absolute deviation from 1)
+        to consider a ratio (of 2 channels) to be close to 1.
+    :param cutoff: The cutoff value of 3 channels.
+        If the 3 channels all have value no less than this cutoff,
+        then it is considered as shading effect.
+    """
     arr = np.array(img)
     arr = deshade_arr_3(arr, threshold=threshold, cutoff=cutoff)
     return Image.fromarray(arr)

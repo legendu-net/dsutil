@@ -8,7 +8,9 @@ import docker
 from .builder import DockerImage, DockerImageBuilder
 
 
-def images():
+def images() -> pd.DataFrame:
+    """Return Docker images as a pandas DataFrame.
+    """
     data = []
     for image in docker.from_env().images.list():
         repository = image.attrs["RepoDigests"][0].split("@")[0]
@@ -39,7 +41,9 @@ def images():
     return pd.DataFrame(data)
 
 
-def containers():
+def containers() -> pd.DataFrame:
+    """Return Docker containers as a pandas DataFrame.
+    """
     data = [
         {
             "container_id": cont.short_id,

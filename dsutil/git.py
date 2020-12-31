@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
-
+"""Git related utils.
+"""
 import subprocess as sp
 from pathlib import Path
 from typing import List, Set

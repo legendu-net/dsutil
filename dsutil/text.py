@@ -1,3 +1,5 @@
+"""Utils for manipulating text files. 
+"""
 #!/usr/bin/env python3
 # encoding: utf-8
 from typing import Union
@@ -111,6 +113,11 @@ def select(file, columns, delimiter, output: str = ""):
 
 
 def prune_json(input: Union[str, Path], output: Union[str, Path] = ""):
+    """Prune fields (value_counts) from a JSON file.
+
+    :param input: The path to a JSON file to be pruned.
+    :param output: The path to output the pruned JSON file.
+    """
     logger.info("Pruning the JSON fiel at {}...", input)
     if isinstance(input, str):
         input = Path(input)

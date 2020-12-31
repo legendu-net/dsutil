@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+"""Memory related utils.
+"""
 import getpass
 import sys
 import math
@@ -12,6 +13,10 @@ USER = getpass.getuser()
 
 
 def get_memory_usage(user: str = USER):
+    """Get the memory usage of the specified user.
+
+    :param user: The user whose memory usage to get.
+    """
     STATUS = (
         psutil.STATUS_RUNNING,
         psutil.STATUS_SLEEPING,
@@ -31,6 +36,11 @@ def get_memory_usage(user: str = USER):
 
 
 def monitor_memory_usage(seconds: float = 1, user: str = USER):
+    """Log out the memory usage of the specified user in a specified frequency.
+
+    :param seconds: The number of seconds to wait before the next logging.
+    :param user: The user whose memory usage to monitor.
+    """
     while True:
         time.sleep(seconds)
         logger.info("Memory used by {}: {:,}", user, get_memory_usage(user=user))
@@ -42,6 +52,12 @@ def match_memory_usage(
     sleep_min: float = 1,
     sleep_max: float = 30
 ):
+    """Match a user's memory usage to the specified value.
+    The memory usage will gradually increase to the specified value 
+    if it is smaller than the specified value.
+    Otherwise, 
+    the memory usage drops immediately to match the specified value.
+    """
     logger.info("Target memory: {:,.0f}", target)
     # define an template array
     arr = list(range(arr_size))
@@ -93,6 +109,8 @@ def parse_args(args=None, namespace=None) -> Namespace:
 
 
 def main():
+    """The main function for scripting usage.
+    """
     args = parse_args()
     match_memory_usage(args.target)
 
