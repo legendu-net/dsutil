@@ -324,6 +324,8 @@ def install_package(options: List[str] = (), proj_dir: Path = None):
 
 
 def clean(proj_dir: Path = None):
+    """Remove non-essential files from the current project.
+    """
     if proj_dir is None:
         proj_dir = _project_dir()
     paths = [

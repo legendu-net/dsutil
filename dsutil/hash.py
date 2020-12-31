@@ -1,3 +1,5 @@
+"""Hash code related utils.
+"""
 import hashlib
 from typing import Union, List, Tuple
 from pathlib import Path

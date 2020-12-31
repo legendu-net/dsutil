@@ -1,3 +1,5 @@
+"""Shell command related utils.
+"""
 from typing import List, Union
 import re
 import subprocess as sp
@@ -10,39 +12,52 @@ def to_frame(
     header: Union[int, List[str], None] = None,
     skip: Union[int, List[int]] = (),
     lines: List[str] = (),
-    split_by_title: bool = False
+    split_by_header: bool = False
 ) -> pd.DataFrame:
-    if split_by_title:
-        return to_frame_title(cmd=cmd, split=split, lines=lines)
-    return to_frame_space(cmd=cmd, split=split, header=header, skip=skip, lines=lines)
+    """Convert the result of a shell command to a DataFrame.
+    The headers are splitted by a regular expression
+    while the columns are splitted by the right-most position of the headers.
 
-
-def to_frame_space(
-    cmd="",
-    split: str = r"  +",
-    header: Union[int, List[str], None] = None,
-    skip: Union[int, List[int]] = (),
-    lines: List[str] = ()
-) -> pd.DataFrame:
-    """Construct a pandas DataFrame from a List with the first row as header.
-
-    :param lines: The output of the shell command.
+    :param cmd: A shell command.
     :param split: A regular expression pattern for splitting a line into fields.
     :param header: An integer, list of string or None specifiying the header of the data frame.
-        If header is an integer, the corresponding row of lines after removing empty and skipped rows is used as header of the data frame; 
-        if header is a list of string then it is used as the header of the data frame.
-        if header is None, then default header is used for the data frame.
-    :param cmd: A shell command.
+    If header is an integer, 
+    the corresponding row of lines after removing empty and skipped rows is used as header of the data frame; 
+    if header is a list of string then it is used as the header of the data frame.
+    if header is None, then default header is used for the data frame.
+    :param skip: Indexes of rows to skip.
+    :param lines: The output of the shell command.
+    :param split_by_header: If true, the headers are splitted by a regular expression 
+    and the columns are splitted by the right-most position of the headers.
+    Otherwise, all lines are splitted by the specified regular expression.
     :return: A pandas DataFrame.
     """
     if not lines:
         lines = sp.check_output(cmd, shell=True).decode().strip().split("\n")
     if isinstance(skip, int):
         skip = [skip]
-    data = [
-        re.split(split, line.strip())
-        for index, line in enumerate(lines) if line.strip() != "" and index not in skip
-    ]
+    lines = [line for idx, line in enumerate(lines) if idx not in skip]
+    if split_by_header:
+        return _to_frame_title(split=split, lines=lines)
+    return _to_frame_space(split=split, header=header, skip=skip, lines=lines)
+
+
+def _to_frame_space(
+    lines: List[str],
+    split: str = r"  +",
+    header: Union[int, List[str], None] = None,
+) -> pd.DataFrame:
+    """Convert the result of a shell command to a DataFrame.
+
+    :param lines: The output of a shell command as lines of rows.
+    :param split: A regular expression pattern for splitting a line into fields.
+    :param header: An integer, list of string or None specifiying the header of the data frame.
+        If header is an integer, the corresponding row of lines after removing empty and skipped rows is used as header of the data frame; 
+        if header is a list of string then it is used as the header of the data frame.
+        if header is None, then default header is used for the data frame.
+    :return: A pandas DataFrame.
+    """
+    data = [re.split(split, line.strip()) for line in lines if line.strip() != ""]
     if isinstance(header, int):
         columns = [re.sub(r"\s+", "_", col.lower()) for col in data[header]]
         data = (row for idx, row in enumerate(data) if idx != header)
@@ -54,17 +69,14 @@ def to_frame_space(
     return frame.astype(str)
 
 
-def to_frame_title(cmd="", split=r"  +", lines: List[str] = ()):
+def _to_frame_title(lines: List[str], split: str = r"  +") -> pd.DataFrame:
     """Convert the result of a shell command to a DataFrame.
-    The headers are splitted by a regular expression
-    while the columns are splitted by the right-most position of the headers.
 
-    :param lines: The output of the shell command.
+    :param lines: The output of the shell command as list of lines.
     :param split: A regular expression pattern for splitting headers.
-    :param cmd: A shell command.
+    Notice that non-header rows are splitted according the right-most position of the headers.
+    :return: A pandas DataFrame.
     """
-    if not lines:
-        lines = sp.check_output(cmd, shell=True).decode().strip().split("\n")
     headers = re.split(split, lines[0])
     n = len(headers)
     data = {}
