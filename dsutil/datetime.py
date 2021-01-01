@@ -22,7 +22,7 @@ def range_str(
     :param stop: A datetime object or a string that can be parsed into a datetime.
     :param step: A timedelta object specifying how much the values in the sequence increase at each step.
     :param fmt: The format of date/time (defaults to TIME_FORMAT_DASH)
-    :return: A generator of datetime in string format.
+    :yield: A generator of datetime in string format.
     """
     for ts in range(start=start, stop=stop, step=step):
         yield ts.strftime(fmt)
@@ -34,7 +34,7 @@ def range(start, stop, step=datetime.timedelta(days=1)) -> Iterable[datetime.dat
     :param start: A datetime object or a string that can be parsed into a datetime.
     :param stop: A datetime object or a string that can be parsed into a datetime.
     :param step: A timedelta object specifying how much the values in the sequence increase at each step.
-    :return: A generator of datetime objects.
+    :yield: A generator of datetime objects.
     """
     start = pd.to_datetime(start)
     stop = pd.to_datetime(stop)

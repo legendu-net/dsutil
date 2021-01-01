@@ -37,8 +37,8 @@ class DockerHub():
     def delete_tag(self, image: str, tag: str = "") -> str:
         """Delete a tag of the specified Docker image.
 
-        :param image: 
-        :param tag:
+        :param image: The name of a docker image (without tag). 
+        :param tag: The tag of the Docker image (to delete).
         """
         user = self.user
         if "/" in image:

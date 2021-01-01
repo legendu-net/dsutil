@@ -19,6 +19,7 @@ def _project_dir() -> Path:
     """Get the root directory of the Poetry project.
 
     :return: The root directory of the Poetry project.
+    :raises RuntimeError: Raises RuntimeError if the current directory is not under a Python Poetry project.
     """
     path = Path.cwd()
     while path.parent != path:
@@ -43,6 +44,7 @@ def _project_version(proj_dir: Path) -> str:
     """Get the version of the project.
 
     :param proj_dir: The root directory of the Poetry project.
+    :return: Version of the project.
     """
     return toml.load(proj_dir / TOML)["tool"]["poetry"]["version"]
 
@@ -97,7 +99,7 @@ def version(
     ver: str = "",
     commit: bool = False,
     proj_dir: Path = None,
-):
+) -> None:
     """List or update the version of the package.
 
     :param ver: The new version to use.
@@ -208,6 +210,7 @@ def _lint_code(proj_dir: Union[Path, None], linter: Union[str, List[str]]):
         "pylint": _lint_code_pylint,
         "flake8": _lint_code_flake8,
         "pytype": _lint_code_pytype,
+        "darglint": _lint_code_darglint,
     }
     if isinstance(linter, str):
         linter = [linter]
@@ -279,9 +282,27 @@ def _lint_code_flake8(proj_dir: Union[Path, None], pyvenv_path: str):
         logger.error("Please fix errors: {}", cmd)
 
 
+def _lint_code_darglint(proj_dir: Union[Path, None], pyvenv_path: str):
+    logger.info("Linting docstring using darglint ...")
+    if not proj_dir:
+        proj_dir = _project_dir()
+    if not pyvenv_path:
+        pyvenv_path = _pyvenv_path()
+    pkg = _project_name(proj_dir)
+    if not pyvenv_path:
+        pyvenv_path = _pyvenv_path()
+    if pyvenv_path:
+        pyvenv_path += ":"
+    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH darglint {proj_dir / pkg}"
+    try:
+        sp.run(cmd, shell=True, check=True)
+    except sp.CalledProcessError:
+        logger.error("Please fix errors: {}", cmd)
+
+
 def build_package(
     proj_dir: Union[Path, None] = None,
-    linter: Union[str, Iterable[str]] = ("pylint", "flake8", "pytype"),
+    linter: Union[str, Iterable[str]] = ("pylint", "flake8", "pytype", "darglint"),
     test: bool = True
 ) -> None:
     """Build the package using poetry.
