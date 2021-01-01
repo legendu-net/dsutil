@@ -128,9 +128,9 @@ class DockerImage:
         """Get all dependencies of this DockerImage in order.
 
         :param images: A dict containing dependency images.
-        A key is an URL of a DockerImage and the value is the corresponding DockerImage.
+            A key is an URL of a DockerImage and the value is the corresponding DockerImage.
         :return: A dict containing dependency images.
-        A key is an URL of a DockerImage and the value is the corresponding DockerImage.
+            A key is an URL of a DockerImage and the value is the corresponding DockerImage.
         """
         self.clone_repo()
         deps = deque([self])
@@ -169,18 +169,18 @@ class DockerImage:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
-        If None (default), then it is determined by the branch name.
-        When the branch is master the "latest" tag is used,
-        otherwise the next tag is used.
-        If an empty string is specifed for tag_build,
-        it is also treated as the latest tag.
+            If None (default), then it is determined by the branch name.
+            When the branch is master the "latest" tag is used,
+            otherwise the next tag is used.
+            If an empty string is specifed for tag_build,
+            it is also treated as the latest tag.
         :param tag_base: The tag of the base image to use.
-        If emtpy (default),
-        then the tag of the base image is as specified in the Dockerfile.
+            If emtpy (default),
+            then the tag of the base image is as specified in the Dockerfile.
         :param no_cache: If True, no cache is used when building the Docker image;
-        otherwise, cache is used.
-        :param copy_ssh_keys: If True, SSH keys are copied into a directory named ssh
-        under the current local Git repository. 
+            otherwise, cache is used.
+        :param copy_ssh_to: If True, SSH keys are copied into a directory named ssh
+            under the current local Git repository. 
         :return: A tuple of the format (image_name_built, time_taken).
         """
         start = time.perf_counter_ns()
@@ -242,11 +242,11 @@ class DockerImage:
         """Push the built Docker image to the container repository.
 
         :param tag_tran_fun: A function takeing a tag as the parameter
-        and generating a new tag to tag Docker images before pushing.
+            and generating a new tag to tag Docker images before pushing.
         :param retry: The number of times (default 3) to retry pushing the Docker image.
         :param seconds: The number of seconds (default 60) to wait before retrying.
         :return: A pandas DataFrame with 2 columns "image" (name of the built Docker image) 
-        and "seconds" (time taken to build the Docker image).
+            and "seconds" (time taken to build the Docker image).
         """
         data = [
             _retry_docker(
@@ -313,7 +313,7 @@ class DockerImageBuilder:
         """Push all Docker images in self.docker_images.
 
         :param tag_tran_fun: A function takeing a tag as the parameter
-        and generating a new tag to tag Docker images before pushing.
+            and generating a new tag to tag Docker images before pushing.
         """
         self._get_deps()
         frames = [image.push(tag_tran_fun) for _, image in self.docker_images.items()]

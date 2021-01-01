@@ -79,7 +79,7 @@ def remove_containers(
     """Remove the specified Docker containers.
     :param id_: The id of the container to remove.
     :param name: A (regex) pattern of names of containers to remove.
-    :param exited: Whether to remove exited containers.
+    :param status: Filter containers with the specified status.
     :param choice: One of "y" (auto yes), "n" (auto no) 
         or "i" (interactive, i.e., ask for confirmation on each case).
     """
@@ -177,7 +177,7 @@ def stop(id_: str = "", name: str = "", status: str = "", choice: str = "") -> N
     """Stop the specified Docker containers.
     :param id_: The id of the container to remove.
     :param name: A (regex) pattern of names of containers to remove.
-    :param exited: Whether to remove exited containers.
+    :param status: Stop containers with the specified status.
     :param choice: One of "y" (auto yes), "n" (auto no)
         or "i" (interactive, i.e., ask for confirmation on each case).
     """

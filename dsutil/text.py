@@ -13,7 +13,7 @@ def has_header(files, num_files: int = 5) -> bool:
     """Check whether the files have headers.
 
     :param files: the list of files to check.
-    :param n: the number of non-empty files to use to decide whether there are header lines.
+    :param num_files: the number of non-empty files to use to decide whether there are header lines.
     """
     # i: file index
     for i in range(len(files)):

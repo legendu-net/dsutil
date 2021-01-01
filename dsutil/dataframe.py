@@ -26,6 +26,8 @@ def table_2w(frame: pd.DataFrame, columns: Union[str, List[str], None], na_as=No
 
 def read_csv(path: Union[str, Path], **kwargs):
     """Read many CSV files into a DataFrame at once.
+
+    :param kwargs: Additional arguments to pass to pandas::read_csv.
     """
     if isinstance(path, str):
         path = Path(path)

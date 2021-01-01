@@ -50,7 +50,7 @@ class Hdfs():
         """Get the size of HDFS paths.
         :param path: A HDFS path.
         :param depth: The depth (by default 1) of paths to calculate sizes for.
-        Note that any depth less than 1 is treated as 1.
+            Note that any depth less than 1 is treated as 1.
         """
         index = len(path.rstrip("/"))
         if depth > 1:

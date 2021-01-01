@@ -9,6 +9,8 @@ YARN = '/apache/hadoop/bin/yarn'
 
 def filter_(args):
     """Filter the a log file.
+
+    :param args: A Namespace object containing command-line options.
     """
     logf = LogFilter(
         log_file=args.log_file,
@@ -34,6 +36,8 @@ def _format_app_id(app_id: str):
 
 def fetch(args):
     """Fetch and filter the log of a Spark/Hadoop application.
+
+    :param args: A Namespace object containing command-line options.
     """
     app_id = _format_app_id(args.app_id)
     output = args.output if args.output else app_id
@@ -45,8 +49,12 @@ def fetch(args):
     LogFilter(log_file=output).filter()
 
 
-def parse_args(args=None, namespace=None):
+def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
+
+    :param args: Arguments to parse.
+    :param namespace: An initial namespace.
+    :return: Parse arguments as a Namespace object.
     """
     parser = argparse.ArgumentParser(description='Spark/Hadoop log utils.')
     subparsers = parser.add_subparsers(help='Sub commands.')

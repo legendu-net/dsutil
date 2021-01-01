@@ -19,6 +19,7 @@ def _project_dir() -> Path:
     """Get the root directory of the Poetry project.
 
     :return: The root directory of the Poetry project.
+    :raises RuntimeError: Raises RuntimeError if the current directory is not under a Python Poetry project.
     """
     path = Path.cwd()
     while path.parent != path:
@@ -43,6 +44,7 @@ def _project_version(proj_dir: Path) -> str:
     """Get the version of the project.
 
     :param proj_dir: The root directory of the Poetry project.
+    :return: Version of the project.
     """
     return toml.load(proj_dir / TOML)["tool"]["poetry"]["version"]
 
@@ -97,7 +99,7 @@ def version(
     ver: str = "",
     commit: bool = False,
     proj_dir: Path = None,
-):
+) -> None:
     """List or update the version of the package.
 
     :param ver: The new version to use.
