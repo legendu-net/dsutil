@@ -210,6 +210,7 @@ def _lint_code(proj_dir: Union[Path, None], linter: Union[str, List[str]]):
         "pylint": _lint_code_pylint,
         "flake8": _lint_code_flake8,
         "pytype": _lint_code_pytype,
+        "darglint": _lint_code_darglint,
     }
     if isinstance(linter, str):
         linter = [linter]
@@ -281,9 +282,27 @@ def _lint_code_flake8(proj_dir: Union[Path, None], pyvenv_path: str):
         logger.error("Please fix errors: {}", cmd)
 
 
+def _lint_code_darglint(proj_dir: Union[Path, None], pyvenv_path: str):
+    logger.info("Linting docstring using darglint ...")
+    if not proj_dir:
+        proj_dir = _project_dir()
+    if not pyvenv_path:
+        pyvenv_path = _pyvenv_path()
+    pkg = _project_name(proj_dir)
+    if not pyvenv_path:
+        pyvenv_path = _pyvenv_path()
+    if pyvenv_path:
+        pyvenv_path += ":"
+    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH darglint {proj_dir / pkg}"
+    try:
+        sp.run(cmd, shell=True, check=True)
+    except sp.CalledProcessError:
+        logger.error("Please fix errors: {}", cmd)
+
+
 def build_package(
     proj_dir: Union[Path, None] = None,
-    linter: Union[str, Iterable[str]] = ("pylint", "flake8", "pytype"),
+    linter: Union[str, Iterable[str]] = ("pylint", "flake8", "pytype", "darglint"),
     test: bool = True
 ) -> None:
     """Build the package using poetry.
