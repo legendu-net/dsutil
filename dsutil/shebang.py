@@ -22,6 +22,7 @@ def update_shebang(script_dir: Union[Path, str], shebang: str):
     """Update the Shebang of scripts in the given script dir.
 
     :param script_dir: A directory containing scripts whose shebang are to be updated.
+    :param shebang: The new shebang to use.
     """
     if isinstance(script_dir, str):
         script_dir = Path(script_dir)
@@ -37,6 +38,10 @@ def update_shebang(script_dir: Union[Path, str], shebang: str):
 
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
+
+    :param args: The arguments to parse. If None, the arguments from command line is parsed.
+    :param namespace: An inital Namespace object.
+    :return: A Namespace object containing parsed options.
     """
     parser = ArgumentParser(description="Update shebang of scripts.")
     parser.add_argument(

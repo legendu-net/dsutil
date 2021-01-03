@@ -46,6 +46,10 @@ def range(start, stop, step=datetime.timedelta(days=1)) -> Iterable[datetime.dat
 
 def last_weekday(weekday) -> datetime.date:
     """Get the date of latest occurrence of the specified weekday.
+
+    :param weekday: An integer (0 stands for Monday) 
+        or the name (full or 3-letter abbreviation) of a weekday/weekend.
+    :return: The date of specified last weekday.
     """
     mapping = {
         "Monday": 0,
@@ -74,59 +78,55 @@ def last_weekday(weekday) -> datetime.date:
 
 def last_monday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
+
+    :return: The date of last Monday.
     """
     return last_weekday("Mon")
 
 
 def last_tuesday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
+
+    :return: The date of last Tuesday.
     """
     return last_weekday("Tue")
 
 
 def last_wednesday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
+
+    :return: The date of last Wednesday.
     """
     return last_weekday("Wed")
 
 
 def last_thursday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
+
+    :return: The date of last Thursday.
     """
     return last_weekday("Thu")
 
 
 def last_friday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
+
+    :return: The date of last Friday.
     """
     return last_weekday("Fri")
 
 
 def last_saturday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
+
+    :return: The date of last Saturday.
     """
     return last_weekday("Sat")
 
 
 def last_sunday() -> datetime.date:
     """Get the date of latest occurrence of Monday.
+
+    :return: The date of last Sunday.
     """
     return last_weekday("Sun")
-
-
-def today(days: int = 0) -> datetime.date:
-    """Return the date of days after today as a date.
-    """
-    return datetime.date.today() + datetime.timedelta(days=days)
-
-
-def today_dash(days: int = 0) -> str:
-    """Return the date of days after today as a dash separated string.
-    """
-    return today(days).strftime(DATE_FORMAT_DASH)
-
-
-def today_digit(days: int = 0) -> str:
-    """Return the date of days after today as a 8-digit string.
-    """
-    return today(days).strftime(DATE_FORMAT_DIGIT)

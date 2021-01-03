@@ -7,8 +7,17 @@ import pandas as pd
 from pandas_profiling import ProfileReport
 
 
-def table_2w(frame: pd.DataFrame, columns: Union[str, List[str], None], na_as=None):
+def table_2w(
+    frame: Union[pd.DataFrame, pd.Series],
+    columns: Union[str, List[str], None],
+    na_as=None
+) -> pd.DataFrame:
     """Create 2-way table from columns of a DataFrame.
+
+    :param frame: A pandas DataFrame.
+    :param columns: Columns based on which to generate 2-way tables.
+    :raises TypeError: If frame is neither a pandas DataFrame nor a Series.
+    :return: A 2-way table as a pandas DataFrame.
     """
     if na_as is not None:
         frame = frame.fillna(na_as)
@@ -24,10 +33,12 @@ def table_2w(frame: pd.DataFrame, columns: Union[str, List[str], None], na_as=No
     raise TypeError('"frame" must be pandas.Series or pandas.DataFrame.')
 
 
-def read_csv(path: Union[str, Path], **kwargs):
+def read_csv(path: Union[str, Path], **kwargs) -> pd.DataFrame:
     """Read many CSV files into a DataFrame at once.
 
+    :param path: A path to a CSV file or to a directory containing CSV files.
     :param kwargs: Additional arguments to pass to pandas::read_csv.
+    :return: A pandas DataFrame.
     """
     if isinstance(path, str):
         path = Path(path)
@@ -44,6 +55,7 @@ def dump_profile(
     :param df: A pandas DataFrame.
     :param title: The title of the generated report.
     :param output_dir: The output directory for reports.
+    :raises ValueError: If an input file other than Parquet/Pickle/CSV is provided.
     """
     if isinstance(df, str):
         df = Path(df)

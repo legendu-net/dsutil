@@ -22,6 +22,8 @@ class SparkSubmit:
     """
     def __init__(self, email: Union[Dict, None] = None, level: str = "INFO"):
         """Initialize a SparkSubmit instance.
+
+        :param email: A dict object containing email information ("from", "to" and "host").
         :param level: The logging level for loguru.
         """
         # set up loguru with the right logging level
@@ -122,6 +124,10 @@ class SparkSubmit:
 
     def submit(self, cmd: str, attachments: Union[None, List[str]] = None) -> bool:
         """Submit a Spark job.
+
+        :param cmd: The Python script command to run.
+        :param attachments: Attachments to send with the notification email.
+        :return: True if the Spark application succeeds and False otherwise.
         """
         logger.info("Submitting Spark job...\n{}", cmd)
         stdout = []
@@ -183,8 +189,11 @@ class SparkSubmit:
         )
 
     @staticmethod
-    def _app_id(stdout: List[str]):
+    def _app_id(stdout: List[str]) -> str:
         """Parse the application ID.
+
+        :param stdout: Standard output as a list of strings.
+        :return: The application ID of the Spark application.
         """
         for line in reversed(stdout):
             match = re.search(r"(application_\d+_\d+)", line)
@@ -193,8 +202,11 @@ class SparkSubmit:
         return ""
 
     @staticmethod
-    def _final_status(stdout: List[str]):
+    def _final_status(stdout: List[str]) -> str:
         """Parse the final status of the Spark application.
+
+        :param stdout: Standard output as a list of strings.
+        :return: The final status (SUCCEED or FAILED) of the Spark application.
         """
         for line in reversed(stdout):
             if "final status: " in line:
@@ -204,6 +216,9 @@ class SparkSubmit:
 
 def _files(config: Dict) -> str:
     """Get a list of valid configuration files to use with the option --files.
+
+    :param config: A dict object containing configurations.
+    :return: A string containing Spark configuration files separated by comma.
     """
     files = []
     for key, paths in config["files"].items():
@@ -270,6 +285,8 @@ def _submit_cluster(args, config: Dict[str, Any]) -> bool:
 
 def submit(args: Namespace) -> None:
     """Submit the Spark job.
+
+    :param args: A Namespace object containing command-line options.
     """
     with open(args.config, "r") as fin:
         config = yaml.load(fin, Loader=yaml.FullLoader)
@@ -284,6 +301,10 @@ def submit(args: Namespace) -> None:
 
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
+
+    :param args: Arguments to parse. If None, arguments from command line is used.
+    :param namespace: An initial Namespace object to use.
+    :return: A Namespace object containing command-line options.
     """
     parser = ArgumentParser(description="Submit Spark application.")
     parser.add_argument(

@@ -18,6 +18,8 @@ import docker
 
 def tag_date(tag: str) -> str:
     """Get the current date as a 6-digit string.
+
+    :param tag: A tag of Docker image.
     :return: The current in 6-digit format.
     """
     mmddhh = datetime.datetime.now().strftime("%m%d%H")
@@ -314,6 +316,7 @@ class DockerImageBuilder:
 
         :param tag_tran_fun: A function takeing a tag as the parameter
             and generating a new tag to tag Docker images before pushing.
+        :return: A pandas DataFrame summarizing pushing information.
         """
         self._get_deps()
         frames = [image.push(tag_tran_fun) for _, image in self.docker_images.items()]
@@ -326,11 +329,16 @@ class DockerImageBuilder:
         no_cache: Union[bool, str, List[str], Set[str]] = None,
         copy_ssh_to: str = "",
         push: bool = True,
-    ) -> Tuple[str, float]:
+    ) -> pd.DataFrame:
         """Build all Docker images in self.docker_images in order.
+
         :param tag_build: The tag of built images.
         :param tag_base: The tag to the root base image to use.
         :param no_cache: A set of docker images to disable cache when building.
+        :param copy_ssh_to: If True, SSH keys are copied into a directory named ssh
+            under each of the local Git repositories. 
+        :param push: If True, push the built Docker images to DockerHub.
+        :return: A pandas DataFrame summarizing building information.
         """
         self._get_deps()
         if isinstance(no_cache, str):
