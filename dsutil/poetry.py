@@ -9,6 +9,7 @@ import subprocess as sp
 import toml
 from loguru import logger
 import git
+import pathspec
 from .filesystem import update_file
 DIST = "dist"
 README = "readme.md"
@@ -104,6 +105,7 @@ def version(
 
     :param ver: The new version to use.
         If empty, then the current version of the package is printed.
+    :param commit: Whether to commit changes.
     :param proj_dir: The root directory of the Poetry project.
     """
     if proj_dir is None:
@@ -134,7 +136,10 @@ def add_tag_release(
     """Add a tag to the latest commit on the release branch for releasing.
     The tag is decided based on the current version of the project.
 
+    :param proj_dir: The root directory of the Poetry project.
     :param tag: The tag (defaults to the current version of the package) to use.
+    :param release_branch: The branch for releasing.
+    :raises ValueError: If the tag to create already exists.
     """
     repo = git.Repo(proj_dir)
     current_branch = repo.active_branch
@@ -161,14 +166,16 @@ def format_code(
     commit: bool = False,
     proj_dir: Path = None,
     files: Iterable[Union[Path, str]] = ()
-):
+) -> None:
     """Format code.
 
     :param inplace: If true (defaults to False), format code inplace.
-    Otherwise, changes are printed to terminal only.
+        Otherwise, changes are printed to terminal only.
     :param commit: If true (defaults to False),
-    commit code formatting changes automatically.
-    :param proj_dir: [description], defaults to None
+        commit code formatting changes automatically.
+    :param proj_dir: The root directory of the Poetry project.
+    :param files: An iterable of Python scripts to format.
+        If empty, then the whole project is formatted.
     """
     cmd = ["yapf"]
     if inplace:
@@ -302,13 +309,15 @@ def _lint_code_darglint(proj_dir: Union[Path, None], pyvenv_path: str):
 
 def build_package(
     proj_dir: Union[Path, None] = None,
-    linter: Union[str, Iterable[str]] = ("pylint", "flake8", "pytype", "darglint"),
+    linter: Union[str, Iterable[str]] = ("pylint", "flake8", "pytype"),
     test: bool = True
 ) -> None:
     """Build the package using poetry.
 
-    :param dst_dir: The root directory of the project.
     :param proj_dir: The root directory of the Poetry project.
+    :param linter: A linter or an iterable of linters.
+    :param test: Whether to run test suits (using pytest).
+    :raises FileNotFoundError: If the command poetry is not found.
     """
     if not shutil.which("poetry"):
         raise FileNotFoundError("The command poetry is not found!")
@@ -325,38 +334,40 @@ def build_package(
     sp.run(f"cd '{proj_dir}' && poetry build", shell=True, check=True)
 
 
-def install_package(options: List[str] = (), proj_dir: Path = None):
-    """Install the built package.
-
-    :param options: A list of options to pass to pip3.
-    """
-    if proj_dir is None:
-        proj_dir = _project_dir()
-    pkg = list(proj_dir.glob("dist/*.whl"))
-    if not pkg:
-        logger.error("No built package is found!")
-        return
-    if len(pkg) > 1:
-        logger.error("Multiple built packages are found!")
-        return
-    cmd = ["pip3", "install", "--user", "--upgrade", pkg[0]]
-    cmd.extend(options)
-    sp.run(cmd, check=True)
-
-
-def clean(proj_dir: Path = None):
+def clean(proj_dir: Path = None, ignore: Union[str, Path, None] = None) -> None:
     """Remove non-essential files from the current project.
+
+    :param proj_dir: The root directory of the Poetry project.
+    :param ignore: The full path to a GitIgnore file.
     """
     if proj_dir is None:
         proj_dir = _project_dir()
-    paths = [
-        ".venv", ".mypy_cache", "dbay.egg-info", "core", "dist", ".pytest_cache",
-        ".pytype"
-    ]
-    for path in paths:
-        path = proj_dir / path
-        if path.exists():
+    if ignore is None:
+        ignore = proj_dir / ".gitignore"
+    elif isinstance(ignore, str):
+        ignore = Path(ignore)
+    if not ignore.is_file():
+        return
+    logger.info("Use the GitIgnore file: {}", ignore)
+    with ignore.open("r") as fin:
+        patterns = [line.strip() for line in fin]
+    spec = pathspec.PathSpec.from_lines(pathspec.patterns.GitWildMatchPattern, patterns)
+    _clean(proj_dir, spec)
+
+
+def _clean(path: Path, spec: pathspec.PathSpec) -> None:
+    if spec.match_file(path):
+        if path.is_file():
             try:
                 path.unlink()
             except:
-                logger.error("Failed to remove the path: {}", path)
+                logger.error("Failed to remove the file: {}", path)
+        else:
+            try:
+                shutil.rmtree(path)
+            except:
+                logger.error("Failed to remove the directory: {}", path)
+        return
+    if path.is_dir():
+        for p in path.iterdir():
+            _clean(p, spec)

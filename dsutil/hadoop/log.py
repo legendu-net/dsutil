@@ -18,11 +18,18 @@ class LogCluster:
     @staticmethod
     def similarity(line1, line2):
         """Calcualte similarity between 2 lines.
+
+        :param line1: A line of logging message.
+        :param line2: Another line of logging message.
+        :return: A similarity score (between 0 and 1) between the 2 lines.
         """
         return SequenceMatcher(None, line1, line2).ratio()
 
     def add(self, line, line_num):
         """Add a line.
+
+        :param line: A line of logging message.
+        :param line_num: The row number (0-based) of the line.
         """
         LINE = "L{line_num}: {line}\n"
         similarity = max(
@@ -33,6 +40,8 @@ class LogCluster:
 
     def write(self, fout):
         """Write deduplicated log to a file.
+
+        :param fout: A file handler for writing.
         """
         fout.write(DASH_50 + "SUMMARY" + DASH_50 + "\n")
         for line in self.cluster:
@@ -91,22 +100,31 @@ class LogFilter:
         title, ext = os.path.splitext(self._log_file)
         return title + "_s" + ext
 
-    def regularize(self, line):
+    def regularize(self, line) -> str:
         """Get rid of substrings with patterns specified by the regular expressions.
+
+        :param line: A line of logging message.
+        :return: The regularized the line message.
         """
         for pattern in self.patterns:
             line = pattern.sub("", line)
         return line
 
-    def _dump_queue(self, lines):
+    def _dump_queue(self, lines) -> None:
         """Dump content in the queue.
+
+        :param lines: A list to dump the queue to.
         """
         lines.append("-" * 100 + "\n")
         lines.extend(self.queue)
         self.queue.clear()
 
-    def keep(self, idx, line):
+    def keep(self, idx: int, line: str) -> bool:
         """Check whether the line should be kept.
+
+        :param idx: The original row number (0-based) of the line. 
+        :param line: A line of logging message.
+        :return: True if the line is to be kept and False otherwise.
         """
         if not self.case_sensitive:
             line = line.lower()

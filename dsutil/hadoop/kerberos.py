@@ -38,6 +38,8 @@ class ExceptionNoPassword(Exception):
 
 def save_passwd(passwd: str) -> None:
     """Encrypt and save the password into a profile that is readable/writable only by the user.
+
+    :param passwd: The password of the user (to save).
     """
     bytes_ = passwd.encode("ascii")
     encode = base64.b64encode(bytes_).decode()
@@ -48,6 +50,8 @@ def save_passwd(passwd: str) -> None:
 
 def read_passwd() -> str:
     """Read in the saved password.
+
+    :return: Password in the profile file or empty string if the file does not exist.
     """
     os.chmod(PROFILE, 0o600)
     if not os.path.isfile(PROFILE):
@@ -77,6 +81,10 @@ def _warn_passwd_expiration(process, email: Dict[str, str]):
 
 def authenticate(password: str, email: Dict[str, str], user: str = "") -> None:
     """Authenticate using the shell command /usr/bin/kinit.
+
+    :param password: The password of the user.
+    :param email: A dict containing email information ("from", "to" and "host").
+    :param user: User name. If empty, the current user name is used.
     """
     SUBJECT = "kinit: authentication {}"
     MSG = f'kinit ({PID}): authentication on {HOST} ({HOST_IP}) {"{}"} at {datetime.datetime.now()}'
@@ -120,6 +128,10 @@ def authenticate(password: str, email: Dict[str, str], user: str = "") -> None:
 
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments for the script.
+
+    :param args: The arguments to parse. If None, the command-line arguments are parsed.
+    :param namespace: An initial Namespace object.
+    :return: A Namespace object containing parsed command-line options.
     """
     parser = ArgumentParser(description="Easy kinit authentication.")
     parser.add_argument(
@@ -162,6 +174,8 @@ def _read_config(config: Union[Path, str, None]) -> Dict[str, Any]:
 
 def main() -> None:
     """Authenticate the user using either supplied or saved password.
+
+    :raises ExceptionNoPassword: If no password is provided or found.
     """
     args = parse_args()
     if args.password:

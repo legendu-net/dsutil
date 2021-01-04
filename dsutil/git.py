@@ -40,6 +40,7 @@ def check(path: str = ".", file_mode: bool = False) -> None:
     Git submodule is not supported currently.
 
     :param path: The path of the directory under which Git repositories are to be checked.
+    :param file_mode: Whether (default False) to check file mode changes as well.
     """
     path = Path(path).resolve()
     logger.info('Checking status of Git repositories under "{}"...', path)

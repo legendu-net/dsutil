@@ -1,7 +1,7 @@
 """Script for fetch and filtering Spark application logs.
 """
 import re
-import argparse
+from argparse import ArgumentParser, Namespace
 import subprocess as sp
 from .log import LogFilter
 YARN = '/apache/hadoop/bin/yarn'
@@ -56,7 +56,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
     :param namespace: An initial namespace.
     :return: Parse arguments as a Namespace object.
     """
-    parser = argparse.ArgumentParser(description='Spark/Hadoop log utils.')
+    parser = ArgumentParser(description='Spark/Hadoop log utils.')
     subparsers = parser.add_subparsers(help='Sub commands.')
     _subparser_fetch(subparsers)
     _subparser_filter(subparsers)

@@ -1,6 +1,6 @@
 """Utils functions for Hadoop.
 """
-from typing import Union
+from typing import Union, List
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, spark_partition_id, rank, coalesce, lit, max, sum
 
@@ -13,7 +13,9 @@ def sample(
     """Sample rows from a PySpark DataFrame.
 
     :param frame: The PySpark DataFrame from which to sample rows.
+    :param ratio: The acceptance ratio or the number of rows to sample.
     :param total: The total number of rows in the DataFrame.
+    :return: A PySpark DataFrame containing sampled rows.
     """
     if isinstance(ratio, int):
         if total is None:
@@ -24,43 +26,28 @@ def sample(
     return frame.sample(ratio)
 
 
-def calc_global_rank(item: DataFrame) -> DataFrame:
+def calc_global_rank(frame: DataFrame, order_by: Union[str, List[str]]) -> DataFrame:
     """Calculate global ranks.
-    This function uses a smart algorithm to avoding shuffling all items
+    This function uses a smart algorithm to avoding shuffling all rows
     to a single node which causes OOM.
-    :return: A DataFrame containing item metrics from both marketing and site.
+
+    :param frame: A PySpark DataFrame. 
+    :param order_by: The columns to sort the DataFrame by. 
+    :return: A DataFrame with new columns ("part_id", "local_rank", "cum_rank", "sum_factor" and "rank") added.
     """
+    if isinstance(order_by, str):
+        order_by = [order_by]
     # calculate local rank
-    wspec1 = Window.partitionBy("part_id").orderBy(
-        col("col1").desc(),
-        col("col2"),
-        col("col3").desc(),
-        col("col4").desc(),
-        col("col5").desc(),
-    )
-    item_local_rank = item.orderBy(
-        [
-            "col1",  # descending
-            "col2",  # ascending
-            "col3",  # descending
-            "col4",  # descending
-            "col5",  # descending
-        ],
-        ascending=[
-            False,
-            True,
-            False,
-            False,
-            False,
-        ]
-    ).withColumn("part_id",
-                 spark_partition_id()).withColumn("local_rank",
-                                                  rank().over(wspec1)).persist()
+    wspec1 = Window.partitionBy("part_id").orderBy(*order_by)
+    frame_local_rank = frame.orderBy(order_by).withColumn(
+        "part_id", spark_partition_id()
+    ).withColumn("local_rank",
+                 rank().over(wspec1)).persist()
     # calculate accumulative rank
     wspec2 = Window.orderBy("part_id").rowsBetween(
         Window.unboundedPreceding, Window.currentRow
     )
-    stat = item_local_rank.groupBy("part_id").agg(
+    stat = frame_local_rank.groupBy("part_id").agg(
         max("local_rank").alias("max_rank")
     ).withColumn("cum_rank",
                  sum("max_rank").over(wspec2))
@@ -70,7 +57,7 @@ def calc_global_rank(item: DataFrame) -> DataFrame:
         col("l.part_id") == col("r.part_id") + 1, "left_outer"
     ).select(col("l.part_id"),
              coalesce(col("r.cum_rank"), lit(0)).alias("sum_factor"))
-    return item_local_rank.join(
+    return frame_local_rank.join(
         #broadcast(stat2),
         stat2,
         ["part_id"],

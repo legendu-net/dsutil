@@ -18,7 +18,10 @@ class Hdfs():
 
     def ls(self, path: str, recursive: bool = False) -> pd.DataFrame:
         """Return the results of hdfs dfs -ls /hdfs/path as a DataFrame.
+
         :param path: A HDFS path.
+        :param recursive: If True, list content of the HDFS path recursively.
+        :return: The result of hdfs dfs -ls as a pandas DataFrame.
         """
         cols = [
             "permissions",
@@ -39,7 +42,9 @@ class Hdfs():
 
     def count(self, path: str) -> pd.DataFrame:
         """Return the results of hdfs dfs -count -q -v /hdfs/path as a DataFrame.
+
         :param path: A HDFS path.
+        :return: The result of hdfs dfs -count as a pandas DataFrame.
         """
         cmd = f"{self.bin} dfs -count -q -v {path}"
         frame = to_frame(cmd, split=r" +", header=0)
@@ -48,9 +53,11 @@ class Hdfs():
 
     def du(self, path: str, depth: int = 1) -> pd.DataFrame:
         """Get the size of HDFS paths.
+
         :param path: A HDFS path.
         :param depth: The depth (by default 1) of paths to calculate sizes for.
             Note that any depth less than 1 is treated as 1.
+        :return: Disk usage of the HDFS path as a pandas DataFrame.
         """
         index = len(path.rstrip("/"))
         if depth > 1:
@@ -69,6 +76,7 @@ class Hdfs():
 
     def exists(self, path: str) -> bool:
         """Check if a HDFS path exist.
+
         :param path: A HDFS path.
         :return: True if the HDFS path exists and False otherwise.
         """
@@ -88,7 +96,9 @@ class Hdfs():
 
     def num_partitions(self, path: str) -> int:
         """Get the number of partitions of a HDFS path.
+
         :param path: A HDFS path.
+        :return: The number of partitions under the HDFS path.
         """
         cmd = f"{self.bin} dfs -ls {path}/part-* | wc -l"
         return int(sp.check_output(cmd, shell=True))
@@ -100,8 +110,10 @@ class Hdfs():
         is_file: bool = False
     ) -> None:
         """Download data from HDFS into a local directory. 
+
         :param hdfs_path: The HDFS path (can be both a file or a directory) to copy.
         :param local_dir: The local directory to copy HDFS files into.
+        :param is_file: A boolean indicator of whether the HDFS path is a file or a directory.
         """
         if isinstance(local_dir, str):
             local_dir = Path(local_dir)
@@ -131,13 +143,18 @@ class Hdfs():
 
     def count_path(self, path: str) -> pd.Series:
         """Count frequence of paths and their parent paths.
+
         :param path: An iterable collection of paths.
+        :return: Frequency of paths as a pandas Series.
         """
         frame = self.ls(path, recursive=True)
         return count_path(frame.path)
 
     def size(self, path: str) -> pd.DataFrame:
         """Calculate sizes of subdirs and subfiles under a path.
+
+        :param path: A HDFS path.
+        :return: Size information of the HDFS path as a pandas DataFrame.
         """
         files = self.ls(path, recursive=True)
         files.set_index("path", inplace=True)
@@ -180,11 +197,10 @@ class Hdfs():
                               path: str,
                               extension: str = ".parquet") -> List[str]:
         """Get Parquet partition names (with the parent directory) under a HDFS path.
+
         :param path: A HDFS path.
+        :param extension: Return partitions with the specified file extension.
         :return: A list of the partition names (with the parent directory).
         """
         paths = self.ls(path).path
-        return [
-            path.rsplit("/", maxsplit=1)[-1]
-            for path in paths if path.endswith(extension)
-        ]
+        return [path for path in paths if path.endswith(extension)]

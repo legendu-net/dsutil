@@ -17,12 +17,13 @@ import git
 HOME = Path.home()
 
 
-def copy_if_exists(src, dst=HOME) -> bool:
+def copy_if_exists(src: str, dst: str = HOME) -> bool:
     """Copy a file.
     No exception is thrown if the source file does not exist.
 
     :param src: The path of the source file.
     :param dst: The path of the destination file.
+    :return: True if a copy if made, vice versa.
     """
     if not os.path.exists(src):
         return False
@@ -33,12 +34,14 @@ def copy_if_exists(src, dst=HOME) -> bool:
         return False
 
 
-def link_if_exists(src, dst=HOME, target_is_directory=True) -> bool:
+def link_if_exists(src: str, dst: str = HOME, target_is_directory: bool = True) -> bool:
     """Make a symbolic link of a file.
     No exception is thrown if the source file does not exist.
 
     :param src: The path of the source file.
     :param dst: The path of the destination file.
+    :param target_is_directory: Whether the target is a directory.
+    :return: True if a symbolic link is created, vice versa.
     """
     if not os.path.exists(src):
         return False
@@ -55,6 +58,9 @@ def count_path(paths: Iterable[str], ascending=False) -> pd.Series:
     """Count frequence of paths and their parent paths.
 
     :param paths: An iterable collection of paths.
+    :param ascending: If true, sort paths according to their frequencies in ascending order, 
+        vice versa.
+    :return: A pandas Series with paths as index and frequencies of paths as value.
     """
     freq = {}
     for path in paths:
@@ -63,7 +69,7 @@ def count_path(paths: Iterable[str], ascending=False) -> pd.Series:
     return freq
 
 
-def _count_path_helper(path: str, freq: dict):
+def _count_path_helper(path: str, freq: dict) -> None:
     fields = path.rstrip("/").split("/")[:-1]
     path = ""
     for field in fields:
@@ -85,7 +91,7 @@ def zip_subdirs(root: Union[str, Path]) -> None:
             sp.run(f"zip -qr {file} {path} &", shell=True, check=True)
 
 
-def flatten_dir(dir_):
+def flatten_dir(dir_: Union[str, Path]) -> None:
     """Flatten a directory,
     i.e., move files in immediate subdirectories into the current directory.
 
@@ -99,14 +105,16 @@ def flatten_dir(dir_):
             path.rmdir()
 
 
-def _flatten_dir(dir_):
+def _flatten_dir(dir_: Path) -> None:
     """Helper method of flatten_dir.
+
+    :param dir_: A directory to flatten.
     """
     for path in dir_.iterdir():
         path.rename(path.parent.parent / path.name)
 
 
-def split_dir(dir_: Union[str, Path], batch: int, wildcard: str = "*") -> None:
+def split_dir(dir_: Union[str, Path], batch_size: int, wildcard: str = "*") -> None:
     """Split files in a directory into sub-directories.
     This function is for the convenience of splitting a directory 
     with a large number of files into smaller directories 
@@ -114,22 +122,29 @@ def split_dir(dir_: Union[str, Path], batch: int, wildcard: str = "*") -> None:
 
     :param dir_: The root directory whose files are to be splitted into sub-directories.
     :param wildcard: A wild card pattern specifying files to be included.
-    :param batch: The number files that each subdirs should contain.
+    :param batch_size: The number files that each subdirs should contain.
     """
     if isinstance(dir_, str):
         dir_ = Path(dir_)
     files = sorted(dir_.glob(wildcard))
-    num_batch = math.ceil(len(files) / batch)
+    num_batch = math.ceil(len(files) / batch_size)
     nchar = len(str(num_batch))
-    for index in tqdm(range(num_batch)):
-        _split_dir_1(dir_ / f"{index:0>{nchar}}", files, index, batch)
+    for batch_idx in tqdm(range(num_batch)):
+        _split_dir_1(dir_ / f"{batch_idx:0>{nchar}}", files, batch_idx, batch_size)
 
 
-def _split_dir_1(desdir, files, index, batch):
+def _split_dir_1(
+    desdir: Path, files: List[Path], batch_idx: int, batch_size: int
+) -> None:
     """Helper method of split_dir.
+
+    :param desdir: The destination directory to save subset of files.
+    :param files: A list of Path objects.
+    :param batch_idx: The batch index (0-based).
+    :param batch_size: The size of the batch.
     """
     desdir.mkdir(exist_ok=True)
-    for path in files[(index * batch):((index + 1) * batch)]:
+    for path in files[(batch_idx * batch_size):((batch_idx + 1) * batch_size)]:
         path.rename(desdir / path.name)
 
 
@@ -137,6 +152,7 @@ def find_images(root_dir: Union[str, Path, List[str], List[Path]]) -> List[Path]
     """Find all PNG images in a (sequence) of dir(s) or its/their subdirs.
 
     :param root_dir: A (list) of dir(s).
+    :return: A list of Path objects to PNG images. 
     """
     if isinstance(root_dir, (str, Path)):
         root_dir = [root_dir]
@@ -158,9 +174,10 @@ def find_data_tables(
 
     :param root: The root directory or a GitHub repo URL in which to find data table names.
     :param filter_: A function for filtering identified keywords (via regular expressions).
-    By default, all keywords identified by regular expressions are kept.
+        By default, all keywords identified by regular expressions are kept.
     :param extensions: Addtional text file extensions to use.
-    :param extensions: Addtional regular expression patterns to use.
+    :param patterns: Addtional regular expression patterns to use.
+    :return: A set of names of data tables.
     """
     if isinstance(root, str):
         if re.search(r"(git@|https://).*\.git", root):
@@ -214,11 +231,14 @@ def _find_data_tables_file(file, filter_, patterns) -> Set[str]:
     return set(table for table in tables if filter_(table))
 
 
-def is_empty(dir_: Union[str, Path], filter_: Union[None, Callable] = lambda _: True):
+def is_empty(
+    dir_: Union[str, Path], filter_: Union[None, Callable] = lambda _: True
+) -> bool:
     """Check whether a directory is empty.
 
     :param dir_: The directory to check.
     :param filter_: A filtering function (default True always) to limit the check to sub files/dirs.
+    :return: True if the specified directory is empty and False otherwise.
     """
     if isinstance(dir_, str):
         dir_ = Path(dir_)
@@ -293,6 +313,8 @@ def is_ess_empty(
 
     :param path: The path to the directory to check.
     :param ignore: A bool function which returns True on files/directories to ignore.
+    :param ess_empty: A dictionary caching essentially empty paths.
+    :raises FileNotFoundError: If the given path does not exist.
     :return: True if the directory is essentially empty and False otherwise.
     """
     if isinstance(path, str):
@@ -331,11 +353,12 @@ def update_file(
 ) -> None:
     """Update a text file using regular expression substitution.
 
+    :param path: A Path object to the file to be updated.
     :param regex: A list of tuples containing regular expression patterns
-    and the corresponding replacement text.
+        and the corresponding replacement text.
     :param exact: A list of tuples containing exact patterns and the corresponding replacement text.
     :param append: A string of a list of lines to append.
-    When append is a list of lines, "\n" is automatically added to each line.
+        When append is a list of lines, "\n" is automatically added to each line.
     :param exist_skip: Skip appending if already exists.
     """
     if isinstance(path, str):

@@ -2,18 +2,21 @@
 """
 #!/usr/bin/env python3
 # encoding: utf-8
-from typing import Union
-import os
+from typing import Union, List
 import sys
 from pathlib import Path
 from loguru import logger
 
 
-def has_header(files, num_files: int = 5) -> bool:
+def has_header(
+    files: Union[str, Path, List[Union[str, Path]]],
+    num_files_checking: int = 5
+) -> bool:
     """Check whether the files have headers.
 
     :param files: the list of files to check.
-    :param num_files: the number of non-empty files to use to decide whether there are header lines.
+    :param num_files_checking: the number of non-empty files to use to decide whether there are header lines.
+    :return: True if the files have headers and False otherwise.
     """
     # i: file index
     for i in range(len(files)):
@@ -25,7 +28,7 @@ def has_header(files, num_files: int = 5) -> bool:
     # k: current number of non-empty files
     k = 1
     for j in range(i, len(files)):
-        if k >= num_files:
+        if k >= num_files_checking:
             break
         with open(files[j], "r", encoding="utf-8") as fin:
             first_line = fin.readline()
@@ -36,8 +39,15 @@ def has_header(files, num_files: int = 5) -> bool:
     return True
 
 
-def _merge_with_headers(files, output: str = "") -> None:
+def _merge_with_headers(
+    files: Union[str, Path, List[Union[str, Path]]],
+    output: Union[str, Path] = ""
+) -> None:
     """Merge files with headers. Keep only one header.
+
+    :param files: A list of files 
+        or the path to a directory containing a list of files to merge.
+    :param output: output files for merging the files.
     """
     with open(output, "wb") if output else sys.stdout.buffer as out:
         with open(files[0], "rb") as fin0:
@@ -50,8 +60,15 @@ def _merge_with_headers(files, output: str = "") -> None:
                     out.write(line)
 
 
-def _merge_without_header(files, output: str = "") -> None:
+def _merge_without_header(
+    files: Union[str, Path, List[Union[str, Path]]],
+    output: Union[str, Path] = ""
+) -> None:
     """Merge files without header.
+
+    :param files: A list of files 
+        or the path to a directory containing a list of files to merge.
+    :param output: output files for merging the files.
     """
     with open(output, "wb") if output else sys.stdout.buffer as fout:
         for file in files:
@@ -61,29 +78,39 @@ def _merge_without_header(files, output: str = "") -> None:
                 fout.write(b"\n")
 
 
-def merge(files, output: str = "", n: int = 5) -> None:
+def merge(
+    files: Union[str, Path, List[Union[str, Path]]],
+    output: str = "",
+    num_files_checking: int = 5
+) -> None:
     """Merge files. If there are headers in files, keep only one header in the single merged file.
 
-    :param files: list of files.
+    :param files: A list of files 
+        or the path to a directory containing a list of files to merge.
     :param output: output files for merging the files.
-    :param n: number of files for checking whether there are headers in files.
+    :param num_files_checking: number of files for checking whether there are headers in files.
     """
     if isinstance(files, str):
-        files = [os.path.join(files, f) for f in os.listdir(files)]
-        merge(files, output=output, n=n)
-        return
-    if not n:
-        n = min(10, len(files))
-    if has_header(files, n):
+        files = Path(files)
+    if isinstance(files, Path):
+        files = list(files.iterdir())
+    if num_files_checking <= 0:
+        num_files_checking = 5
+    num_files_checking = min(num_files_checking, len(files))
+    if has_header(files, num_files_checking):
         _merge_with_headers(files, output)
         return
     _merge_without_header(files, output)
 
 
-def dedup_header(file, output: str = ""):
+def dedup_header(file: Union[str, Path], output: Union[str, Path] = "") -> None:
     """Dedup headers in a file (due to the hadoop getmerge command).
     Only the header on the first line is kept and headers (identical line to the first line) 
     on other lines are removed.
+
+    :param file: The path to the file to be deduplicated.
+    :param output: The path of the output file. 
+        If empty, then output to the standard output.
     """
     with open(file, "rb"
              ) as fin, open(output, "wb") if output else sys.stdout.buffer as fout:
@@ -94,22 +121,37 @@ def dedup_header(file, output: str = ""):
                 fout.write(line)
 
 
-def select(file, columns, delimiter, output: str = ""):
+def select(
+    path: Union[str, Path],
+    columns: Union[str, List[str]],
+    delimiter: str,
+    output: str = ""
+):
     """Select fields by name from a delimited file (not necessarily well structured).
+
+    :param path: To path to a file (containing delimited values in each row).
+    :param columns: A list of columns to extract from the file.
+    :param delimiter: The delimiter of fields.
+    :param output: The path of the output file. 
+        If empty, then output to the standard output.
     """
-    with open(file, "r", encoding="utf-8") as fin:
+    if isinstance(path, str):
+        path = Path(path)
+    if isinstance(columns, str):
+        columns = [columns]
+    with path.open("r", encoding="utf-8") as fin:
         header = fin.readline().split(delimiter)
         index = []
         columns_full = []
-        for i, field in enumerate(header):
+        for idx, field in enumerate(header):
             if field in columns:
-                index.append(i)
+                index.append(idx)
                 columns_full.append(field)
         with (open(output, "w", encoding="utf-8") if output else sys.stdout) as fout:
             fout.write(delimiter.join(columns_full) + "\n")
             for line in fin:
                 fields = line.split(delimiter)
-                fout.write(delimiter.join([fields[i] for i in index]) + "\n")
+                fout.write(delimiter.join([fields[idx] for idx in index]) + "\n")
 
 
 def prune_json(input: Union[str, Path], output: Union[str, Path] = ""):

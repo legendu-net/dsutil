@@ -55,15 +55,21 @@ def resize_image(
         resize_image(paths=path, desdir=desdir, size=size)
 
 
-def _is_approx_close(x, y, threshold=0.4):
+def _is_approx_close(x: float, y: float, threshold: float = 0.4) -> bool:
     """Helper function of is_approx_close.
-        Check whether the 2 values x and y are relative close.
+    Check whether the 2 values x and y are relative close.
+
+    :param x: An non negative value.
+    :param y: Another non negative value.
+    :param threshold: The maximum ratio difference from 1 to be considered as close.
+    :return: True if the 2 values are considered close and False otherwise.
     """
-    ratio = (x + 0.01) / (y + 0.01)
-    return 1 - threshold <= ratio <= 1 + threshold
+    if x < y:
+        x, y = y, x
+    return (x + 0.01) / (y + 0.01) <= 1 + threshold
 
 
-def is_approx_close(red: int, green: int, blue: int, threshold: float = 0.4):
+def is_approx_close(red: int, green: int, blue: int, threshold: float = 0.4) -> bool:
     """Check whether the 3 channels have approximately close values.
 
     :param red: The red channel.
@@ -71,19 +77,21 @@ def is_approx_close(red: int, green: int, blue: int, threshold: float = 0.4):
     :param blue: The blue channel.
     :param threshold: The threshold (absolute deviation from 1)
         to consider a ratio (of 2 channels) to be close to 1.
+    :return: True if the RGB values are approximately close to each other.
     """
     return _is_approx_close(red, green, threshold=threshold) and \
         _is_approx_close(red, blue, threshold=threshold) and \
         _is_approx_close(green, blue, threshold=threshold)
 
 
-def deshade_arr_1(arr, threshold=0.4):
+def deshade_arr_1(arr: np.ndarray, threshold: float = 0.4) -> np.ndarray:
     """Deshade a poker card (i.e., get rid of the shading effec on a poker card)
         by checking whether the 3 channels have relative close values.
 
     :param arr: A numpy.ndarray representation of the image to be deshaded.
     :param threshold: The threshold (absolute deviation from 1)
         to consider a ratio (of 2 channels) to be close to 1.
+    :return: A new numpy ndarray with shading effect removed.
     """
     arr = arr.copy()
     nrow, ncol, _ = arr.shape
@@ -97,7 +105,7 @@ def deshade_arr_1(arr, threshold=0.4):
     return arr
 
 
-def deshade_arr_2(arr, cutoff=30):
+def deshade_arr_2(arr: np.ndarray, cutoff: float = 30) -> np.ndarray:
     """Deshade a poker card (i.e., get rid of the shading effec on a poker card)
         by checking whether the 3 channels all have values larger than a threshold.
 
@@ -105,6 +113,7 @@ def deshade_arr_2(arr, cutoff=30):
     :param cutoff: The cutoff value of 3 channels.
         If the 3 channels all have value no less than this cutoff,
         then it is considered as shading effect.
+    :return: A new numpy ndarray with shading effect removed.
     """
     arr = arr.copy()
     nrow, ncol, _ = arr.shape
@@ -119,8 +128,10 @@ def deshade_arr_2(arr, cutoff=30):
     return arr
 
 
-def deshade_arr_3(arr, threshold=0.4, cutoff=30):
-    """Deshade a poker card (i.e., get rid of the shading effec on a poker card)
+def deshade_arr_3(
+    arr: np.ndarray, threshold: float = 0.4, cutoff: float = 30
+) -> np.ndarray:
+    """Deshade a poker card (i.e., get rid of the shading effect on a poker card)
         by combining methods in deshade_arr_1 and deshade_arr_2.
 
     :param arr: A numpy.ndarray representation of the image to be deshaded.
@@ -129,6 +140,7 @@ def deshade_arr_3(arr, threshold=0.4, cutoff=30):
     :param cutoff: The cutoff value of 3 channels.
         If the 3 channels all have value no less than this cutoff,
         then it is considered as shading effect.
+    :return: A new numpy ndarray with shading effect removed.
     """
     arr = arr.copy()
     nrow, ncol, _ = arr.shape
@@ -142,20 +154,21 @@ def deshade_arr_3(arr, threshold=0.4, cutoff=30):
     return arr
 
 
-def deshade_1(img, threshold=0.4):
+def deshade_1(img, threshold=0.4) -> Image.Image:
     """Deshade an image (i.e., get rid of the shading effec on an image.)
         by checking whether the 3 channels have relative close values.
 
     :param img: An image to deshade.
     :param threshold: The threshold (absolute deviation from 1)
         to consider a ratio (of 2 channels) to be close to 1.
+    :return: The new image with shading effect removed.
     """
     arr = np.array(img)
     arr = deshade_arr_1(arr, threshold=threshold)
     return Image.fromarray(arr)
 
 
-def deshade_2(img, cutoff=30):
+def deshade_2(img, cutoff=30) -> Image.Image:
     """Deshade an image (i.e., get rid of the shading effec on an image)
         by checking whether the 3 channels all have values larger than a threshold.
 
@@ -163,14 +176,15 @@ def deshade_2(img, cutoff=30):
     :param cutoff: The cutoff value of 3 channels.
         If the 3 channels all have value no less than this cutoff,
         then it is considered as shading effect.
+    :return: The new image with shading effect removed.
     """
     arr = np.array(img)
     arr = deshade_arr_2(arr, cutoff=cutoff)
     return Image.fromarray(arr)
 
 
-def deshade_3(img, threshold=0.4, cutoff=30):
-    """Deshade an image (i.e., get rid of the shading effec on an image)
+def deshade_3(img, threshold=0.4, cutoff=30) -> Image.Image:
+    """Deshade an image (i.e., get rid of the shading effect on an image)
         by combining methods in deshade_arr_1 and deshade_arr_2.
 
     :param img: An image to deshade.
@@ -179,6 +193,7 @@ def deshade_3(img, threshold=0.4, cutoff=30):
     :param cutoff: The cutoff value of 3 channels.
         If the 3 channels all have value no less than this cutoff,
         then it is considered as shading effect.
+    :return: The new image with shading effect removed.
     """
     arr = np.array(img)
     arr = deshade_arr_3(arr, threshold=threshold, cutoff=cutoff)
@@ -186,9 +201,16 @@ def deshade_3(img, threshold=0.4, cutoff=30):
 
 
 def highlight_frame(
-    rgb: Tuple[int, int, int], shape: Tuple[int, int], thickness: int = 3
-):
+    rgb: Tuple[int, int, int],
+    shape: Tuple[int, int],
+    thickness: int = 3
+) -> Image.Image:
     """Generate a rectangle frame with the specified color and thickness.
+
+    :param rgb: The color in RGB (as a tuple) to use for the frame.
+    :param shape: The shape of the frame.
+    :param thickness: The thickness of the frame.
+    :return: A PIL image presenting the frame.
     """
     nrow = shape[0]
     ncol = shape[1]
@@ -208,8 +230,15 @@ def highlight_frame(
     return Image.fromarray(arr)
 
 
-def frame_image(img: Image.Image, rgb, thickness: int = 3):
+def frame_image(
+    img: Image.Image, rgb: Tuple[int, int, int], thickness: int = 3
+) -> Image.Image:
     """Add a highlight frame to an image.
+
+    :param img: A PIL image.
+    :param rgb: The color in RGB (as a tuple) to use for the frame.
+    :param thickness: The thickness of the frame.
+    :return: A new image with the frame added.
     """
     shape = img.size
     shape = (shape[1], shape[0])

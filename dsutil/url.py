@@ -8,6 +8,7 @@ def format(url: str, text: str = "", type_="html") -> str:
     :param url: The url to be converted to a hyperlink.
     :param text: The text to display. 
     :param type_: The type (html or excel) of hyperlink.
+    :return: The formatted URL.
     """
     if not text:
         text = url

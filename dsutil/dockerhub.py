@@ -1,5 +1,6 @@
 """DockerHub
 """
+from typing import List
 import requests
 
 
@@ -10,10 +11,11 @@ class DockerHub():
         self.user = user
         self._token = self.token(password) if password else token
 
-    def tags(self, image: str):
+    def tags(self, image: str) -> List[str]:
         """Get tags of a Docker image on Docker Hub.
 
         :param image: The name of a Docker image, e.g., "jupyterhub-ds".
+        :return: A list of tags belonging to the Docker image.
         """
         user = self.user
         if "/" in image:
@@ -24,6 +26,8 @@ class DockerHub():
 
     def token(self, password: str) -> None:
         """Generate a token of the account.
+
+        :param password: The password of the user.
         """
         res = requests.post(
             url="https://hub.docker.com/v2/users/login/",
@@ -39,6 +43,8 @@ class DockerHub():
 
         :param image: The name of a docker image (without tag). 
         :param tag: The tag of the Docker image (to delete).
+        :return: The removed tag of the Docker image. 
+            An empty string is returned if no tag is removed.
         """
         user = self.user
         if "/" in image:
