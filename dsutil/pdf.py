@@ -9,7 +9,7 @@ def extract_pages(file: str, subfiles: Mapping[str, Sequence[int]]) -> None:
 
     :param file: The raw PDF file to extract pages from.
     :param subfiles: A dictionary specifying sub PDF files
-    and the corresponding list of pages from the raw PDF file.
+        and the corresponding list of pages from the raw PDF file.
     """
     with open(file, "rb") as fin:
         reader = PdfFileReader(fin)

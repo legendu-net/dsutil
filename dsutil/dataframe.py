@@ -16,6 +16,7 @@ def table_2w(
 
     :param frame: A pandas DataFrame.
     :param columns: Columns based on which to generate 2-way tables.
+    :param na_as: The value to replace NAs.
     :raises TypeError: If frame is neither a pandas DataFrame nor a Series.
     :return: A 2-way table as a pandas DataFrame.
     """

@@ -21,15 +21,15 @@ def to_frame(
     :param cmd: A shell command.
     :param split: A regular expression pattern for splitting a line into fields.
     :param header: An integer, list of string or None specifiying the header of the data frame.
-    If header is an integer, 
-    the corresponding row of lines after removing empty and skipped rows is used as header of the data frame; 
-    if header is a list of string then it is used as the header of the data frame.
-    if header is None, then default header is used for the data frame.
+        If header is an integer, 
+        the corresponding row of lines after removing empty and skipped rows is used as header of the data frame; 
+        if header is a list of string then it is used as the header of the data frame.
+        if header is None, then default header is used for the data frame.
     :param skip: Indexes of rows to skip.
     :param lines: The output of the shell command.
     :param split_by_header: If true, the headers are splitted by a regular expression 
-    and the columns are splitted by the right-most position of the headers.
-    Otherwise, all lines are splitted by the specified regular expression.
+        and the columns are splitted by the right-most position of the headers.
+        Otherwise, all lines are splitted by the specified regular expression.
     :return: A pandas DataFrame.
     """
     if not lines:
@@ -74,7 +74,7 @@ def _to_frame_title(lines: List[str], split: str = r"  +") -> pd.DataFrame:
 
     :param lines: The output of the shell command as list of lines.
     :param split: A regular expression pattern for splitting headers.
-    Notice that non-header rows are splitted according the right-most position of the headers.
+        Notice that non-header rows are splitted according the right-most position of the headers.
     :return: A pandas DataFrame.
     """
     headers = re.split(split, lines[0])

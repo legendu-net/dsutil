@@ -12,10 +12,11 @@ from loguru import logger
 USER = getpass.getuser()
 
 
-def get_memory_usage(user: str = USER):
+def get_memory_usage(user: str = USER) -> int:
     """Get the memory usage of the specified user.
 
     :param user: The user whose memory usage to get.
+    :return: The memory usage of the user in bytes.
     """
     STATUS = (
         psutil.STATUS_RUNNING,
@@ -57,6 +58,11 @@ def match_memory_usage(
     if it is smaller than the specified value.
     Otherwise, 
     the memory usage drops immediately to match the specified value.
+
+    :param target: The target memory in bytes.
+    :param arr_size: The size of integer arrays for consuming memory.
+    :param sleep_min: The minimum time of sleeping.
+    :param sleep_max: The maximum time of sleeping.
     """
     logger.info("Target memory: {:,.0f}", target)
     # define an template array
@@ -88,6 +94,11 @@ def match_memory_usage(
 
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
+
+    :param args: The arguments to parse. 
+        If None, the arguments from command-line are parsed.
+    :param namespace: An inital Namespace object.
+    :return: A namespace object containing parsed options.
     """
     parser = ArgumentParser(
         description="Make memory consumption match the specified target."

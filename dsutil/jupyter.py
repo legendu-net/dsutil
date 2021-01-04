@@ -14,6 +14,10 @@ HOME = Path.home()
 
 def _format_cell(cell: Dict, style_file: str) -> bool:
     """Format a cell in a Jupyter notebook.
+
+    :param cell: A cell in the notebook.
+    :param style_file: The path to a style file for formatting.
+    :return: True if the cell is formatted (correctly) and False otherwise.
     """
     if cell["cell_type"] != "code":
         return False
@@ -57,6 +61,7 @@ def nbconvert_notebooks(root_dir: Union[str, Path], cache: bool = False) -> None
     """Convert all notebooks under a directory and its subdirectories using nbconvert.
 
     :param root_dir: The directory containing notebooks to convert.
+    :param cache: If True, previously generated HTML files will be used if they are still update to date.
     """
     if isinstance(root_dir, str):
         root_dir = Path(root_dir)
