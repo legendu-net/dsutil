@@ -13,7 +13,9 @@ def sample(
     """Sample rows from a PySpark DataFrame.
 
     :param frame: The PySpark DataFrame from which to sample rows.
+    :param ratio: The acceptance ratio or the number of rows to sample.
     :param total: The total number of rows in the DataFrame.
+    :return: A PySpark DataFrame containing sampled rows.
     """
     if isinstance(ratio, int):
         if total is None:
@@ -30,36 +32,17 @@ def calc_global_rank(frame: DataFrame, order_by: Union[str, List[str]]) -> DataF
     to a single node which causes OOM.
 
     :param frame: A PySpark DataFrame. 
+    :param order_by: The columns to sort the DataFrame by. 
     :return: A DataFrame with new columns ("part_id", "local_rank", "cum_rank", "sum_factor" and "rank") added.
     """
     if isinstance(order_by, str):
         order_by = [order_by]
     # calculate local rank
-    wspec1 = Window.partitionBy("part_id").orderBy(
-        col("col1").desc(),
-        col("col2"),
-        col("col3").desc(),
-        col("col4").desc(),
-        col("col5").desc(),
-    )
-    frame_local_rank = frame.orderBy(
-        [
-            "col1",  # descending
-            "col2",  # ascending
-            "col3",  # descending
-            "col4",  # descending
-            "col5",  # descending
-        ],
-        ascending=[
-            False,
-            True,
-            False,
-            False,
-            False,
-        ]
-    ).withColumn("part_id",
-                 spark_partition_id()).withColumn("local_rank",
-                                                  rank().over(wspec1)).persist()
+    wspec1 = Window.partitionBy("part_id").orderBy(*order_by)
+    frame_local_rank = frame.orderBy(order_by).withColumn(
+        "part_id", spark_partition_id()
+    ).withColumn("local_rank",
+                 rank().over(wspec1)).persist()
     # calculate accumulative rank
     wspec2 = Window.orderBy("part_id").rowsBetween(
         Window.unboundedPreceding, Window.currentRow
