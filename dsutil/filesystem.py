@@ -358,7 +358,7 @@ def update_file(
         and the corresponding replacement text.
     :param exact: A list of tuples containing exact patterns and the corresponding replacement text.
     :param append: A string or a list of lines to append.
-        When append is a list of lines, \\n is automatically added to the end of each line.
+        When append is a list of lines, "\\n" is automatically added to the end of each line.
     :param exist_skip: Skip appending if already exists.
     """
     if isinstance(path, str):
