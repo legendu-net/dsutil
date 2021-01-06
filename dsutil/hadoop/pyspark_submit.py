@@ -257,8 +257,14 @@ def _submit_local(args, config: Dict[str, Any]) -> bool:
         lines.append(f"--jars {config['jars']}")
     lines.append("--conf spark.yarn.maxAppAttempts=1")
     python = shutil.which("python3")
-    lines.append("--conf spark.pyspark.driver.python=" + config["conf"].get("spark.pyspark.driver.python", python))
-    lines.append("--conf spark.pyspark.python=" + config["conf"].get("spark.pyspark.python", python))
+    lines.append(
+        "--conf spark.pyspark.driver.python=" +
+        config["conf"].get("spark.pyspark.driver.python", python)
+    )
+    lines.append(
+        "--conf spark.pyspark.python=" +
+        config["conf"].get("spark.pyspark.python", python)
+    )
     lines.extend(args.cmd)
     for idx in range(2, len(lines)):
         lines[idx] = " " * 4 + lines[idx]
