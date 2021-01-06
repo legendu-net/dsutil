@@ -266,7 +266,7 @@ def _submit_local(args, config: Dict[str, Any]) -> bool:
 
 
 def _submit_cluster(args, config: Dict[str, Any]) -> bool:
-    spark_submit = config.get("spark-submit", ""):
+    spark_submit = config.get("spark-submit", "")
     if not spark_submit:
         logger.warning("The filed spark-submit is not defined!")
         return True
