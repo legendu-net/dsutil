@@ -19,6 +19,7 @@ def sample(
     """
     if isinstance(ratio, int):
         if total is None:
+            frame.persist()
             total = frame.count()
         ratio /= total
     if ratio >= 1:

@@ -244,18 +244,27 @@ def _files(config: Dict) -> str:
 
 
 def _submit_local(args, config: Dict[str, Any]) -> bool:
-    if not config.get("spark-submit-local", ""):
+    spark_submit = config.get("spark-submit-local", "")
+    if not spark_submit:
         return True
+    if not os.path.isfile(spark_submit):
+        raise ValueError(f"{spark_submit} does not exist!")
     lines = [
         "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-        config["spark-submit-local"]
+        spark_submit
     ]
     if config["jars"]:
         lines.append(f"--jars {config['jars']}")
     lines.append("--conf spark.yarn.maxAppAttempts=1")
     python = shutil.which("python3")
-    lines.append(f"--conf spark.pyspark.driver.python={python}")
-    lines.append(f"--conf spark.pyspark.python={python}")
+    lines.append(
+        "--conf spark.pyspark.driver.python=" +
+        config["conf"].get("spark.pyspark.driver.python", python)
+    )
+    lines.append(
+        "--conf spark.pyspark.python=" +
+        config["conf"].get("spark.pyspark.python", python)
+    )
     lines.extend(args.cmd)
     for idx in range(2, len(lines)):
         lines[idx] = " " * 4 + lines[idx]
@@ -263,10 +272,12 @@ def _submit_local(args, config: Dict[str, Any]) -> bool:
 
 
 def _submit_cluster(args, config: Dict[str, Any]) -> bool:
-    if not config.get("spark-submit", ""):
-        raise LookupError(
-            "The field spark-submit is not defined in the configuration file!"
-        )
+    spark_submit = config.get("spark-submit", "")
+    if not spark_submit:
+        logger.warning("The filed spark-submit is not defined!")
+        return True
+    if not os.path.isfile(spark_submit):
+        raise ValueError(f"{spark_submit} does not exist!")
     opts = (
         "files", "master", "deploy-mode", "queue", "num-executors", "executor-memory",
         "driver-memory", "executor-cores", "archives"
@@ -290,6 +301,8 @@ def submit(args: Namespace) -> None:
     """
     with open(args.config, "r") as fin:
         config = yaml.load(fin, Loader=yaml.FullLoader)
+    if "files" not in config:
+        config["files"] = {}
     config["files"] = _files(config)
     if "jars" not in config:
         config["jars"] = ""
