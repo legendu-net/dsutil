@@ -22,7 +22,7 @@ def sample(
             frame.persist()
             total = frame.count()
         if total == 0:
-            return fram
+            return frame
         ratio /= total
     if ratio >= 1:
         return frame
