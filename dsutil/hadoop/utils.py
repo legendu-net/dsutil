@@ -21,6 +21,8 @@ def sample(
         if total is None:
             frame.persist()
             total = frame.count()
+        if total == 0:
+            return frame
         ratio /= total
     if ratio >= 1:
         return frame
