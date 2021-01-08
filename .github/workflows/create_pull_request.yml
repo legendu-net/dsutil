@@ -20,3 +20,4 @@ jobs:
           title: Merge dev into main
           branch: dev
           author: dclong <dclong@users.noreply.github.com>
+          assignees: dclong 
