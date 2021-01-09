@@ -231,6 +231,15 @@ def _find_data_tables_file(file, filter_, patterns) -> Set[str]:
     return set(table for table in tables if filter_(table))
 
 
+def find_data_tables_sql(sql: str, filter_: Union[Callable, None] = None) -> Set[str]:
+    sql = sql.lower()
+    pattern = r"(join|from)\s+(\w+(\.\w+)?)(\s|$)"
+    tables =  (pms[1] for pms in re.findall(pattern, sql))
+    if filter_ is None:
+        return set(tables)
+    return set(table for table in tables if filter_(table))
+
+
 def is_empty(
     dir_: Union[str, Path], filter_: Union[None, Callable] = lambda _: True
 ) -> bool:
