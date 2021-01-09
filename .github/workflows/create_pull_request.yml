@@ -19,4 +19,5 @@ jobs:
         with:
           title: Merge dev into main
           branch: dev
-          author: dclong <longendu@yahoo.com>
+          author: dclong <dclong@users.noreply.github.com>
+          assignees: dclong 
