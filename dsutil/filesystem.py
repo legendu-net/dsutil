@@ -376,3 +376,25 @@ def update_file(
         if not exist_skip or append not in text:
             text += append
     path.write_text(text)
+
+
+def get_files(dir_: Union[str, Path], exts: Union[str, List[str]]) -> Iterable[Path]:
+    """Get files with the specified file extensions.
+
+    :param dir_: The path to a directory.
+    :param exts: A (list of) file extensions (e.g., .txt).
+    """
+    if isinstance(dir_, str):
+        dir_ = Path(dir_)
+    if isinstance(exts, str):
+        exts = [exts]
+    yield from _get_files(dir_, exts)
+
+
+def _get_files(dir_: Path, exts: List[str]) -> Iterable[Path]:
+    for path in dir_.iterdir():
+        if path.is_file():
+            if path.suffix.lower() in exts:
+                yield path
+        else:
+            yield from _get_files(path, exts)
