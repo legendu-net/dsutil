@@ -256,7 +256,7 @@ def _python(config: Dict) -> str:
         if bin_ and os.path.isfile(bin_):
             return bin_
     raise ValueError("No valid local python executable specified for python-local!")
-    
+
 
 def _submit_local(args, config: Dict[str, Any]) -> bool:
     spark_submit = config.get("spark-submit-local", "")
@@ -272,12 +272,8 @@ def _submit_local(args, config: Dict[str, Any]) -> bool:
         lines.append(f"--jars {config['jars']}")
     lines.append("--conf spark.yarn.maxAppAttempts=1")
     python = _python(config)
-    lines.append(
-        f"--conf spark.pyspark.driver.python={python}"
-    )
-    lines.append(
-        f"--conf spark.pyspark.python={python}"
-    )
+    lines.append(f"--conf spark.pyspark.driver.python={python}")
+    lines.append(f"--conf spark.pyspark.python={python}")
     lines.extend(args.cmd)
     for idx in range(2, len(lines)):
         lines[idx] = " " * 4 + lines[idx]
