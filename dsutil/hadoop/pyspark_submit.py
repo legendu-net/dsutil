@@ -243,6 +243,21 @@ def _files(config: Dict) -> str:
     return ",".join(files)
 
 
+def _python(config: Dict) -> str:
+    if "python-local" not in config:
+        bins = ["python3", "python"]
+    else:
+        bins = config["python-local"]
+        if isinstance(bins, str):
+            bins = [bins]
+    for bin_ in bins:
+        if bin_.startswith("python"):
+            bin_ = shutil.which(bin_)
+        if bin_ and os.path.isfile(bin_):
+            return bin_
+    raise ValueError("No valid local python executable specified for python-local!")
+    
+
 def _submit_local(args, config: Dict[str, Any]) -> bool:
     spark_submit = config.get("spark-submit-local", "")
     if not spark_submit:
@@ -256,14 +271,12 @@ def _submit_local(args, config: Dict[str, Any]) -> bool:
     if config["jars"]:
         lines.append(f"--jars {config['jars']}")
     lines.append("--conf spark.yarn.maxAppAttempts=1")
-    python = shutil.which("python3")
+    python = _python(config)
     lines.append(
-        "--conf spark.pyspark.driver.python=" +
-        config["conf"].get("spark.pyspark.driver.python", python)
+        f"--conf spark.pyspark.driver.python={python}"
     )
     lines.append(
-        "--conf spark.pyspark.python=" +
-        config["conf"].get("spark.pyspark.python", python)
+        f"--conf spark.pyspark.python={python}"
     )
     lines.extend(args.cmd)
     for idx in range(2, len(lines)):
