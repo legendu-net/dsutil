@@ -308,8 +308,19 @@ def submit(args: Namespace) -> None:
 
     :param args: A Namespace object containing command-line options.
     """
-    with open(args.config, "r") as fin:
-        config = yaml.load(fin, Loader=yaml.FullLoader)
+    # generate a config example
+    if args.gen_config:
+        path = Path(__file__).resolve().parent / "pyspark_submit.yaml"
+        shutil.copy2(path, args.gen_config)
+        logger.info("An example configuration is generated at {}", args.gen_config)
+        return
+    # load configuration 
+    if not args.config:
+        config = {}
+    else:
+        with open(args.config, "r") as fin:
+            config = yaml.load(fin, Loader=yaml.FullLoader)
+    # handle various options
     if args.spark_submit_local:
         config["spark-submit-local"] = args.spark_submit_local
     if "files" not in config:
@@ -319,6 +330,7 @@ def submit(args: Namespace) -> None:
         config["jars"] = ""
     if isinstance(config["jars"], (list, tuple)):
         config["jars"] = ",".join(config["jars"])
+    # submit Spark applications
     if _submit_local(args, config):
         _submit_cluster(args, config)
 
@@ -335,7 +347,8 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "-c",
         "--config",
         dest="config",
-        required=True,
+        required=False,
+        default="",
         help="The configuration file to use."
     )
     parser.add_argument(
@@ -346,6 +359,14 @@ def parse_args(args=None, namespace=None) -> Namespace:
         required=False,
         default="",
         help="The local path to spark-submit."
+    )
+    parser.add_argument(
+        "-g",
+        "--gen-config",
+        "--generate-config",
+        dest="gen_config",
+        required=False,
+        help="Specify a path for generating a configration example."
     )
     parser.add_argument(
         dest="cmd", nargs="+", help="The command to submit to Spark to run."
