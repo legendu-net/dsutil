@@ -310,6 +310,8 @@ def submit(args: Namespace) -> None:
     """
     with open(args.config, "r") as fin:
         config = yaml.load(fin, Loader=yaml.FullLoader)
+    if args.spark_submit_local:
+        config["spark-submit-local"] = args.spark_submit_local
     if "files" not in config:
         config["files"] = {}
     config["files"] = _files(config)
@@ -335,6 +337,15 @@ def parse_args(args=None, namespace=None) -> Namespace:
         dest="config",
         required=True,
         help="The configuration file to use."
+    )
+    parser.add_argument(
+        "-l",
+        "--local",
+        "--spark-submit-local",
+        dest="spark_submit_local",
+        required=False,
+        default="",
+        help="The local path to spark-submit."
     )
     parser.add_argument(
         dest="cmd", nargs="+", help="The command to submit to Spark to run."
