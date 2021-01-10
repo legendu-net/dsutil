@@ -234,7 +234,7 @@ def _find_data_tables_file(file, filter_, patterns) -> Set[str]:
 def find_data_tables_sql(sql: str, filter_: Union[Callable, None] = None) -> Set[str]:
     sql = sql.lower()
     pattern = r"(join|from)\s+(\w+(\.\w+)?)(\s|$)"
-    tables =  (pms[1] for pms in re.findall(pattern, sql))
+    tables = (pms[1] for pms in re.findall(pattern, sql))
     if filter_ is None:
         return set(tables)
     return set(table for table in tables if filter_(table))
@@ -392,6 +392,7 @@ def get_files(dir_: Union[str, Path], exts: Union[str, List[str]]) -> Iterable[P
 
     :param dir_: The path to a directory.
     :param exts: A (list of) file extensions (e.g., .txt).
+    :yield: A generator of Path objects.
     """
     if isinstance(dir_, str):
         dir_ = Path(dir_)
