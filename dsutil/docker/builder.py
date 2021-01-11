@@ -314,6 +314,7 @@ class DockerImageBuilder:
             ).get_deps(graph.nodes)
             if deps[0].git_url_base:
                 graph.add_edge((deps[0].git_url_base, deps[0].branch), deps[0].git_url)
+                graph.add_edge(deps[0].git_url, (deps[0].git_url, deps[0].branch))
             for idx in range(1, len(deps)):
                 dep1 = deps[idx - 1]
                 dep2 = deps[idx]
