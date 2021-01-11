@@ -311,9 +311,9 @@ class DockerImageBuilder:
             print("git_url: ", git_url)
             deps: Sequence[DockerImage] = DockerImage(
                 git_url=git_url, branch=self.branch
-            ).get_deps({})
-            print("length of deps", len(deps))
-            print("deps: ", deps)
+            ).get_deps(graph.nodes)
+            if deps[0].git_url_base:
+                graph.add_edge((deps[0].git_url_base, deps[0].branch), deps[0].git_url)
             for idx in range(1, len(deps)):
                 dep1 = deps[idx - 1]
                 dep2 = deps[idx]
@@ -323,6 +323,9 @@ class DockerImageBuilder:
                 graph.add_edge(dep2.git_url, (dep2.git_url, dep2.branch))
                 # edge from dep1 to dep2
                 graph.add_edge((dep1.git_url, dep1.branch), dep2.git_url)
+        with open("edges.txt", "w") as fout:
+            for edge in graph.edges:
+                fout.write(str(edge) + "\n")
 
     def _login_servers(self) -> None:
         servers = set()
