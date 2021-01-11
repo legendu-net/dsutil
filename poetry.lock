@@ -1509,7 +1509,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.10"
-content-hash = "0cb725d831b479426df5bfdfc792bf09559e81980693d8cf3c15920343d0cb13"
+content-hash = "580750471078d7293ad18b82d6c4efc0ad2786d677be20a1bdac6b6842a25ed5"
 
 [metadata.files]
 appnope = [

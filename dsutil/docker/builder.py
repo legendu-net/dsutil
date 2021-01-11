@@ -14,6 +14,8 @@ from loguru import logger
 import pandas as pd
 import git
 import docker
+import networkx as nx
+import matplotlib.pyplot as plt
 
 
 def tag_date(tag: str) -> str:
@@ -299,7 +301,28 @@ class DockerImageBuilder:
                 ).get_deps(self.docker_images)
                 for dep in deps:
                     self.docker_images[dep.git_url] = dep
+            self._build_graph()
         self._login_servers()
+
+    def _build_graph(self):
+        self.groots = []
+        graph = nx.Graph()
+        for git_url in self.git_urls:
+            deps: Sequence[DockerImage] = DockerImage(
+                git_url=git_url, branch=self.branch
+            ).get_deps(self.docker_images)
+            for idx in range(1, len(deps)):
+                dep1 = deps[idx - 1]
+                dep2 = deps[idx]
+                # edge from virtual node to a node instance for dep1
+                graph.add_edge(dep1.git_url, (dep1.git_url, dep1.branch))
+                # edge from virtual node to a node instance for dep2
+                graph.add_edge(dep2.git_url, (dep2.git_url, dep2.branch))
+                # edge from dep1 to dep2
+                graph.add_edge((dep1.git_url, dep1.branch), dep2.git_url)
+        fig, ax = plt.subplots(1, 1, figsize=(8, 6));
+        nx.draw_networkx(graph, ax=ax)
+        fig.savfig("graph.png")
 
     def _login_servers(self) -> None:
         servers = set()
