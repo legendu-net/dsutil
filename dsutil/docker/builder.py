@@ -320,8 +320,9 @@ class DockerImageBuilder:
                 graph.add_edge(dep2.git_url, (dep2.git_url, dep2.branch))
                 # edge from dep1 to dep2
                 graph.add_edge((dep1.git_url, dep1.branch), dep2.git_url)
-        for edge in graph.edges:
-            print(edge)
+        with open("edges.txt", "w") as fout:
+            for edge in graph.edges:
+                fout.write(str(edge))
         fig, ax = plt.subplots(1, 1, figsize=(8, 6))
         nx.draw_networkx(graph, ax=ax)
         fig.savefig("graph.png")
