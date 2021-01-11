@@ -311,7 +311,7 @@ class DockerImageBuilder:
             print("git_url: ", git_url)
             deps: Sequence[DockerImage] = DockerImage(
                 git_url=git_url, branch=self.branch
-            ).get_deps()
+            ).get_deps({})
             print("length of deps", len(deps))
             print("deps: ", deps)
             for idx in range(1, len(deps)):
