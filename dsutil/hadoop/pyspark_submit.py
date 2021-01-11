@@ -314,7 +314,7 @@ def submit(args: Namespace) -> None:
         shutil.copy2(path, args.gen_config)
         logger.info("An example configuration is generated at {}", args.gen_config)
         return
-    # load configuration 
+    # load configuration
     if not args.config:
         config = {}
     else:
