@@ -308,9 +308,12 @@ class DockerImageBuilder:
         self.groots = []
         graph = nx.Graph()
         for git_url in self.git_urls:
+            print("git_url: ", git_url)
             deps: Sequence[DockerImage] = DockerImage(
                 git_url=git_url, branch=self.branch
             ).get_deps(self.docker_images)
+            print("length of deps", len(deps))
+            print("deps: ", deps)
             for idx in range(1, len(deps)):
                 dep1 = deps[idx - 1]
                 dep2 = deps[idx]
