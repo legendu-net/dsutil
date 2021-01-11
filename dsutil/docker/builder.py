@@ -309,9 +309,11 @@ class DockerImageBuilder:
         self.groots = []
         graph = nx.Graph()
         for git_url in self.git_urls:
+            print(git_url)
             deps: Sequence[DockerImage] = DockerImage(
                 git_url=git_url, branch=self.branch
             ).get_deps(graph.nodes)
+            print([dep.git_url for dep in deps])
             if deps[0].git_url_base:
                 graph.add_edge((deps[0].git_url_base, deps[0].branch), deps[0].git_url)
                 graph.add_edge(deps[0].git_url, (deps[0].git_url, deps[0].branch))
@@ -368,6 +370,7 @@ class DockerImageBuilder:
         :return: A pandas DataFrame summarizing building information.
         """
         self._get_deps()
+        return
         if isinstance(no_cache, str):
             no_cache = set([no_cache])
         elif isinstance(no_cache, list):
