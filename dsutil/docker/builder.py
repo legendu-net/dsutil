@@ -294,6 +294,8 @@ class DockerImageBuilder:
     def _get_deps(self) -> None:
         """Get dependencies (of all Docker images to build) in order.
         """
+        self._build_graph()
+        return
         if not self.docker_images:
             for git_url in self.git_urls:
                 deps: Sequence[DockerImage] = DockerImage(
@@ -301,14 +303,12 @@ class DockerImageBuilder:
                 ).get_deps(self.docker_images)
                 for dep in deps:
                     self.docker_images[dep.git_url] = dep
-            self._build_graph()
         self._login_servers()
 
     def _build_graph(self):
         self.groots = []
         graph = nx.Graph()
         for git_url in self.git_urls:
-            print("git_url: ", git_url)
             deps: Sequence[DockerImage] = DockerImage(
                 git_url=git_url, branch=self.branch
             ).get_deps(graph.nodes)
