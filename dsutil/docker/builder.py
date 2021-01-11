@@ -322,7 +322,7 @@ class DockerImageBuilder:
                 graph.add_edge((dep1.git_url, dep1.branch), dep2.git_url)
         fig, ax = plt.subplots(1, 1, figsize=(8, 6))
         nx.draw_networkx(graph, ax=ax)
-        fig.savfig("graph.png")
+        fig.savefig("graph.png")
 
     def _login_servers(self) -> None:
         servers = set()
