@@ -323,6 +323,7 @@ class DockerImageBuilder:
         fig, ax = plt.subplots(1, 1, figsize=(8, 6))
         nx.draw_networkx(graph, ax=ax)
         fig.savefig("graph.png")
+        fig.show()
 
     def _login_servers(self) -> None:
         servers = set()
