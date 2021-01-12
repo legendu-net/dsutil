@@ -15,7 +15,6 @@ import pandas as pd
 import git
 import docker
 import networkx as nx
-import matplotlib.pyplot as plt
 
 
 def tag_date(tag: str) -> str:
