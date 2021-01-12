@@ -14,6 +14,7 @@ from loguru import logger
 import pandas as pd
 import git
 import docker
+import networkx as nx
 
 
 def tag_date(tag: str) -> str:
@@ -292,6 +293,8 @@ class DockerImageBuilder:
     def _get_deps(self) -> None:
         """Get dependencies (of all Docker images to build) in order.
         """
+        self._build_graph()
+        return
         if not self.docker_images:
             for git_url in self.git_urls:
                 deps: Sequence[DockerImage] = DockerImage(
@@ -300,6 +303,31 @@ class DockerImageBuilder:
                 for dep in deps:
                     self.docker_images[dep.git_url] = dep
         self._login_servers()
+
+    def _build_graph(self):
+        self.groots = []
+        graph = nx.Graph()
+        for git_url in self.git_urls:
+            print(git_url)
+            deps: Sequence[DockerImage] = DockerImage(
+                git_url=git_url, branch=self.branch
+            ).get_deps(graph.nodes)
+            print([dep.git_url for dep in deps])
+            if deps[0].git_url_base:
+                graph.add_edge((deps[0].git_url_base, deps[0].branch), deps[0].git_url)
+                graph.add_edge(deps[0].git_url, (deps[0].git_url, deps[0].branch))
+            for idx in range(1, len(deps)):
+                dep1 = deps[idx - 1]
+                dep2 = deps[idx]
+                # edge from virtual node to a node instance for dep1
+                graph.add_edge(dep1.git_url, (dep1.git_url, dep1.branch))
+                # edge from virtual node to a node instance for dep2
+                graph.add_edge(dep2.git_url, (dep2.git_url, dep2.branch))
+                # edge from dep1 to dep2
+                graph.add_edge((dep1.git_url, dep1.branch), dep2.git_url)
+        with open("edges.txt", "w") as fout:
+            for edge in graph.edges:
+                fout.write(str(edge) + "\n")
 
     def _login_servers(self) -> None:
         servers = set()
@@ -341,6 +369,7 @@ class DockerImageBuilder:
         :return: A pandas DataFrame summarizing building information.
         """
         self._get_deps()
+        return
         if isinstance(no_cache, str):
             no_cache = set([no_cache])
         elif isinstance(no_cache, list):

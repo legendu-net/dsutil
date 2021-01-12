@@ -314,7 +314,7 @@ def submit(args: Namespace) -> None:
         shutil.copy2(path, args.gen_config)
         logger.info("An example configuration is generated at {}", args.gen_config)
         return
-    # load configuration 
+    # load configuration
     if not args.config:
         config = {}
     else:
@@ -323,6 +323,8 @@ def submit(args: Namespace) -> None:
     # handle various options
     if args.spark_submit_local:
         config["spark-submit-local"] = args.spark_submit_local
+    if args.python_local:
+        config["python-local"] = args.python_local
     if "files" not in config:
         config["files"] = {}
     config["files"] = _files(config)
@@ -352,13 +354,20 @@ def parse_args(args=None, namespace=None) -> Namespace:
         help="The configuration file to use."
     )
     parser.add_argument(
-        "-l",
-        "--local",
+        "--ssl",
         "--spark-submit-local",
         dest="spark_submit_local",
         required=False,
         default="",
         help="The local path to spark-submit."
+    )
+    parser.add_argument(
+        "--pl",
+        "--python-local",
+        dest="python_local",
+        required=False,
+        default="",
+        help="The local path to Python."
     )
     parser.add_argument(
         "-g",
