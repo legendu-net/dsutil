@@ -8,18 +8,22 @@ from pyspark.sql.functions import col, spark_partition_id, rank, coalesce, lit, 
 def sample(
     frame: DataFrame,
     ratio: Union[float, int],
-    total: Union[int, None] = None
+    total: Union[int, None] = None,
+    persist: bool = False
 ) -> DataFrame:
     """Sample rows from a PySpark DataFrame.
 
     :param frame: The PySpark DataFrame from which to sample rows.
     :param ratio: The acceptance ratio or the number of rows to sample.
     :param total: The total number of rows in the DataFrame.
+    :param persist: Whether to persist the table when it is needed multiple times.
+        False by default.
     :return: A PySpark DataFrame containing sampled rows.
     """
     if isinstance(ratio, int):
         if total is None:
-            frame.persist()
+            if persist:
+                frame.persist()
             total = frame.count()
         if total == 0:
             return frame
