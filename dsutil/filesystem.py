@@ -232,6 +232,13 @@ def _find_data_tables_file(file, filter_, patterns) -> Set[str]:
 
 
 def find_data_tables_sql(sql: str, filter_: Union[Callable, None] = None) -> Set[str]:
+    """Find keywords which are likely data table names in a SQL string.
+
+    :param sql: A SQL query.
+    :param filter_: A function for filtering identified keywords (via regular expressions).
+        By default, all keywords identified by regular expressions are kept.
+    :return: A set of names of data tables.
+    """
     sql = sql.lower()
     pattern = r"(join|from)\s+(\w+(\.\w+)?)(\s|$)"
     tables = (pms[1] for pms in re.findall(pattern, sql))
