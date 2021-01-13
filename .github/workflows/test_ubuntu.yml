@@ -3,7 +3,7 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
+    branches: [ dev, main ]
 jobs:
   test_code:
     runs-on: ${{matrix.os}}
