@@ -303,7 +303,6 @@ class DockerImageBuilder:
         self._login_servers()
 
     def _build_graph(self):
-        self.groots = []
         graph = nx.Graph()
         for git_url in self.git_urls:
             print(git_url)

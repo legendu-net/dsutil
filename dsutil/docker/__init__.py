@@ -47,8 +47,9 @@ def containers() -> pd.DataFrame:
     data = [
         {
             "container_id": cont.short_id,
+            "container_obj": cont,
             "image": cont.image.tags[0] if cont.image.tags else cont.image.short_id[7:],
-            "command": cont.attrs["Cmd"],
+            "command": cont.attrs["Config"]["Cmd"],
             "created": cont.attrs["Created"],
             "status": cont.status,
             "ports": cont.ports,
