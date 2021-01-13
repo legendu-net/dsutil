@@ -293,8 +293,6 @@ class DockerImageBuilder:
     def _get_deps(self) -> None:
         """Get dependencies (of all Docker images to build) in order.
         """
-        self._build_graph()
-        return
         if not self.docker_images:
             for git_url in self.git_urls:
                 deps: Sequence[DockerImage] = DockerImage(
@@ -369,7 +367,6 @@ class DockerImageBuilder:
         :return: A pandas DataFrame summarizing building information.
         """
         self._get_deps()
-        return
         if isinstance(no_cache, str):
             no_cache = set([no_cache])
         elif isinstance(no_cache, list):
