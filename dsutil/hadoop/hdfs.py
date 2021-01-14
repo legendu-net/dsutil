@@ -225,7 +225,7 @@ class Hdfs():
         flag_skip_trash = "-skipTrash" if skip_trash else ""
         flag_recursive = "-r" if recursive else ""
         cmd = f"{self.bin} dfs -rm {flag_recursive} {flag_skip_trash} {path}"
-        proc = sp.run(cmd, shell=True)
+        proc = sp.run(cmd, shell=True)  # pylint: disable=W1510
         return proc.returncode == 0
 
     def rm_robust(self,
