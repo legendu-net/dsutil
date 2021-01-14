@@ -43,7 +43,7 @@ class Hdfs():
         flag_recursive = "-R" if recursive else ""
         cmd = f"{self.bin} dfs -ls {flag_dir_only} {flag_recursive} {path}"
         logger.info("Running command: {}. Might take several minutes.", cmd)
-        frame = to_frame(cmd, split=r" +", skip=0, header=cols)
+        frame = to_frame(cmd, split=r" +", skip=() if dir_only else [0], header=cols)
         frame.bytes = frame.bytes.astype(int)
         frame.mtime = pd.to_datetime(frame.mdate + " " + frame.mtime)
         frame.drop("mdate", axis=1, inplace=True)
