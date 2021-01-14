@@ -16,10 +16,16 @@ class Hdfs():
     def __init__(self, bin: str = "/apache/hadoop/bin/hdfs"):
         self.bin = bin
 
-    def ls(self, path: str, recursive: bool = False) -> pd.DataFrame:
+    def ls(
+        self,
+        path: str,
+        dir_only: bool = False,
+        recursive: bool = False
+    ) -> pd.DataFrame:
         """Return the results of hdfs dfs -ls /hdfs/path as a DataFrame.
 
         :param path: A HDFS path.
+        :param dir_only: If true, list directories only.
         :param recursive: If True, list content of the HDFS path recursively.
         :return: The result of hdfs dfs -ls as a pandas DataFrame.
         """
@@ -33,7 +39,9 @@ class Hdfs():
             "mtime",
             "path",
         ]
-        cmd = f'{self.bin} dfs -ls {"-R" if recursive else ""} {path}'
+        flag_dir_only = "-d" if dir_only else ""
+        flag_recursive = "-R" if recursive else ""
+        cmd = f"{self.bin} dfs -ls {flag_dir_only} {flag_recursive} {path}"
         logger.info("Running command: {}. Might take several minutes.", cmd)
         frame = to_frame(cmd, split=r" +", skip=0, header=cols)
         frame.bytes = frame.bytes.astype(int)
@@ -205,3 +213,50 @@ class Hdfs():
         """
         paths = self.ls(path).path
         return [path for path in paths if path.endswith(extension)]
+
+    def rm(self, path: str, recursive: bool = True, skip_trash: bool = False) -> bool:
+        """Remove a HDFS path.
+
+        :param path: A HDFS path to remove.
+        :param recursive: If true, use the option -r.
+        :param skip_trash: If true, use the option -skipTrash.
+        :return: True if the path is removed successfully and false otherwise.
+        """
+        flag_skip_trash = "-skipTrash" if skip_trash else ""
+        flag_recursive = "-r" if recursive else ""
+        cmd = f"{self.bin} dfs -rm {flag_recursive} {flag_skip_trash} {path}"
+        proc = sp.run(cmd, shell=True)
+        return proc.returncode == 0
+
+    def rm_robust(self,
+                  path: str,
+                  skip_trash: bool = False,
+                  user: str = "") -> List[str]:
+        """Remove a HDFS path in a robust way. 
+            If removing a directory fails, 
+            the method continues to remove its subfiles and subdirs 
+            insteadd of throwing an exception.
+
+        :param path: A HDFS path to remove.
+        :param skip_trash: If true, use the option -skipTrash.
+        :param user: If specified, remove only paths belong to the user.
+        :return: A list of HDFS paths that are successfully removed.
+        """
+        if user:
+            frame = self.ls(path, dir_only=True)
+            frame = frame[frame.userid == user]
+            if frame.empty:
+                return []
+        if self.rm(path, recursive=True, skip_trash=skip_trash):
+            return [path]
+        frame = self.ls(path)
+        if user:
+            frame = frame[frame.userid == user]
+        paths_removed = []
+        # remove files
+        for file in frame[~frame.permissions.str.startswith("d")].path:
+            if self.rm(file, skip_trash=skip_trash):
+                paths_removed.append(file)
+        for p in frame[frame.permissions.str.startswith("d")].path:
+            paths_removed.extend(self.rm_robust(p, skip_trash=skip_trash, user=user))
+        return paths_removed
