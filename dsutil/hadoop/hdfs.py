@@ -16,7 +16,12 @@ class Hdfs():
     def __init__(self, bin: str = "/apache/hadoop/bin/hdfs"):
         self.bin = bin
 
-    def ls(self, path: str, dir_only: bool = False, recursive: bool = False) -> pd.DataFrame:
+    def ls(
+        self,
+        path: str,
+        dir_only: bool = False,
+        recursive: bool = False
+    ) -> pd.DataFrame:
         """Return the results of hdfs dfs -ls /hdfs/path as a DataFrame.
 
         :param path: A HDFS path.
@@ -223,7 +228,10 @@ class Hdfs():
         proc = sp.run(cmd, shell=True)
         return proc.returncode == 0
 
-    def rm_robust(self, path: str, skip_trash: bool = False, user: str = "") -> List[str]:
+    def rm_robust(self,
+                  path: str,
+                  skip_trash: bool = False,
+                  user: str = "") -> List[str]:
         """Remove a HDFS path in a robust way. 
             If removing a directory fails, 
             the method continues to remove its subfiles and subdirs 
