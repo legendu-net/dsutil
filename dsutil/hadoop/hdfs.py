@@ -223,7 +223,7 @@ class Hdfs():
         proc = sp.run(cmd, shell=True)
         return proc.returncode == 0
 
-    def rm_robust(self, path: str, skip_trash: bool = False, user: str = "") -> LList[str]:
+    def rm_robust(self, path: str, skip_trash: bool = False, user: str = "") -> List[str]:
         """Remove a HDFS path in a robust way. 
             If removing a directory fails, 
             the method continues to remove its subfiles and subdirs 
@@ -240,15 +240,15 @@ class Hdfs():
             if frame.empty:
                 return []
         if self.rm(path, recursive=True, skip_trash=skip_trash):
-            retrun [path]
+            return [path]
         frame = self.ls(path)
         if user:
-            frame = frame[df.userid == user]
+            frame = frame[frame.userid == user]
         paths_removed = []
         # remove files
         for file in frame[~frame.permissions.str.startswith("d")].path:
             if self.rm(file, skip_trash=skip_trash):
                 paths_removed.append(file)
-        for path in frame[frame.permissions.str.startswith("d")].path:
-            paths_removed.extend(self.rm_robust(path, skip_trash=skip_trash, user=user))
+        for p in frame[frame.permissions.str.startswith("d")].path:
+            paths_removed.extend(self.rm_robust(p, skip_trash=skip_trash, user=user))
         return paths_removed
