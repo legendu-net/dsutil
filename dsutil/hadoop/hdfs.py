@@ -42,7 +42,7 @@ class Hdfs():
         flag_dir_only = "-d" if dir_only else ""
         flag_recursive = "-R" if recursive else ""
         cmd = f"{self.bin} dfs -ls {flag_dir_only} {flag_recursive} {path}"
-        logger.info("Running command: {}. Might take several minutes.", cmd)
+        logger.info("Running command: {}. Might take a while.", cmd)
         frame = to_frame(cmd, split=r" +", skip=() if dir_only else [0], header=cols)
         frame.bytes = frame.bytes.astype(int)
         frame.mtime = pd.to_datetime(frame.mdate + " " + frame.mtime)
@@ -56,6 +56,7 @@ class Hdfs():
         :return: The result of hdfs dfs -count as a pandas DataFrame.
         """
         cmd = f"{self.bin} dfs -count -q -v {path}"
+        logger.info("Running command: {}. Might take a while.", cmd)
         frame = to_frame(cmd, split=r" +", header=0)
         frame.columns = frame.columns.str.lower()
         return frame
@@ -80,6 +81,7 @@ class Hdfs():
 
     def _du_helper(self, path: str) -> pd.DataFrame:
         cmd = f"{self.bin} dfs -du {path}"
+        logger.info("Running command: {}. Might take a while.", cmd)
         frame = to_frame(cmd, split=r" +", header=["size", "path"])
         return frame
 
@@ -90,6 +92,7 @@ class Hdfs():
         :return: True if the HDFS path exists and False otherwise.
         """
         cmd = f"{self.bin} dfs -test -e {path}"
+        logger.info("Running command: {}. Might take a while.", cmd)
         try:
             sp.run(cmd, shell=True, check=True)
             return True
@@ -101,6 +104,7 @@ class Hdfs():
         :param path: A HDFS path.
         """
         cmd = f"{self.bin} dfs -rm -r {path}"
+        logger.info("Running command: {}. Might take a while.", cmd)
         sp.run(cmd, shell=True, check=True)
 
     def num_partitions(self, path: str) -> int:
@@ -110,6 +114,7 @@ class Hdfs():
         :return: The number of partitions under the HDFS path.
         """
         cmd = f"{self.bin} dfs -ls {path}/part-* | wc -l"
+        logger.info("Running command: {}. Might take a while.", cmd)
         return int(sp.check_output(cmd, shell=True))
 
     def get(
@@ -131,6 +136,7 @@ class Hdfs():
             cmd = f"{self.bin} dfs -get {hdfs_path} {local_dir}"
         else:
             cmd = f"{self.bin} dfs -get {hdfs_path}/* {local_dir}"
+        logger.info("Running command: {}. Might take a while.", cmd)
         sp.run(cmd, shell=True, check=True)
         print(
             f"Content of the HDFS path {hdfs_path} has been fetch into the local directory {local_dir}"
@@ -180,8 +186,9 @@ class Hdfs():
         :param path: The HDFS path to create.
         """
         cmd = f"{self.bin} dfs -mkdir -p {path}"
+        logger.info("Running command: {}. Might take a while.", cmd)
         sp.run(cmd, shell=True, check=True)
-        print(f"The HDFS path {path} has been created.")
+        logger.info(f"The HDFS path {path} has been created.")
 
     def put(
         self,
@@ -197,8 +204,9 @@ class Hdfs():
         if create_hdfs_path:
             self.mkdir(hdfs_path)
         cmd = f"{self.bin} dfs -put -f {local_path} {hdfs_path}"
+        logger.info("Running command: {}. Might take a while.", cmd)
         sp.run(cmd, shell=True, check=True)
-        print(
+        logger.info(
             f"The local path {local_path} has been uploaded into the HDFS path {hdfs_path}"
         )
 
@@ -225,6 +233,7 @@ class Hdfs():
         flag_skip_trash = "-skipTrash" if skip_trash else ""
         flag_recursive = "-r" if recursive else ""
         cmd = f"{self.bin} dfs -rm {flag_recursive} {flag_skip_trash} {path}"
+        logger.info("Running command: {}. Might take a while.", cmd)
         proc = sp.run(cmd, shell=True)  # pylint: disable=W1510
         return proc.returncode == 0
 
