@@ -10,6 +10,7 @@ import datetime
 import subprocess as sp
 from collections import deque
 import shutil
+import yaml
 from loguru import logger
 import pandas as pd
 import git
@@ -275,56 +276,42 @@ class DockerImageBuilder:
     """
     def __init__(
         self,
-        git_urls: Union[Iterable[str], str, Path],
-        branch: str = "dev",
+        branch_urls: Union[Dict[str, List[str]], str, Path]
     ):
-        if isinstance(git_urls, str):
-            git_urls = Path(git_urls)
-        if isinstance(git_urls, Path):
-            with git_urls.open("r") as fin:
-                lines = (line.strip() for line in fin)
-                git_urls = [
-                    line for line in lines if not line.startswith("#") and line != ""
-                ]
-        self.git_urls = git_urls
-        self.branch = branch
-        self.docker_images: Dict[str, DockerImage] = {}
+        if isinstance(branch_urls, (str, Path)):
+            with open(branch_urls, "r") as fin:
+                branch_urls = yaml.load(fin, Loader=yaml.FullLoader)
+        self.branch_urls = branch_urls
+        self.graph = None
 
-    def _get_deps(self) -> None:
-        """Get dependencies (of all Docker images to build) in order.
-        """
-        if not self.docker_images:
-            for git_url in self.git_urls:
-                deps: Sequence[DockerImage] = DockerImage(
-                    git_url=git_url, branch=self.branch
-                ).get_deps(self.docker_images)
-                for dep in deps:
-                    self.docker_images[dep.git_url] = dep
-        self._login_servers()
-
-    def _build_graph(self):
-        graph = nx.Graph()
-        for git_url in self.git_urls:
-            print(git_url)
+    def _build_graph_branch(self, branch, urls):
+        for url in urls:
             deps: Sequence[DockerImage] = DockerImage(
-                git_url=git_url, branch=self.branch
+                git_url=url, branch=branch
             ).get_deps(graph.nodes)
-            print([dep.git_url for dep in deps])
             if deps[0].git_url_base:
-                graph.add_edge((deps[0].git_url_base, deps[0].branch), deps[0].git_url)
-                graph.add_edge(deps[0].git_url, (deps[0].git_url, deps[0].branch))
+                self.graph.add_edge((deps[0].git_url_base, deps[0].branch), deps[0].git_url)
+                self.graph.add_edge(deps[0].git_url, (deps[0].git_url, deps[0].branch))
             for idx in range(1, len(deps)):
                 dep1 = deps[idx - 1]
                 dep2 = deps[idx]
                 # edge from virtual node to a node instance for dep1
-                graph.add_edge(dep1.git_url, (dep1.git_url, dep1.branch))
+                self.graph.add_edge(dep1.git_url, (dep1.git_url, dep1.branch))
                 # edge from virtual node to a node instance for dep2
-                graph.add_edge(dep2.git_url, (dep2.git_url, dep2.branch))
+                self.graph.add_edge(dep2.git_url, (dep2.git_url, dep2.branch))
                 # edge from dep1 to dep2
-                graph.add_edge((dep1.git_url, dep1.branch), dep2.git_url)
+                self.graph.add_edge((dep1.git_url, dep1.branch), dep2.git_url)
+
+    def _build_graph(self):
+        if self.graph is not None:
+            return
+        self.graph = nx.Graph()
+        for branch, urls in self.branch_urls:
+            self._build_graph_branch(branch, urls)
         with open("edges.txt", "w") as fout:
             for edge in graph.edges:
                 fout.write(str(edge) + "\n")
+        #self._login_servers()
 
     def _login_servers(self) -> None:
         servers = set()
@@ -343,7 +330,7 @@ class DockerImageBuilder:
             and generating a new tag to tag Docker images before pushing.
         :return: A pandas DataFrame summarizing pushing information.
         """
-        self._get_deps()
+        self._build_graph()
         frames = [image.push(tag_tran_fun) for _, image in self.docker_images.items()]
         return pd.concat(frames)
 
@@ -365,7 +352,7 @@ class DockerImageBuilder:
         :param push: If True, push the built Docker images to DockerHub.
         :return: A pandas DataFrame summarizing building information.
         """
-        self._get_deps()
+        self._build_graph()
         if isinstance(no_cache, str):
             no_cache = set([no_cache])
         elif isinstance(no_cache, list):
