@@ -274,10 +274,7 @@ class DockerImage:
 class DockerImageBuilder:
     """A class for build many Docker images at once.
     """
-    def __init__(
-        self,
-        branch_urls: Union[Dict[str, List[str]], str, Path]
-    ):
+    def __init__(self, branch_urls: Union[Dict[str, List[str]], str, Path]):
         if isinstance(branch_urls, (str, Path)):
             with open(branch_urls, "r") as fin:
                 branch_urls = yaml.load(fin, Loader=yaml.FullLoader)
@@ -286,11 +283,14 @@ class DockerImageBuilder:
 
     def _build_graph_branch(self, branch, urls):
         for url in urls:
-            deps: Sequence[DockerImage] = DockerImage(
-                git_url=url, branch=branch
-            ).get_deps(self.graph.nodes)
+            deps: Sequence[DockerImage] = DockerImage(git_url=url,
+                                                      branch=branch).get_deps(
+                                                          self.graph.nodes
+                                                      )
             if deps[0].git_url_base:
-                self.graph.add_edge((deps[0].git_url_base, deps[0].branch), deps[0].git_url)
+                self.graph.add_edge(
+                    (deps[0].git_url_base, deps[0].branch), deps[0].git_url
+                )
                 self.graph.add_edge(deps[0].git_url, (deps[0].git_url, deps[0].branch))
             for idx in range(1, len(deps)):
                 dep1 = deps[idx - 1]
