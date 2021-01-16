@@ -139,7 +139,7 @@ class DockerImage:
         self.clone_repo()
         deps = deque([self])
         obj = self
-        while obj.git_url_base not in images:
+        while (obj.git_url_base, obj.branch) not in images:
             if obj.git_url_base:
                 obj = DockerImage(git_url=obj.git_url_base, branch=obj.branch)
                 obj.clone_repo()
