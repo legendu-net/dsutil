@@ -288,7 +288,7 @@ class DockerImageBuilder:
         for url in urls:
             deps: Sequence[DockerImage] = DockerImage(
                 git_url=url, branch=branch
-            ).get_deps(graph.nodes)
+            ).get_deps(self.graph.nodes)
             if deps[0].git_url_base:
                 self.graph.add_edge((deps[0].git_url_base, deps[0].branch), deps[0].git_url)
                 self.graph.add_edge(deps[0].git_url, (deps[0].git_url, deps[0].branch))
@@ -309,7 +309,7 @@ class DockerImageBuilder:
         for branch, urls in self.branch_urls.items():
             self._build_graph_branch(branch, urls)
         with open("edges.txt", "w") as fout:
-            for edge in graph.edges:
+            for edge in self.graph.edges:
                 fout.write(str(edge) + "\n")
         #self._login_servers()
 
