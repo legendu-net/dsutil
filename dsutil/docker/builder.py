@@ -306,7 +306,7 @@ class DockerImageBuilder:
         if self.graph is not None:
             return
         self.graph = nx.Graph()
-        for branch, urls in self.branch_urls:
+        for branch, urls in self.branch_urls.items():
             self._build_graph_branch(branch, urls)
         with open("edges.txt", "w") as fout:
             for edge in graph.edges:
