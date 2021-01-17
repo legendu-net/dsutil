@@ -2,7 +2,7 @@ name: Test Code on Windows
 
 on:
   push:
-    branches: [ dev, main ]
+    branches: [ main ]
   pull_request:
     branches: [ dev, main ]
 
