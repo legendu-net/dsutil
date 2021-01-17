@@ -20,7 +20,7 @@ def images() -> pd.DataFrame:
     """
     data = []
     for image in docker.from_env().images.list():
-        repository = image.attrs["RepoDigests"][0].split("@")[0]
+        repository = _get_image_repo(image)
         image_id = image.short_id[7:]
         created = image.attrs["Created"]
         size = image.attrs["Size"]
