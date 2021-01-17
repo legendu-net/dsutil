@@ -8,6 +8,13 @@ import docker
 from .builder import DockerImage, DockerImageBuilder
 
 
+def _get_image_repo(image):
+    repo_digests = image.attrs["RepoDigests"]
+    if repo_digests:
+        return repo_digests[0].split("@", maxsplit=1)[0]
+    return image.attrs["RepoTags"][0].split(":", maxsplit=1)[0]
+
+
 def images() -> pd.DataFrame:
     """Return Docker images as a pandas DataFrame.
     """
