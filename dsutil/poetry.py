@@ -309,7 +309,7 @@ def _lint_code_darglint(proj_dir: Union[Path, None], pyvenv_path: str):
 
 def build_package(
     proj_dir: Union[Path, None] = None,
-    linter: Union[str, Iterable[str]] = ("pylint", "flake8", "pytype"),
+    linter: Union[str, Iterable[str]] = ("pylint", "pytype"),
     test: bool = True
 ) -> None:
     """Build the package using poetry.
