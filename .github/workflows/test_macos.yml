@@ -1,9 +1,9 @@
 name: Test Code on macOS
 on:
   push:
-    branches: [ main ]
+    branches: [ dev, main ]
   pull_request:
-    branches: [ main ]
+    branches: [ dev, main ]
 jobs:
   test_code:
     runs-on: ${{matrix.os}}
