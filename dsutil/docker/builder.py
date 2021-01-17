@@ -289,18 +289,12 @@ class DockerImageBuilder:
                                                       )
             if deps[0].git_url_base:
                 self.graph.add_edge(
-                    (deps[0].git_url_base, deps[0].branch), deps[0].git_url
+                    (deps[0].git_url_base, deps[0].branch), (deps[0].git_url, deps[0].branch)
                 )
-                self.graph.add_edge(deps[0].git_url, (deps[0].git_url, deps[0].branch))
             for idx in range(1, len(deps)):
                 dep1 = deps[idx - 1]
                 dep2 = deps[idx]
-                # edge from virtual node to a node instance for dep1
-                self.graph.add_edge(dep1.git_url, (dep1.git_url, dep1.branch))
-                # edge from virtual node to a node instance for dep2
-                self.graph.add_edge(dep2.git_url, (dep2.git_url, dep2.branch))
-                # edge from dep1 to dep2
-                self.graph.add_edge((dep1.git_url, dep1.branch), dep2.git_url)
+                self.graph.add_edge((dep1.git_url, dep1.branch), (dep2.git_url, dep2.branch))
 
     def _build_graph(self):
         if self.graph is not None:
