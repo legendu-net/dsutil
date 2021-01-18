@@ -109,10 +109,11 @@ class DockerImage:
             return
         if self.git_url in repo_path:
             self.path = repo_path[self.git_url]
+            repo = Repo(self.path)
         else:
             self.path = Path(tempfile.mkdtemp())
             logger.info("Cloning {} into {}", self.git_url, self.path)
-            repo = git.Repo.clone_from(self.git_url, self.path)
+            repo = Repo.clone_from(self.git_url, self.path)
             repo_path[self.git_url] = self.path
         for ref in repo.refs:
             if ref.name.endswith("/" + self.branch):
