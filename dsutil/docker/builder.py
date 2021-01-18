@@ -351,7 +351,7 @@ class DockerImageBuilder:
                 # add extra branch info into the node
                 attr = self._graph.nodes[inode]
                 attr.setdefault("identical_branches", [])
-                attr.get("identical_branches").append(dep.branch)
+                attr.get("identical_branches").append(branch)
                 return inode
         return None
 
