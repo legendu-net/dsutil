@@ -110,6 +110,7 @@ class DockerImage:
         if self.git_url in repo_path:
             self.path = repo_path[self.git_url]
             repo = Repo(self.path)
+            logger.info("{} has already been cloned into {} previously.", self.git_url, self.path)
         else:
             self.path = Path(tempfile.mkdtemp())
             logger.info("Cloning {} into {}", self.git_url, self.path)
@@ -374,7 +375,7 @@ class DockerImageBuilder:
             # node2 has an identical node inode2 in the graph
             # but inode2's parent is different from the parent of node2 (which is inode1),
             # so we cannot reuse inode2 here
-            self._graph.add_edge(inode1, (dep2.git_url, dep2.branch_urls))
+            self._graph.add_edge(inode1, (dep2.git_url, dep2.branch))
 
     def _build_graph(self):
         if self._graph is not None:
