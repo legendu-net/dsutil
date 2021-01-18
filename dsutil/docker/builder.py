@@ -351,7 +351,12 @@ class DockerImageBuilder:
             if self._compare_git_branches(
                 path, (branch, branch), ("", branch_fallback)
             ):
-                return (git_url, branch)
+                inode = (git_url, branch)
+                # add extra branch info into the node
+                attr = self._graph[inode]
+                attr.setdefault("identical_branches", [])
+                attr.get("identical_branches").append(dep.branch)
+                return inode
         return None
 
     def _compare_git_branches(
@@ -436,7 +441,6 @@ class DockerImageBuilder:
         self,
         tag_build: str = None,
         tag_base: str = "",
-        no_cache: Union[bool, str, List[str], Set[str]] = None,
         copy_ssh_to: str = "",
         push: bool = True,
     ) -> pd.DataFrame:
@@ -451,14 +455,6 @@ class DockerImageBuilder:
         :return: A pandas DataFrame summarizing building information.
         """
         self._build_graph()
-        if isinstance(no_cache, str):
-            no_cache = set([no_cache])
-        elif isinstance(no_cache, list):
-            no_cache = set(no_cache)
-        elif isinstance(no_cache, bool) and no_cache:
-            no_cache = set(image.name for image in self.docker_images.values())
-        else:
-            no_cache = set()
         data = [
             image.build(
                 tag_build=tag_build,
