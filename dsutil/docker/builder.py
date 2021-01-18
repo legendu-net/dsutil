@@ -364,8 +364,7 @@ class DockerImageBuilder:
     def _add_nodes(self, dep1: Union[DockerImage, Tuple[str, str, str]], dep2: DockerImage) -> None:
         inode1 = self._find_identical_node(dep1)
         if inode1 is None:
-            pass
-            # TODO: need throw an exception here as this is impossible
+            raise LookupError("The node {} which is expected in the graph is not found!", (dep1,git_url, dep1.branch))
         inode2 = self._find_identical_node(dep2)
         if inode2 is None:
             self._graph.add_edge(inode1, (dep2.git_url, dep2.branch))
