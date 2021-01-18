@@ -406,7 +406,7 @@ class DockerImageBuilder:
         if inode2 is None or next(self._graph.predecessors(inode2)) != inode1:
             self._graph.add_edge(inode1, (dep2.git_url, dep2.branch))
             self._repo_branch.setdefault(dep2.git_url, [])
-            self._repo_branch.get(dep2.git_url).append(deps[0].branch)
+            self._repo_branch.get(dep2.git_url).append(dep2.branch)
 
     def _build_graph(self):
         if self._graph is not None:
