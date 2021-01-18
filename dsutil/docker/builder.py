@@ -351,7 +351,7 @@ class DockerImageBuilder:
             ):
                 inode = (git_url, br)
                 # add extra branch info into the node
-                attr = self._graph[inode]
+                attr = self._graph.nodes[inode]
                 attr.setdefault("identical_branches", [])
                 attr.get("identical_branches").append(dep.branch)
                 return inode
