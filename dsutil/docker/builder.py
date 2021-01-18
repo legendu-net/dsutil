@@ -422,7 +422,7 @@ class DockerImageBuilder:
                 fout.write(str(edge) + "\n")
         with open("nodes.txt", "w") as fout:
             for node in self._graph.nodes:
-                fout.write(f"{node}: {json.dumps(self._graph.nodes[node])}\n")
+                fout.write(f"{node}: {list(self._graph.nodes[node]["identical_branches"])}\n")
         with open("branches.txt", "w") as fout:
             fout.write(json.dumps(self._repo_branch, indent=4))
 
