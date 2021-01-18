@@ -423,6 +423,8 @@ class DockerImageBuilder:
         with open("nodes.txt", "w") as fout:
             for node in self._graph.nodes:
                 fout.write(f"{node}: {json.dumps(self._graph.nodes[node])}\n")
+        with open("branches.txt", "w") as fout:
+            fout.write(json.dumps(self._repo_branch, indent=4))
 
     #def _login_servers(self) -> None:
     #    servers = set()
