@@ -322,7 +322,7 @@ class DockerImageBuilder:
             return None
         path = self._repo_path.get(dep.git_url)
         for branch in branches:
-            if self._compare_git_branches(path, branch, dep.branch):
+            if self._compare_git_branches(path, (branch, dep.branch), ("", dep.branch_fallback)):
                 return (dep.git_url, branch)
         return None
 
