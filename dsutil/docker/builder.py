@@ -322,8 +322,8 @@ class DockerImageBuilder:
                     (deps[0].git_url_base, deps[0].branch, self._branch_fallback),
                     deps[0]
                 )
-            self._repo_branch.setdefault(deps[0].git_url, [])
-            self._repo_branch.get(deps[0].git_url).append(deps[0].branch)
+                self._repo_branch.setdefault(deps[0].git_url, [])
+                self._repo_branch.get(deps[0].git_url).append(deps[0].branch)
             for idx in range(1, len(deps)):
                 self._add_nodes(deps[idx - 1], deps[idx])
                 self._repo_branch.setdefault(deps[idx].git_url, [])
