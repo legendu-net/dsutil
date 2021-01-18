@@ -351,8 +351,8 @@ class DockerImageBuilder:
                 inode = (git_url, br)
                 # add extra branch info into the node
                 attr = self._graph.nodes[inode]
-                attr.setdefault("identical_branches", [])
-                attr.get("identical_branches").append(branch)
+                attr.setdefault("identical_branches", set())
+                attr.get("identical_branches").add(branch)
                 return inode
         return None
 
@@ -387,8 +387,8 @@ class DockerImageBuilder:
         inode = self._find_identical_node((git_url, branch, branch_fallback))
         if inode is None:
             self._graph.add_node((git_url, branch))
-        self._repo_branch.setdefault(git_url, set())
-        self._repo_branch.get(git_url).add(branch)
+        self._repo_branch.setdefault(git_url, [])
+        self._repo_branch.get(git_url).append(branch)
 
     def _add_nodes(
         self, dep1: Union[DockerImage, Tuple[str, str, str]], dep2: DockerImage
@@ -405,8 +405,8 @@ class DockerImageBuilder:
         #     but inode2's parent is different from the parent of node2 (which is inode1)
         if inode2 is None or next(self._graph.predecessors(inode2)) != inode1:
             self._graph.add_edge(inode1, (dep2.git_url, dep2.branch))
-            self._repo_branch.setdefault(dep2.git_url, set())
-            self._repo_branch.get(dep2.git_url).add(dep2.branch)
+            self._repo_branch.setdefault(dep2.git_url, [])
+            self._repo_branch.get(dep2.git_url).append(dep2.branch)
 
     def _build_graph(self):
         if self._graph is not None:
