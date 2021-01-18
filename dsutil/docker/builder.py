@@ -1,19 +1,17 @@
 """Docker related utils.
 """
 from __future__ import annotations
-from typing import Union, List, Sequence, Set, Deque, Tuple, Dict, Iterable, Callable
+from typing import Union, List, Sequence, Set, Deque, Tuple, Dict, Callable
 import tempfile
 from pathlib import Path
 import time
 import timeit
 import datetime
-import subprocess as sp
 from collections import deque
 import shutil
 import yaml
 from loguru import logger
 import pandas as pd
-import git
 import docker
 import networkx as nx
 from git import Repo
@@ -211,7 +209,7 @@ class DockerImage:
         :return: A tuple of the format (image_name_built, time_taken).
         """
         start = time.perf_counter_ns()
-        self.clone_repo({})
+        self.clone_repo()
         self._copy_ssh(copy_ssh_to)
         if tag_build is None:
             if self.branch in ("master", "main"):
@@ -388,10 +386,7 @@ class DockerImageBuilder:
     ) -> None:
         inode1 = self._find_identical_node(dep1)
         if inode1 is None:
-            raise LookupError(
-                "The node {} which is expected in the graph is not found!",
-                (dep1, git_url, dep1.branch)
-            )
+            raise LookupError(f"The node {(dep1.git_url, dep1.branch)} which is expected in the graph is not found!")
         inode2 = self._find_identical_node(dep2)
         if inode2 is None:
             self._graph.add_edge(inode1, (dep2.git_url, dep2.branch))
