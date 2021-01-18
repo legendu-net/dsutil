@@ -414,12 +414,13 @@ class DockerImageBuilder:
             self._build_graph_branch(branch, urls)
 
     def save_graph(self) -> None:
-        nx.write_yaml(self._graph, "graph.yaml")
-        #with open("edges.txt", "w") as fout:
-        #    for edge in self._graph.edges:
-        #        fout.write(str(edge) + "\n")
-        #with open("nodes.txt", "w") as fout:
-        #self._login_servers()
+        #nx.write_yaml(self._graph, "graph.yaml")
+        with open("edges.txt", "w") as fout:
+            for edge in self._graph.edges:
+                fout.write(str(edge) + "\n")
+        with open("nodes.txt", "w") as fout:
+            for node in self._graph.nodes:
+                fout.write(f"{node}: {json.dumps(self._graph.nodes[node])}\n")
 
     #def _login_servers(self) -> None:
     #    servers = set()
