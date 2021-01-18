@@ -159,7 +159,12 @@ class DockerImage:
         obj = self
         while (obj.git_url_base, obj.branch) not in repo_branch:
             if obj.git_url_base:
-                obj = DockerImage(git_url=obj.git_url_base, branch=obj.branch, branch_fallback=self.branch_fallback, repo_path=self._repo_path)
+                obj = DockerImage(
+                    git_url=obj.git_url_base,
+                    branch=obj.branch,
+                    branch_fallback=self.branch_fallback,
+                    repo_path=self._repo_path
+                )
                 obj.clone_repo()
                 deps.appendleft(obj)
             else:
@@ -309,7 +314,10 @@ class DockerImageBuilder:
     def _build_graph_branch(self, branch, urls):
         for url in urls:
             deps: Sequence[DockerImage] = DockerImage(
-                git_url=url, branch=branch, branch_fallback=self._branch_fallback, repo_path=self._repo_path
+                git_url=url,
+                branch=branch,
+                branch_fallback=self._branch_fallback,
+                repo_path=self._repo_path
             ).get_deps(self._graph.nodes)
             if deps[0].git_url_base:
                 self._add_nodes(
