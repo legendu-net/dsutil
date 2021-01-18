@@ -346,12 +346,12 @@ class DockerImageBuilder:
         branches = self._repo_branch.get(git_url, [])
         if not branches:
             return None
-        path = self._repo_path.get(git_url)
-        for branch in branches:
+        path = self._repo_path[git_url]
+        for br in branches:
             if self._compare_git_branches(
-                path, (branch, branch), ("", branch_fallback)
+                path, (br, branch), ("", branch_fallback)
             ):
-                inode = (git_url, branch)
+                inode = (git_url, br)
                 # add extra branch info into the node
                 attr = self._graph[inode]
                 attr.setdefault("identical_branches", [])
