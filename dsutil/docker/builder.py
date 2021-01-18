@@ -324,7 +324,7 @@ class DockerImageBuilder:
                     deps[0]
                 )
             else:
-                self._add_root_node((deps[0].git_url, deps[0].branch))
+                self._add_root_node(deps[0].git_url, deps[0].branch, deps[0].branch_fallback)
             for idx in range(1, len(deps)):
                 self._add_nodes(deps[idx - 1], deps[idx])
 
@@ -383,9 +383,10 @@ class DockerImageBuilder:
                 fallback_commit = ref.commit
         return fallback_commit
 
-    def _add_root_node(self, root_node):
-        self._graph.add_node(root_node)
-        git_url, branch = root_node
+    def _add_root_node(self, git_url, branch, branch_fallback):
+        inode = self._find_identical_node((git_url, branch, branch_fallback))
+        if inode is None:
+            self._graph.add_node((git_url, branch))
         self._repo_branch.setdefault(git_url, [])
         self._repo_branch.get(git_url).append(branch)
 
