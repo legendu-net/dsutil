@@ -302,7 +302,7 @@ class DockerImageBuilder:
             ).get_deps(self._graph.nodes, self._repo_path)
             if deps[0].git_url_base:
                 self._add_nodes(
-                    (deps[0].git_url_base, deps[0].branch, self.branch_fallback), deps[0]
+                    (deps[0].git_url_base, deps[0].branch, self._branch_fallback), deps[0]
                 )
             self._repo_branch.setdefault(deps[0].git_url, [])
             self._repo_branch.get(deps[0].git_url).append(deps[0].branch)
