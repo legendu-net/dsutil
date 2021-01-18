@@ -110,7 +110,10 @@ class DockerImage:
         if self.git_url in repo_path:
             self.path = repo_path[self.git_url]
             repo = Repo(self.path)
-            logger.info("{} has already been cloned into {} previously.", self.git_url, self.path)
+            logger.info(
+                "{} has already been cloned into {} previously.", self.git_url,
+                self.path
+            )
         else:
             self.path = Path(tempfile.mkdtemp())
             logger.info("Cloning {} into {}", self.git_url, self.path)
@@ -287,7 +290,11 @@ class DockerImage:
 class DockerImageBuilder:
     """A class for build many Docker images at once.
     """
-    def __init__(self, branch_urls: Union[Dict[str, List[str]], str, Path], branch_fallback: str = "dev"):
+    def __init__(
+        self,
+        branch_urls: Union[Dict[str, List[str]], str, Path],
+        branch_fallback: str = "dev"
+    ):
         if isinstance(branch_urls, (str, Path)):
             with open(branch_urls, "r") as fin:
                 branch_urls = yaml.load(fin, Loader=yaml.FullLoader)
@@ -304,7 +311,8 @@ class DockerImageBuilder:
             ).get_deps(self._graph.nodes, self._repo_path)
             if deps[0].git_url_base:
                 self._add_nodes(
-                    (deps[0].git_url_base, deps[0].branch, self._branch_fallback), deps[0]
+                    (deps[0].git_url_base, deps[0].branch, self._branch_fallback),
+                    deps[0]
                 )
             self._repo_branch.setdefault(deps[0].git_url, [])
             self._repo_branch.get(deps[0].git_url).append(deps[0].branch)
@@ -313,7 +321,9 @@ class DockerImageBuilder:
                 self._repo_branch.setdefault(deps[idx].git_url, [])
                 self._repo_branch.get(deps[idx].git_url).append(deps[idx].branch)
 
-    def _find_identical_node(self, dep: Union[DockerImage, Tuple[str, str, str]]) -> Union[Tuple[str, str], None]:
+    def _find_identical_node(
+        self, dep: Union[DockerImage, Tuple[str, str, str]]
+    ) -> Union[Tuple[str, str], None]:
         """Find node in the graph which has identical branch as the specified dependency.
         Notice that a node in the graph is represented as (git_url, branch).
 
@@ -330,7 +340,9 @@ class DockerImageBuilder:
             return None
         path = self._repo_path.get(git_url)
         for branch in branches:
-            if self._compare_git_branches(path, (branch, branch), ("", branch_fallback)):
+            if self._compare_git_branches(
+                path, (branch, branch), ("", branch_fallback)
+            ):
                 return (git_url, branch)
         return None
 
@@ -361,10 +373,15 @@ class DockerImageBuilder:
                 fallback_commit = ref.commit
         return fallback_commit
 
-    def _add_nodes(self, dep1: Union[DockerImage, Tuple[str, str, str]], dep2: DockerImage) -> None:
+    def _add_nodes(
+        self, dep1: Union[DockerImage, Tuple[str, str, str]], dep2: DockerImage
+    ) -> None:
         inode1 = self._find_identical_node(dep1)
         if inode1 is None:
-            raise LookupError("The node {} which is expected in the graph is not found!", (dep1,git_url, dep1.branch))
+            raise LookupError(
+                "The node {} which is expected in the graph is not found!",
+                (dep1, git_url, dep1.branch)
+            )
         inode2 = self._find_identical_node(dep2)
         if inode2 is None:
             self._graph.add_edge(inode1, (dep2.git_url, dep2.branch))
