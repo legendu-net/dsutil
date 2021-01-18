@@ -1,7 +1,7 @@
 """Docker related utils.
 """
 from __future__ import annotations
-from typing import Union, List, Sequence, Set, Deque, Tuple, Dict, Callable
+from typing import Union, List, Sequence, Deque, Tuple, Dict, Callable
 import tempfile
 from pathlib import Path
 import time
@@ -466,7 +466,6 @@ class DockerImageBuilder:
             image.build(
                 tag_build=tag_build,
                 tag_base=tag_base,
-                no_cache=image.name in no_cache,
                 copy_ssh_to=copy_ssh_to
             ) for image in self.docker_images.values()
         ]
