@@ -387,8 +387,8 @@ class DockerImageBuilder:
         inode = self._find_identical_node((git_url, branch, branch_fallback))
         if inode is None:
             self._graph.add_node((git_url, branch))
-        self._repo_branch.setdefault(git_url, [])
-        self._repo_branch.get(git_url).append(branch)
+            self._repo_branch.setdefault(git_url, [])
+            self._repo_branch.get(git_url).append(branch)
 
     def _add_nodes(
         self, dep1: Union[DockerImage, Tuple[str, str, str]], dep2: DockerImage
