@@ -84,6 +84,7 @@ class DockerImage:
         git_url: str,
         branch: str = "dev",
         branch_fallback: str = "dev",
+        repo_path: Dict[str, str] = None
     ):
         """Initialize a DockerImage object.
 
@@ -93,6 +94,7 @@ class DockerImage:
         self.git_url = git_url.strip()
         self.branch = branch
         self.branch_fallback = branch_fallback
+        self._repo_path = {} if repo_path is None else repo_path
         self.path = None
         self.name = ""
         self.base_image = ""
@@ -100,15 +102,15 @@ class DockerImage:
         self.is_root = False
         self.tag_build = None
 
-    def clone_repo(self, repo_path: Dict[str, str]) -> None:
+    def clone_repo(self) -> None:
         """Clone the Git repository to a local directory.
 
         :param repo_branch: A dick containing mapping of git_url to its local path.
         """
         if self.path:
             return
-        if self.git_url in repo_path:
-            self.path = repo_path[self.git_url]
+        if self.git_url in self._repo_path:
+            self.path = self._repo_path[self.git_url]
             repo = Repo(self.path)
             logger.info(
                 "{} has already been cloned into {} previously.", self.git_url,
@@ -118,7 +120,7 @@ class DockerImage:
             self.path = Path(tempfile.mkdtemp())
             logger.info("Cloning {} into {}", self.git_url, self.path)
             repo = Repo.clone_from(self.git_url, self.path)
-            repo_path[self.git_url] = self.path
+            self._repo_path[self.git_url] = self.path
         for ref in repo.refs:
             if ref.name.endswith("/" + self.branch):
                 repo.git.checkout(self.branch)
@@ -145,20 +147,20 @@ class DockerImage:
         if not self.base_image:
             raise LookupError("The FROM line is not found in the Dockerfile!")
 
-    def get_deps(self, repo_branch, repo_path: Dict[str, str]) -> Deque[DockerImage]:
+    def get_deps(self, repo_branch) -> Deque[DockerImage]:
         """Get all dependencies of this DockerImage in order.
 
         :param repo_branch: A set-like collection containing tuples of (git_url, branch).
         :param repo_branch: A dick containing mapping of git_url to its local path.
         :return: A deque containing dependency images.
         """
-        self.clone_repo(repo_path)
+        self.clone_repo()
         deps = deque([self])
         obj = self
         while (obj.git_url_base, obj.branch) not in repo_branch:
             if obj.git_url_base:
-                obj = DockerImage(git_url=obj.git_url_base, branch=obj.branch)
-                obj.clone_repo(repo_path)
+                obj = DockerImage(git_url=obj.git_url_base, branch=obj.branch, branch_fallback=self.branch_fallback, repo_path=self._repo_path)
+                obj.clone_repo()
                 deps.appendleft(obj)
             else:
                 deps[0].is_root = True
@@ -307,8 +309,8 @@ class DockerImageBuilder:
     def _build_graph_branch(self, branch, urls):
         for url in urls:
             deps: Sequence[DockerImage] = DockerImage(
-                git_url=url, branch=branch
-            ).get_deps(self._graph.nodes, self._repo_path)
+                git_url=url, branch=branch, branch_fallback=self._branch_fallback, repo_path=self._repo_path
+            ).get_deps(self._graph.nodes)
             if deps[0].git_url_base:
                 self._add_nodes(
                     (deps[0].git_url_base, deps[0].branch, self._branch_fallback),
