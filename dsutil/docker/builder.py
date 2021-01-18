@@ -346,9 +346,7 @@ class DockerImageBuilder:
             return None
         path = self._repo_path[git_url]
         for br in branches:
-            if self._compare_git_branches(
-                path, (br, branch), ("", branch_fallback)
-            ):
+            if self._compare_git_branches(path, (br, branch), ("", branch_fallback)):
                 inode = (git_url, br)
                 # add extra branch info into the node
                 attr = self._graph.nodes[inode]
@@ -464,9 +462,7 @@ class DockerImageBuilder:
         self._build_graph()
         data = [
             image.build(
-                tag_build=tag_build,
-                tag_base=tag_base,
-                copy_ssh_to=copy_ssh_to
+                tag_build=tag_build, tag_base=tag_base, copy_ssh_to=copy_ssh_to
             ) for image in self.docker_images.values()
         ]
         frame = pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
