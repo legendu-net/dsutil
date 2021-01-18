@@ -384,7 +384,7 @@ class DockerImageBuilder:
                 fallback_commit = ref.commit
         return fallback_commit
 
-    def _add_root_node(root_node):
+    def _add_root_node(self, root_node):
         self._graph.add_node(root_node)
         git_url, branch = root_node
         self._repo_branch.setdefault(git_url, [])
