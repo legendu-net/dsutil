@@ -411,9 +411,13 @@ class DockerImageBuilder:
         self._graph = nx.DiGraph()
         for branch, urls in self._branch_urls.items():
             self._build_graph_branch(branch, urls)
-        with open("edges.txt", "w") as fout:
-            for edge in self._graph.edges:
-                fout.write(str(edge) + "\n")
+
+    def save_graph(self) -> None:
+        nx.write_yaml(self._graph, "graph.yaml")
+        #with open("edges.txt", "w") as fout:
+        #    for edge in self._graph.edges:
+        #        fout.write(str(edge) + "\n")
+        #with open("nodes.txt", "w") as fout:
         #self._login_servers()
 
     #def _login_servers(self) -> None:
