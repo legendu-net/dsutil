@@ -19,5 +19,5 @@ jobs:
         with:
           title: Merge dev into main
           branch: dev
-          author: dclong <dclong@users.noreply.github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           assignees: dclong 
