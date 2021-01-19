@@ -76,7 +76,7 @@ def _ignore_socket(dir_, files):
 def branch_to_tag(branch: str):
     if branch in ("master", "main"):
         return "latest"
-    if self.branch == "dev":
+    if branch == "dev":
         return "next"
     return branch
 
