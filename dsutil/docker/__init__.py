@@ -42,7 +42,7 @@ def images() -> pd.DataFrame:
             data.append(
                 {
                     "repository": repository,
-                    "tag": None,
+                    "tag": "",
                     "image_id": image_id,
                     "created": created,
                     "size": size
