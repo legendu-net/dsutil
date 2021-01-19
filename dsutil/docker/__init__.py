@@ -175,13 +175,13 @@ def _remove_images(imgs, choice: str = ""):
         image_name = row.repository + ":" + row.tag
         image = row.image_id if row.tag == "<none>" else image_name
         if choice == "y":
-            client.remove_image(image)
+            client.images.remove(image)
         elif choice == "i":
             choice_i = input(
                 f"Do you want to remove the image '{image_name}'? (y - Yes, n - [No]):"
             )
             if choice_i == "y":
-                client.remove_image(image)
+                client.images.remove(image)
 
 
 def stop(id_: str = "", name: str = "", status: str = "", choice: str = "") -> None:
