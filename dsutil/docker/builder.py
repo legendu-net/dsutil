@@ -438,9 +438,10 @@ class DockerImageBuilder:
             and generating a new tag to tag Docker images before pushing.
         :return: A pandas DataFrame summarizing pushing information.
         """
-        self._build_graph()
-        frames = [image.push(tag_tran_fun) for _, image in self.docker_images.items()]
-        return pd.concat(frames)
+        #self._build_graph()
+        #frames = [image.push(tag_tran_fun) for _, image in self.docker_images.items()]
+        #return pd.concat(frames)
+        pass
 
     def build_images(
         self,
@@ -485,7 +486,9 @@ class DockerImageBuilder:
             branch_fallback=self._branch_fallback,
             repo_path=self._repo_path
         )
-        name, tag, time, type_ = image.build(tag_build=tag_build, copy_ssh_to=copy_ssh_to)
+        name, tag, time, type_ = image.build(
+            tag_build=tag_build, copy_ssh_to=copy_ssh_to
+        )
         for br in self._graph.nodes[node]["identical_branches"]:
             if br == branch:
                 continue
