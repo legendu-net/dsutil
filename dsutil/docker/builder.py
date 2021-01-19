@@ -309,6 +309,7 @@ class DockerImageBuilder:
         self._graph = None
         self._repo_branch = {}
         self._repo_path = {}
+        self._roots = set()
 
     def _build_graph_branch(self, branch, urls):
         for url in urls:
@@ -386,9 +387,11 @@ class DockerImageBuilder:
     def _add_root_node(self, git_url, branch, branch_fallback):
         inode = self._find_identical_node((git_url, branch, branch_fallback))
         if inode is None:
-            self._graph.add_node((git_url, branch))
+            root_node = (git_url, branch)
+            self._graph.add_node(root_node)
             self._repo_branch.setdefault(git_url, [])
             self._repo_branch.get(git_url).append(branch)
+            self._roots.add(root_node)
 
     def _add_nodes(
         self, dep1: Union[DockerImage, Tuple[str, str, str]], dep2: DockerImage
