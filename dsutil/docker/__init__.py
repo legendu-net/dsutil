@@ -84,8 +84,6 @@ def remove(aggressive: bool = False, choice: str = "") -> None:
             lambda frame: frame.query("tag == 'next'") if frame.shape[0] > 1 else None
         )
         _remove_images(imgs, choice=choice)
-    sp.run("docker ps", shell=True, check=True)
-    sp.run("docker images", shell=True, check=True)
 
 
 def remove_containers(
@@ -124,7 +122,6 @@ def remove_containers(
                 )
                 if choice_i == "y":
                     client.containers.remove(row.container_id)
-    sp.run("docker ps", shell=True, check=True)
 
 
 def pull():
@@ -162,7 +159,6 @@ def remove_images(
         _remove_images(imgs[imgs.tag.str.contains(tag, case=False)], choice=choice)
     if frame is not None:
         _remove_images(frame, choice=choice)
-    sp.run("docker images", shell=True, check=True)
 
 
 def _remove_images(imgs, choice: str = ""):
