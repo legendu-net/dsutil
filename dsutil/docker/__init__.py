@@ -96,9 +96,9 @@ def remove_containers(
     """
     client = docker.from_env()
     if id_:
-        client.remove_container(id_)
+        client.containers.remove(id_)
     if name:
-        client.remove_container(name)
+        client.containers.remove(name)
     if status:
         conts = containers()
         conts = conts[conts.status.str.contains(status, case=False)]
@@ -113,13 +113,13 @@ def remove_containers(
             )
         for row in conts.itertuples():
             if choice == "y":
-                client.remove_container(row.container_id)
+                client.containers.remove(row.container_id)
             elif choice == "i":
                 choice_i = input(
                     f"Do you want to remove the container '{row.names}'? (y/N): "
                 )
                 if choice_i == "y":
-                    client.remove_container(row.container_id)
+                    client.containers.remove(row.container_id)
     sp.run("docker ps", shell=True, check=True)
 
 
