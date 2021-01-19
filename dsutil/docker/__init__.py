@@ -12,7 +12,10 @@ def _get_image_repo(image):
     repo_digests = image.attrs["RepoDigests"]
     if repo_digests:
         return repo_digests[0].split("@", maxsplit=1)[0]
-    return image.attrs["RepoTags"][0].split(":", maxsplit=1)[0]
+    repo_tags = image.attrs["RepoTags"]
+    if repo_tags:
+        return repo_tags[0].split(":", maxsplit=1)[0]
+    return ""
 
 
 def images() -> pd.DataFrame:
@@ -39,7 +42,7 @@ def images() -> pd.DataFrame:
             data.append(
                 {
                     "repository": repository,
-                    "tag": None,
+                    "tag": "",
                     "image_id": image_id,
                     "created": created,
                     "size": size
