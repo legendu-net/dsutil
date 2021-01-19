@@ -489,7 +489,7 @@ class DockerImageBuilder:
         name, tag, time, type_ = image.build(
             tag_build=tag_build, copy_ssh_to=copy_ssh_to
         )
-        for br in self._graph.nodes[node]["identical_branches"]:
+        for br in self._graph.nodes[node].get("identical_branches", set()):
             if br == branch:
                 continue
             # create new tags on the built images corresponding to other branches
