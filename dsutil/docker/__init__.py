@@ -55,18 +55,22 @@ def containers() -> pd.DataFrame:
     """Return Docker containers as a pandas DataFrame.
     """
     data = [
-        {
-            "container_id": cont.short_id,
-            "container_obj": cont,
-            "image": cont.image.tags[0] if cont.image.tags else cont.image.short_id[7:],
-            "command": cont.attrs["Config"]["Cmd"],
-            "created": cont.attrs["Created"],
-            "status": cont.status,
-            "ports": cont.ports,
-            "name": cont.name,
-        } for cont in docker.from_env().containers.list(all=True)
+        (
+            cont.short_id,
+            cont,
+            cont.image.tags[0] if cont.image.tags else cont.image.short_id[7:],
+            cont.attrs["Config"]["Cmd"],
+            cont.attrs["Created"],
+            cont.status,
+            cont.ports,
+            cont.name,
+        ) for cont in docker.from_env().containers.list(all=True)
     ]
-    return pd.DataFrame(data)
+    columns = [
+        "container_id", "container_obj", "image", "command", "created", "status",
+        "ports", "name"
+    ]
+    return pd.DataFrame(data, columns=columns)
 
 
 def remove(aggressive: bool = False, choice: str = "") -> None:
@@ -150,7 +154,9 @@ def remove_images(
         _remove_images(imgs[imgs.image_id.str.contains(id_, case=False)], choice=choice)
     if name:
         imgs = images()
-        _remove_images(imgs[imgs.repository.str.contains(name, case=False)], choice=choice)
+        _remove_images(
+            imgs[imgs.repository.str.contains(name, case=False)], choice=choice
+        )
     if tag:
         imgs = images()
         _remove_images(imgs[imgs.tag.str.contains(tag, case=False)], choice=choice)
