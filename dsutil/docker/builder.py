@@ -129,7 +129,7 @@ class DockerImage:
             self._repo_path[self.git_url] = self.path
         for ref in repo.refs:
             if ref.name.endswith("/" + self.branch):
-                repo.git.checkout(self.branch)
+                repo.git.checkout(self.branch, force=True)
                 break
         else:
             repo.git.checkout(self.branch_fallback)
