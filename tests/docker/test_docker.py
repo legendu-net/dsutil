@@ -42,4 +42,4 @@ def test_DockerImageBuilder():
         ]
     }
     builder = dsutil.docker.DockerImageBuilder(branch_urls)
-    builder.build(tag_build="unittest")
+    builder.build_images(tag_build="unittest")
