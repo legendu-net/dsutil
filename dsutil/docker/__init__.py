@@ -72,7 +72,7 @@ def containers() -> pd.DataFrame:
 def remove(aggressive: bool = False, choice: str = "") -> None:
     """Remove exited Docker containers and images without tags.
     """
-    remove_containers(status="^Exited|^Created", choice=choice)
+    remove_containers(status="^exited|^created", choice=choice)
     remove_images(tag="none", choice=choice)
     if aggressive:
         remove_images(tag="[a-z]*_?[0-9]{4}", choice=choice)
@@ -101,7 +101,7 @@ def remove_containers(
         client.remove_container(name)
     if status:
         conts = containers()
-        conts = conts[conts.status.str.contains(status)]
+        conts = conts[conts.status.str.contains(status, case=False)]
         if conts.empty:
             return
         print("\n", conts, "\n")
@@ -147,13 +147,13 @@ def remove_images(
     """
     if id_:
         imgs = images()
-        _remove_images(imgs[imgs.image_id.str.contains(id_)], choice=choice)
+        _remove_images(imgs[imgs.image_id.str.contains(id_, case=False)], choice=choice)
     if name:
         imgs = images()
-        _remove_images(imgs[imgs.repository.str.contains(name)], choice=choice)
+        _remove_images(imgs[imgs.repository.str.contains(name, case=False)], choice=choice)
     if tag:
         imgs = images()
-        _remove_images(imgs[imgs.tag.str.contains(tag)], choice=choice)
+        _remove_images(imgs[imgs.tag.str.contains(tag, case=False)], choice=choice)
     if frame is not None:
         _remove_images(frame, choice=choice)
     sp.run("docker images", shell=True, check=True)
@@ -199,7 +199,7 @@ def stop(id_: str = "", name: str = "", status: str = "", choice: str = "") -> N
         client.stop(name)
     if status:
         conts = containers()
-        conts = conts[conts.status.str.contains(status)]
+        conts = conts[conts.status.str.contains(status, case=False)]
         if conts.empty:
             return
         print("\n", conts, "\n")
