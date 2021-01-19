@@ -76,7 +76,7 @@ def containers() -> pd.DataFrame:
 def remove(aggressive: bool = False, choice: str = "") -> None:
     """Remove exited Docker containers and images without tags.
     """
-    remove_containers(status="^exited|^created", choice=choice)
+    docker.from_env().containers.prune()
     remove_images(tag="none", choice=choice)
     if aggressive:
         remove_images(tag="[a-z]*_?[0-9]{4}", choice=choice)
@@ -84,44 +84,6 @@ def remove(aggressive: bool = False, choice: str = "") -> None:
             lambda frame: frame.query("tag == 'next'") if frame.shape[0] > 1 else None
         )
         _remove_images(imgs, choice=choice)
-
-
-def remove_containers(
-    id_: str = "", name: str = "", status: str = "", choice: str = ""
-) -> None:
-    """Remove the specified Docker containers.
-    :param id_: The id of the container to remove.
-    :param name: A (regex) pattern of names of containers to remove.
-    :param status: Filter containers with the specified status.
-    :param choice: One of "y" (auto yes), "n" (auto no) 
-        or "i" (interactive, i.e., ask for confirmation on each case).
-    """
-    client = docker.from_env()
-    if id_:
-        client.containers.remove(id_)
-    if name:
-        client.containers.remove(name)
-    if status:
-        conts = containers()
-        conts = conts[conts.status.str.contains(status, case=False)]
-        if conts.empty:
-            return
-        print("\n", conts, "\n")
-        sys.stdout.flush()
-        sys.stderr.flush()
-        if not choice:
-            choice = input(
-                "Do you want to remove the above containers? (y - Yes, n - [No], i - interactive): "
-            )
-        for row in conts.itertuples():
-            if choice == "y":
-                client.containers.remove(row.container_id)
-            elif choice == "i":
-                choice_i = input(
-                    f"Do you want to remove the container '{row.names}'? (y/N): "
-                )
-                if choice_i == "y":
-                    client.containers.remove(row.container_id)
 
 
 def pull():
