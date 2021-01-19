@@ -73,6 +73,14 @@ def _ignore_socket(dir_, files):
     return [file for file in files if (dir_ / file).is_socket()]
 
 
+def branch_to_tag(branch: str):
+    if branch in ("master", "main"):
+        return "latest"
+    if self.branch == "dev":
+        return "next"
+    return branch
+
+
 class DockerImage:
     """Class representing a Docker Image.
     """
@@ -98,7 +106,6 @@ class DockerImage:
         self.name = ""
         self.base_image = ""
         self.git_url_base = ""
-        self.is_root = False
         self.tag_build = None
 
     def clone_repo(self) -> None:
@@ -157,18 +164,16 @@ class DockerImage:
         deps = deque([self])
         obj = self
         while (obj.git_url_base, obj.branch) not in repo_branch:
-            if obj.git_url_base:
-                obj = DockerImage(
-                    git_url=obj.git_url_base,
-                    branch=obj.branch,
-                    branch_fallback=self.branch_fallback,
-                    repo_path=self._repo_path
-                )
-                obj.clone_repo()
-                deps.appendleft(obj)
-            else:
-                deps[0].is_root = True
+            if not obj.git_url_base:
                 break
+            obj = DockerImage(
+                git_url=obj.git_url_base,
+                branch=obj.branch,
+                branch_fallback=self.branch_fallback,
+                repo_path=self._repo_path
+            )
+            obj.clone_repo()
+            deps.appendleft(obj)
         return deps
 
     def _copy_ssh(self, copy_ssh_to: str):
@@ -185,13 +190,9 @@ class DockerImage:
             shutil.copytree(ssh_src, ssh_dst, ignore=_ignore_socket)
             logger.info("~/.ssh has been copied to {}", ssh_dst)
 
-    def build(
-        self,
-        tag_build: str = None,
-        tag_base: str = "",
-        no_cache: bool = False,
-        copy_ssh_to: str = ""
-    ) -> Tuple[str, str, float, str]:
+    def build(self,
+              tag_build: str = None,
+              copy_ssh_to: str = "") -> Tuple[str, str, float, str]:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
@@ -200,35 +201,24 @@ class DockerImage:
             otherwise the next tag is used.
             If an empty string is specifed for tag_build,
             it is also treated as the latest tag.
-        :param tag_base: The tag of the base image to use.
-            If emtpy (default),
-            then the tag of the base image is as specified in the Dockerfile.
-        :param no_cache: If True, no cache is used when building the Docker image;
-            otherwise, cache is used.
         :param copy_ssh_to: If True, SSH keys are copied into a directory named ssh
             under the current local Git repository. 
-        :return: A tuple of the format (image_name_built, time_taken).
+        :return: A tuple of the format (image_name_built, tag_built, time_taken, "build").
         """
         start = time.perf_counter_ns()
         self.clone_repo()
         self._copy_ssh(copy_ssh_to)
         if tag_build is None:
-            if self.branch in ("master", "main"):
-                tag_build = "latest"
-            elif self.branch == "dev":
-                tag_build = "next"
-            else:
-                tag_build = self.branch
+            tag_build = branch_to_tag(self.branch)
         elif tag_build == "":
             tag_build = "latest"
-        if self.is_root:
+        if not self.git_url_base:  # self is a root image
             _retry_docker(lambda: _pull_image_timing(*self.base_image.split(":")))
         logger.info("Building the Docker image {}...", self.name)
-        self._update_base_tag(tag_build, tag_base)
+        self._update_base_tag(tag_build)
         docker.from_env().images.build(
             path=str(self.path),
             tag=f"{self.name}:{tag_build}",
-            nocache=no_cache,
             rm=True,
             pull=False,
             cache_from=None
@@ -245,16 +235,15 @@ class DockerImage:
             except FileNotFoundError:
                 pass
 
-    def _update_base_tag(self, tag_build: str, tag_base: str) -> None:
-        tag = tag_base if self.is_root else tag_build
-        if not tag:
+    def _update_base_tag(self, tag_build: str) -> None:
+        if not self.git_url_base:  # self is a root image
             return
         dockerfile = self.path / DockerImage.DOCKERFILE
         with dockerfile.open() as fin:
             lines = fin.readlines()
         for idx, line in enumerate(lines):
             if line.startswith("FROM "):
-                lines[idx] = line[:line.rfind(":")] + f":{tag}\n"
+                lines[idx] = line[:line.rfind(":")] + f":{tag_build}\n"
                 break
         with dockerfile.open("w") as fout:
             fout.writelines(lines)
@@ -325,7 +314,7 @@ class DockerImageBuilder:
                     deps[0]
                 )
             else:
-                self._add_root_node(deps[0].git_url, deps[0].branch, deps[0].branch_fallback)
+                self._add_root_node(deps[0].git_url, deps[0].branch)
             for idx in range(1, len(deps)):
                 self._add_nodes(deps[idx - 1], deps[idx])
 
@@ -384,8 +373,8 @@ class DockerImageBuilder:
                 fallback_commit = ref.commit
         return fallback_commit
 
-    def _add_root_node(self, git_url, branch, branch_fallback):
-        inode = self._find_identical_node((git_url, branch, branch_fallback))
+    def _add_root_node(self, git_url, branch):
+        inode = self._find_identical_node((git_url, branch, self._branch_fallback))
         if inode is None:
             root_node = (git_url, branch)
             self._graph.add_node(root_node)
@@ -425,7 +414,9 @@ class DockerImageBuilder:
                 fout.write(str(edge) + "\n")
         with open("nodes.txt", "w") as fout:
             for node in self._graph.nodes:
-                identical_branches = self._graph.nodes[node].get("identical_branches", set())
+                identical_branches = self._graph.nodes[node].get(
+                    "identical_branches", set()
+                )
                 fout.write(f"{node}: {list(identical_branches)}\n")
         with open("branches.txt", "w") as fout:
             fout.write(json.dumps(self._repo_branch, indent=4))
@@ -451,30 +442,54 @@ class DockerImageBuilder:
         frames = [image.push(tag_tran_fun) for _, image in self.docker_images.items()]
         return pd.concat(frames)
 
-    def build(
+    def build_images(
         self,
         tag_build: str = None,
-        tag_base: str = "",
         copy_ssh_to: str = "",
         push: bool = True,
     ) -> pd.DataFrame:
         """Build all Docker images in self.docker_images in order.
 
         :param tag_build: The tag of built images.
-        :param tag_base: The tag to the root base image to use.
-        :param no_cache: A set of docker images to disable cache when building.
         :param copy_ssh_to: If True, SSH keys are copied into a directory named ssh
             under each of the local Git repositories. 
         :param push: If True, push the built Docker images to DockerHub.
         :return: A pandas DataFrame summarizing building information.
         """
         self._build_graph()
-        data = [
-            image.build(
-                tag_build=tag_build, tag_base=tag_base, copy_ssh_to=copy_ssh_to
-            ) for image in self.docker_images.values()
-        ]
-        frame = pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
-        if push:
-            frame = pd.concat([frame, self.push()])
-        return frame
+        data = []
+        for node in self._roots:
+            self._build_images_graph(
+                node=node, tag_build=tag_build, copy_ssh_to=copy_ssh_to, push=push
+            )
+        #frame = pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
+        #if push:
+        #    frame = pd.concat([frame, self.push()])
+        #return frame
+
+    def _build_images_graph(self, node, tag_build: str, copy_ssh_to: str, push: bool):
+        self._build_image_node(
+            node=node, tag_build=tag_build, copy_ssh_to=copy_ssh_to, push=push
+        )
+        children = self._graph.successors(node)
+        for child in children:
+            self._build_images_graph(
+                node=child, tag_build=tag_build, copy_ssh_to=copy_ssh_to, push=push
+            )
+
+    def _build_image_node(self, node, tag_build: str, copy_ssh_to: str, push: bool):
+        git_url, branch = node
+        image = DockerImage(
+            git_url=git_url,
+            branch=branch,
+            branch_fallback=self._branch_fallback,
+            repo_path=self._repo_path
+        )
+        name, tag, time, type_ = image.build(tag_build=tag_build, copy_ssh_to=copy_ssh_to)
+        for br in self._graph.nodes[node]["identical_branches"]:
+            if br == branch:
+                continue
+            # create new tags on the built images corresponding to other branches
+            docker.from_env().images.get(f"{name}:{tag}").tag(
+                name, branch_to_tag(br), force=True
+            )
