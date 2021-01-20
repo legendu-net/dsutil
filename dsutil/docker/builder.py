@@ -73,7 +73,12 @@ def _ignore_socket(dir_, files):
     return [file for file in files if (dir_ / file).is_socket()]
 
 
-def branch_to_tag(branch: str):
+def branch_to_tag(branch: str) -> str:
+    """Convert a branch to its corresponding Docker image tag.
+
+    :param branch: A branch name.
+    :return: The Docker image tag corresponding to the branch.
+    """
     if branch in ("master", "main"):
         return "latest"
     if branch == "dev":
@@ -408,6 +413,8 @@ class DockerImageBuilder:
             self._build_graph_branch(branch, urls)
 
     def save_graph(self) -> None:
+        """Save the underlying graph structure to files.
+        """
         #nx.write_yaml(self._graph, "graph.yaml")
         with open("edges.txt", "w") as fout:
             for edge in self._graph.edges:
