@@ -73,7 +73,12 @@ def _ignore_socket(dir_, files):
     return [file for file in files if (dir_ / file).is_socket()]
 
 
-def branch_to_tag(branch: str):
+def branch_to_tag(branch: str) -> str:
+    """Convert a branch to its corresponding Docker image tag.
+
+    :param branch: A branch name.
+    :return: The Docker image tag corresponding to the branch.
+    """
     if branch in ("master", "main"):
         return "latest"
     if branch == "dev":
@@ -408,6 +413,8 @@ class DockerImageBuilder:
             self._build_graph_branch(branch, urls)
 
     def save_graph(self) -> None:
+        """Save the underlying graph structure to files.
+        """
         #nx.write_yaml(self._graph, "graph.yaml")
         with open("edges.txt", "w") as fout:
             for edge in self._graph.edges:
@@ -431,18 +438,6 @@ class DockerImageBuilder:
     #    for server in servers:
     #        sp.run(f"docker login {server}", shell=True, check=True)
 
-    def push(self, tag_tran_fun: Callable = tag_date) -> pd.DataFrame:
-        """Push all Docker images in self.docker_images.
-
-        :param tag_tran_fun: A function takeing a tag as the parameter
-            and generating a new tag to tag Docker images before pushing.
-        :return: A pandas DataFrame summarizing pushing information.
-        """
-        #self._build_graph()
-        #frames = [image.push(tag_tran_fun) for _, image in self.docker_images.items()]
-        #return pd.concat(frames)
-        pass
-
     def build_images(
         self,
         tag_build: str = None,
@@ -461,24 +456,38 @@ class DockerImageBuilder:
         data = []
         for node in self._roots:
             self._build_images_graph(
-                node=node, tag_build=tag_build, copy_ssh_to=copy_ssh_to, push=push
+                node=node,
+                tag_build=tag_build,
+                copy_ssh_to=copy_ssh_to,
+                push=push,
+                data=data
             )
-        #frame = pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
-        #if push:
-        #    frame = pd.concat([frame, self.push()])
-        #return frame
+        frame = pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
+        return frame
 
-    def _build_images_graph(self, node, tag_build: str, copy_ssh_to: str, push: bool):
+    def _build_images_graph(
+        self, node, tag_build: str, copy_ssh_to: str, push: bool, data: List
+    ):
         self._build_image_node(
-            node=node, tag_build=tag_build, copy_ssh_to=copy_ssh_to, push=push
+            node=node,
+            tag_build=tag_build,
+            copy_ssh_to=copy_ssh_to,
+            push=push,
+            data=data
         )
         children = self._graph.successors(node)
         for child in children:
             self._build_images_graph(
-                node=child, tag_build=tag_build, copy_ssh_to=copy_ssh_to, push=push
+                node=child,
+                tag_build=tag_build,
+                copy_ssh_to=copy_ssh_to,
+                push=push,
+                data=data
             )
 
-    def _build_image_node(self, node, tag_build: str, copy_ssh_to: str, push: bool):
+    def _build_image_node(
+        self, node, tag_build: str, copy_ssh_to: str, push: bool, data: List
+    ):
         git_url, branch = node
         image = DockerImage(
             git_url=git_url,
@@ -489,10 +498,16 @@ class DockerImageBuilder:
         name, tag, time, type_ = image.build(
             tag_build=tag_build, copy_ssh_to=copy_ssh_to
         )
+        # record building/pushing info
+        data.append((name, tag, time, type_))
+        if push:
+            data.append(_retry_docker(lambda: _push_image_timing(name, tag)))
+        # create new tags on the built images corresponding to other branches
         for br in self._graph.nodes[node].get("identical_branches", set()):
             if br == branch:
                 continue
-            # create new tags on the built images corresponding to other branches
-            docker.from_env().images.get(f"{name}:{tag}").tag(
-                name, branch_to_tag(br), force=True
-            )
+            tag_new = branch_to_tag(br)  # pylint: disable=W0640
+            docker.from_env().images.get(f"{name}:{tag}").tag(name, tag_new, force=True)
+            # record building/pushing info
+            if push:
+                data.append(_retry_docker(lambda: _push_image_timing(name, tag_new)))

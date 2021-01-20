@@ -36,10 +36,6 @@ def test_copy_ssh():
 def test_DockerImageBuilder():
     if not shutil.which("docker"):
         return
-    branch_urls = {
-        "dev": [
-            "https://github.com/dclong/docker-python-portable.git",
-        ]
-    }
+    branch_urls = {"dev": ["https://github.com/dclong/docker-python-portable.git", ]}
     builder = dsutil.docker.DockerImageBuilder(branch_urls)
     builder.build_images(tag_build="unittest")
