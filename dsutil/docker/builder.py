@@ -438,18 +438,6 @@ class DockerImageBuilder:
     #    for server in servers:
     #        sp.run(f"docker login {server}", shell=True, check=True)
 
-    def push(self, tag_tran_fun: Callable = tag_date) -> pd.DataFrame:
-        """Push all Docker images in self.docker_images.
-
-        :param tag_tran_fun: A function takeing a tag as the parameter
-            and generating a new tag to tag Docker images before pushing.
-        :return: A pandas DataFrame summarizing pushing information.
-        """
-        #self._build_graph()
-        #frames = [image.push(tag_tran_fun) for _, image in self.docker_images.items()]
-        #return pd.concat(frames)
-        pass
-
     def build_images(
         self,
         tag_build: str = None,
