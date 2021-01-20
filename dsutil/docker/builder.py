@@ -506,8 +506,8 @@ class DockerImageBuilder:
         for br in self._graph.nodes[node].get("identical_branches", set()):
             if br == branch:
                 continue
-            tag_new = branch_to_tag(br)  # pylint: disable=W0640
+            tag_new = branch_to_tag(br)
             docker.from_env().images.get(f"{name}:{tag}").tag(name, tag_new, force=True)
             # record building/pushing info
             if push:
-                data.append(_retry_docker(lambda: _push_image_timing(name, tag_new)))
+                data.append(_retry_docker(lambda: _push_image_timing(name, tag_new)))  # pylint: disable=W0640
