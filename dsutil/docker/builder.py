@@ -490,7 +490,7 @@ class DockerImageBuilder:
         for br in self._graph.nodes[node].get("identical_branches", set()):
             if br == branch:
                 continue
-            tag_new = branch_to_tag(br)
+            tag_new = branch_to_tag(br)  # pylint: disable=W0640
             docker.from_env().images.get(f"{name}:{tag}").tag(
                 name, tag_new, force=True
             )
