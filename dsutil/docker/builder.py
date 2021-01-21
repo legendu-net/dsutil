@@ -290,6 +290,8 @@ class DockerImage:
 
 @dataclass
 class DockerImageLike:
+    """A class similar to DockerImage for simplifying code.
+    """
     git_url: str
     branch: str
     branch_fallback: str
@@ -381,15 +383,18 @@ class DockerImageBuilder:
                 return ref.commit
             if ref.name.endswith("/" + fallback):
                 fallback_commit = ref.commit
+        assert fallback_commit is not None
         return fallback_commit
 
     def _add_root_node(self, git_url, branch):
-        inode = self._find_identical_node((git_url, branch, self._branch_fallback))
+        inode = self._find_identical_node(
+            DockerImageLike(git_url, branch, self._branch_fallback)
+        )
         if inode is None:
             root_node = (git_url, branch)
             self._graph.add_node(root_node)
             self._repo_branch.setdefault(git_url, [])
-            self._repo_branch.get(git_url).append(branch)
+            self._repo_branch[git_url].append(branch)
             self._roots.add(root_node)
 
     def _add_nodes(
@@ -408,7 +413,7 @@ class DockerImageBuilder:
         if inode2 is None or next(self._graph.predecessors(inode2)) != inode1:
             self._graph.add_edge(inode1, (dep2.git_url, dep2.branch))
             self._repo_branch.setdefault(dep2.git_url, [])
-            self._repo_branch.get(dep2.git_url).append(dep2.branch)
+            self._repo_branch[dep2.git_url].append(dep2.branch)
 
     def _build_graph(self):
         if self._graph is not None:
