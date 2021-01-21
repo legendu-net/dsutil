@@ -323,8 +323,9 @@ class DockerImageBuilder:
             ).get_deps(self._graph.nodes)
             if deps[0].git_url_base:
                 self._add_nodes(
-                    DockerImageLike(deps[0].git_url_base, deps[0].branch, self._branch_fallback),
-                    deps[0]
+                    DockerImageLike(
+                        deps[0].git_url_base, deps[0].branch, self._branch_fallback
+                    ), deps[0]
                 )
             else:
                 self._add_root_node(deps[0].git_url, deps[0].branch)
@@ -344,7 +345,9 @@ class DockerImageBuilder:
             return None
         path = self._repo_path[dep.git_url]
         for br in branches:
-            if self._compare_git_branches(path, (br, dep.branch), ("", dep.branch_fallback)):
+            if self._compare_git_branches(
+                path, (br, dep.branch), ("", dep.branch_fallback)
+            ):
                 inode = (dep.git_url, br)
                 # add extra branch info into the node
                 attr = self._graph.nodes[inode]
