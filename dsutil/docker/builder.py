@@ -2,6 +2,7 @@
 """
 from __future__ import annotations
 from typing import Union, List, Sequence, Deque, Tuple, Dict, Callable
+from dataclasses import dataclass
 import json
 import tempfile
 from pathlib import Path
@@ -287,6 +288,13 @@ class DockerImage:
         return pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
 
 
+@dataclass
+class DockerImageLike:
+    git_url: str
+    branch: str
+    branch_fallback: str
+
+
 class DockerImageBuilder:
     """A class for build many Docker images at once.
     """
@@ -315,7 +323,7 @@ class DockerImageBuilder:
             ).get_deps(self._graph.nodes)
             if deps[0].git_url_base:
                 self._add_nodes(
-                    (deps[0].git_url_base, deps[0].branch, self._branch_fallback),
+                    DockerImageLike(deps[0].git_url_base, deps[0].branch, self._branch_fallback),
                     deps[0]
                 )
             else:
@@ -324,35 +332,29 @@ class DockerImageBuilder:
                 self._add_nodes(deps[idx - 1], deps[idx])
 
     def _find_identical_node(
-        self, dep: Union[DockerImage, Tuple[str, str, str]]
+        self, dep: Union[DockerImage, DockerImageLike]
     ) -> Union[Tuple[str, str], None]:
         """Find node in the graph which has identical branch as the specified dependency.
         Notice that a node in the graph is represented as (git_url, branch).
 
         :param dep: A dependency of the type DockerImage. 
         """
-        if isinstance(dep, tuple):
-            git_url, branch, branch_fallback = dep
-        else:
-            git_url = dep.git_url
-            branch = dep.branch
-            branch_fallback = dep.branch_fallback
-        branches = self._repo_branch.get(git_url, [])
+        branches = self._repo_branch.get(dep.git_url, [])
         if not branches:
             return None
-        path = self._repo_path[git_url]
+        path = self._repo_path[dep.git_url]
         for br in branches:
-            if self._compare_git_branches(path, (br, branch), ("", branch_fallback)):
-                inode = (git_url, br)
+            if self._compare_git_branches(path, (br, dep.branch), ("", dep.branch_fallback)):
+                inode = (dep.git_url, br)
                 # add extra branch info into the node
                 attr = self._graph.nodes[inode]
                 attr.setdefault("identical_branches", set())
-                attr.get("identical_branches").add(branch)
+                attr.get("identical_branches").add(dep.branch)
                 return inode
         return None
 
     def _compare_git_branches(
-        self, path: str, branches: Tuple[str, str], fallback: Tuple[str, str]
+        self, path: str, branches: Tuple[str, str], fallbacks: Tuple[str, str]
     ) -> bool:
         """Compare whether 2 branches of a repo are identical.
 
@@ -363,7 +365,7 @@ class DockerImageBuilder:
         """
         repo = Repo(path)
         b1, b2 = branches
-        f1, f2 = fallback
+        f1, f2 = fallbacks
         commit1 = self._get_branch_commit(repo, b1, f1)
         commit2 = self._get_branch_commit(repo, b2, f2)
         return not commit1.diff(commit2)
@@ -388,7 +390,7 @@ class DockerImageBuilder:
             self._roots.add(root_node)
 
     def _add_nodes(
-        self, dep1: Union[DockerImage, Tuple[str, str, str]], dep2: DockerImage
+        self, dep1: Union[DockerImage, DockerImageLike], dep2: DockerImage
     ) -> None:
         inode1 = self._find_identical_node(dep1)
         if inode1 is None:
