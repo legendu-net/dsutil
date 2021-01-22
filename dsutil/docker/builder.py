@@ -91,6 +91,15 @@ def branch_to_tag(branch: str) -> str:
     return branch
 
 
+@dataclass(frozen=True)
+class Node:
+    """A class similar to DockerImage for simplifying code.
+    """
+    git_url: str
+    branch: str
+    branch_fallback: str = ""
+
+
 class DockerImage:
     """Class representing a Docker Image.
     """
@@ -291,14 +300,11 @@ class DockerImage:
                 )
         return pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
 
+    def node(self):
+        return Node(self.git_url, self.branch, self.branch_fallback)
 
-@dataclass(frozen=True)
-class DockerImageLike:
-    """A class similar to DockerImage for simplifying code.
-    """
-    git_url: str
-    branch: str
-    branch_fallback: str = ""
+    def base_node(self):
+        return Node(self.git_url_base, self.branch, self.branch_fallback)
 
 
 class DockerImageBuilder:
@@ -328,19 +334,13 @@ class DockerImageBuilder:
                 repo_path=self._repo_path
             ).get_deps(self._graph.nodes)
             if deps[0].git_url_base:
-                self._add_nodes(
-                    DockerImageLike(
-                        deps[0].git_url_base, deps[0].branch, self._branch_fallback
-                    ), deps[0]
-                )
+                self._add_nodes(deps[0].base_node(), deps[0].node())
             else:
                 self._add_root_node(deps[0].git_url, deps[0].branch)
             for idx in range(1, len(deps)):
                 self._add_nodes(deps[idx - 1], deps[idx])
 
-    def _find_identical_node(
-        self, dep: Union[DockerImage, DockerImageLike]
-    ) -> Union[Tuple[str, str], None]:
+    def _find_identical_node(self, dep: Node) -> Union[Node, None]:
         """Find node in the graph which has identical branch as the specified dependency.
         Notice that a node in the graph is represented as (git_url, branch).
 
@@ -354,11 +354,11 @@ class DockerImageBuilder:
             if self._compare_git_branches(
                 path, (br, dep.branch), ("", dep.branch_fallback)
             ):
-                inode = (dep.git_url, br)
+                inode = Node(dep.git_url, br, self._branch_fallback)
                 # add extra branch info into the node
                 attr = self._graph.nodes[inode]
                 attr.setdefault("identical_branches", set())
-                attr.get("identical_branches").add(dep.branch)
+                attr["identical_branches"].add(dep.branch)
                 return inode
         return None
 
@@ -390,34 +390,29 @@ class DockerImageBuilder:
         assert fallback_commit is not None
         return fallback_commit
 
-    def _add_root_node(self, git_url, branch):
-        inode = self._find_identical_node(
-            DockerImageLike(git_url, branch, self._branch_fallback)
-        )
+    def _add_root_node(self, node):
+        inode = self._find_identical_node(node)
         if inode is None:
-            root_node = (git_url, branch)
-            self._graph.add_node(root_node)
-            self._repo_branch.setdefault(git_url, [])
-            self._repo_branch[git_url].append(branch)
-            self._roots.add(root_node)
+            self._graph.add_node(node)
+            self._repo_branch.setdefault(node.git_url, [])
+            self._repo_branch[git_url].append(node.branch)
+            self._roots.add(node)
 
-    def _add_nodes(
-        self, dep1: Union[DockerImage, DockerImageLike], dep2: DockerImage
-    ) -> None:
-        inode1 = self._find_identical_node(dep1)
+    def _add_nodes(self, node1: Node, node2: Node) -> None:
+        inode1 = self._find_identical_node(node1)
         if inode1 is None:
             raise LookupError(
-                f"The node {(dep1.git_url, dep1.branch)} which is expected in the graph is not found!"
+                f"{node1} is expected in the graph but not found!"
             )
-        inode2 = self._find_identical_node(dep2)
-        # In the following 2 situations we need to create a new node for dep2
+        inode2 = self._find_identical_node(node2)
+        # In the following 2 situations we need to create a new node for node2
         # 1. node2 does not have an identical node (inode2 is None)
         # 2. node2 has an identical node inode2 in the graph
         #     but inode2's parent is different from the parent of node2 (which is inode1)
         if inode2 is None or next(self._graph.predecessors(inode2)) != inode1:
-            self._graph.add_edge(inode1, (dep2.git_url, dep2.branch))
-            self._repo_branch.setdefault(dep2.git_url, [])
-            self._repo_branch[dep2.git_url].append(dep2.branch)
+            self._graph.add_edge(inode1, node2)
+            self._repo_branch.setdefault(node2.git_url, [])
+            self._repo_branch[node2.git_url].append(node2.branch)
 
     def _build_graph(self):
         if self._graph is not None:
