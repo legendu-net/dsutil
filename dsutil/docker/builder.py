@@ -37,8 +37,11 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     """
     client = docker.from_env()
     logger.info("Pushing Docker image {repo}:{tag} ...", repo, tag)
+    def _push():
+        for line in client.images.push(repo, tag):
+            print(line.decode())
     seconds = timeit.timeit(
-        lambda: client.images.push(repo, tag), timer=time.perf_counter_ns, number=1
+        _push(), timer=time.perf_counter_ns, number=1
     ) / 1E9
     return repo, tag, seconds, "push"
 
