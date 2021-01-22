@@ -340,9 +340,9 @@ class DockerImageBuilder:
             if deps[0].git_url_base:
                 self._add_nodes(deps[0].base_node(), deps[0].node())
             else:
-                self._add_root_node(deps[0].git_url, deps[0].branch)
+                self._add_root_node(deps[0].node())
             for idx in range(1, len(deps)):
-                self._add_nodes(deps[idx - 1], deps[idx])
+                self._add_nodes(deps[idx - 1].node(), deps[idx].node())
 
     def _find_identical_node(self, dep: Node) -> Union[Node, None]:
         """Find node in the graph which has identical branch as the specified dependency.
@@ -399,7 +399,7 @@ class DockerImageBuilder:
         if inode is None:
             self._graph.add_node(node)
             self._repo_branch.setdefault(node.git_url, [])
-            self._repo_branch[git_url].append(node.branch)
+            self._repo_branch[node.git_url].append(node.branch)
             self._roots.add(node)
 
     def _add_nodes(self, node1: Node, node2: Node) -> None:
@@ -511,10 +511,9 @@ class DockerImageBuilder:
         self, node, tag_build: str, copy_ssh_to: str, push: bool,
         data: List[Tuple[str, str, float, str]]
     ) -> List[Tuple[str, str, float, str]]:
-        git_url, branch = node
         image = DockerImage(
-            git_url=git_url,
-            branch=branch,
+            git_url=node.git_url,
+            branch=node.branch,
             branch_fallback=self._branch_fallback,
             repo_path=self._repo_path
         )
@@ -528,7 +527,7 @@ class DockerImageBuilder:
             res.append(_retry_docker(lambda: _push_image_timing(name, tag)))
         # create new tags on the built images corresponding to other branches
         for br in self._graph.nodes[node].get("identical_branches", set()):
-            if br == branch:
+            if br == node.branch:
                 continue
             tag_new = branch_to_tag(br)
             docker.from_env().images.get(f"{name}:{tag}").tag(name, tag_new, force=True)
