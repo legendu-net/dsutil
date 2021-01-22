@@ -1,4 +1,4 @@
-# [dsutill](https://github.com/dclong/dsutil): Data Science Utils
+# [dsutil](https://github.com/dclong/dsutil): Data Science Utils
 
 This is a Python pacakage that contains misc utils for Data Science.
 
