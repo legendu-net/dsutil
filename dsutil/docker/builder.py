@@ -292,13 +292,13 @@ class DockerImage:
         return pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
 
 
-@dataclass
+@dataclass(frozen=True)
 class DockerImageLike:
     """A class similar to DockerImage for simplifying code.
     """
     git_url: str
     branch: str
-    branch_fallback: str
+    branch_fallback: str = ""
 
 
 class DockerImageBuilder:
