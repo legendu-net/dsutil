@@ -37,12 +37,12 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     """
     client = docker.from_env()
     logger.info("Pushing Docker image {repo}:{tag} ...", repo, tag)
+
     def _push():
         for line in client.images.push(repo, tag):
             print(line.decode())
-    seconds = timeit.timeit(
-        _push(), timer=time.perf_counter_ns, number=1
-    ) / 1E9
+
+    seconds = timeit.timeit(_push(), timer=time.perf_counter_ns, number=1) / 1E9
     return repo, tag, seconds, "push"
 
 
@@ -482,7 +482,8 @@ class DockerImageBuilder:
         return frame
 
     def _build_images_graph(
-        self, node, tag_build: str, copy_ssh_to: str, push: bool, remove: bool, data: List
+        self, node, tag_build: str, copy_ssh_to: str, push: bool, remove: bool,
+        data: List
     ) -> None:
         res = self._build_image_node(
             node=node,
@@ -509,7 +510,8 @@ class DockerImageBuilder:
             client.images.remove(f"{image_name}:{tag}")
 
     def _build_image_node(
-        self, node, tag_build: str, copy_ssh_to: str, push: bool, data: List[Tuple[str, str, float, str]]
+        self, node, tag_build: str, copy_ssh_to: str, push: bool,
+        data: List[Tuple[str, str, float, str]]
     ) -> List[Tuple[str, str, float, str]]:
         git_url, branch = node
         image = DockerImage(
