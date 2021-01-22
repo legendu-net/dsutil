@@ -483,8 +483,8 @@ class DockerImageBuilder:
 
     def _build_images_graph(
         self, node, tag_build: str, copy_ssh_to: str, push: bool, remove: bool, data: List
-    ):
-        self._build_image_node(
+    ) -> None:
+        res = self._build_image_node(
             node=node,
             tag_build=tag_build,
             copy_ssh_to=copy_ssh_to,
@@ -504,18 +504,13 @@ class DockerImageBuilder:
         if not remove:
             return
         # remove images associate with node
-        logger.info("Removing Docker image {}:{} ...", name, tag)
-        client.images.remove(f"{name}:{tag}")
-        for br in self._graph.nodes[node].get("identical_branches", set()):
-            if br == branch:
-                continue
-            tag_new = branch_to_tag(br)
-            logger.info("Removing Docker image {}:{} ...", name, tag_new)
-            client.images.remove(f"{name}:{tag_new}")
+        for image_name, tag, _* in res:
+            logger.info("Removing Docker image {}:{} ...", image_name, tag)
+            client.images.remove(f"{image_name}:{tag}")
 
     def _build_image_node(
-        self, node, tag_build: str, copy_ssh_to: str, push: bool, data: List
-    ):
+        self, node, tag_build: str, copy_ssh_to: str, push: bool, data: List[Tuple[str, str, float, str]]
+    ) -> List[Tuple[str, str, float, str]]:
         git_url, branch = node
         image = DockerImage(
             git_url=git_url,
@@ -523,13 +518,14 @@ class DockerImageBuilder:
             branch_fallback=self._branch_fallback,
             repo_path=self._repo_path
         )
+        res = []
         name, tag, time, type_ = image.build(
             tag_build=tag_build, copy_ssh_to=copy_ssh_to
         )
         # record building/pushing info
-        data.append((name, tag, time, type_))
+        res.append((name, tag, time, type_))
         if push:
-            data.append(_retry_docker(lambda: _push_image_timing(name, tag)))
+            res.append(_retry_docker(lambda: _push_image_timing(name, tag)))
         # create new tags on the built images corresponding to other branches
         for br in self._graph.nodes[node].get("identical_branches", set()):
             if br == branch:
@@ -538,4 +534,6 @@ class DockerImageBuilder:
             docker.from_env().images.get(f"{name}:{tag}").tag(name, tag_new, force=True)
             # record building/pushing info
             if push:
-                data.append(_retry_docker(lambda: _push_image_timing(name, tag_new)))  # pylint: disable=W0640
+                res.append(_retry_docker(lambda: _push_image_timing(name, tag_new)))  # pylint: disable=W0640
+        data.extend(res)
+        return res
