@@ -419,10 +419,13 @@ class DockerImageBuilder:
         # 1. node2 does not have an identical node (inode2 is None)
         # 2. node2 has an identical node inode2 in the graph
         #     but inode2's parent is different from the parent of node2 (which is inode1)
-        if inode2 is None or next(self._graph.predecessors(inode2)) != inode1:
+        if inode2 is None:
             self._graph.add_edge(inode1, node2)
             self._repo_branch.setdefault(node2.git_url, [])
             self._repo_branch[node2.git_url].append(node2.branch)
+            return
+        if next(self._graph.predecessors(inode2)) != inode1:
+            self._graph.add_edge(inode1, node2)
 
     def _build_graph(self):
         if self._graph is not None:
