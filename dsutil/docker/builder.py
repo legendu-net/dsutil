@@ -36,6 +36,7 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     :return: The time (in seconds) used to push the Docker image.
     """
     client = docker.from_env()
+    logger.info("Pushing Docker image {repo}:{tag} ...", repo, tag)
     seconds = timeit.timeit(
         lambda: client.images.push(repo, tag), timer=time.perf_counter_ns, number=1
     ) / 1E9
