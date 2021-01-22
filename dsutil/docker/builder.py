@@ -457,6 +457,7 @@ class DockerImageBuilder:
         tag_build: str = None,
         copy_ssh_to: str = "",
         push: bool = True,
+        remove: bool = False,
     ) -> pd.DataFrame:
         """Build all Docker images in self.docker_images in order.
 
@@ -474,13 +475,14 @@ class DockerImageBuilder:
                 tag_build=tag_build,
                 copy_ssh_to=copy_ssh_to,
                 push=push,
+                remove=remove,
                 data=data
             )
         frame = pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
         return frame
 
     def _build_images_graph(
-        self, node, tag_build: str, copy_ssh_to: str, push: bool, data: List
+        self, node, tag_build: str, copy_ssh_to: str, push: bool, remove: bool, data: List
     ):
         self._build_image_node(
             node=node,
@@ -496,8 +498,20 @@ class DockerImageBuilder:
                 tag_build=tag_build,
                 copy_ssh_to=copy_ssh_to,
                 push=push,
+                remove=remove,
                 data=data
             )
+        if not remove:
+            return
+        # remove images associate with node
+        logger.info("Removing Docker image {}:{} ...", name, tag)
+        client.images.remove(f"{name}:{tag}")
+        for br in self._graph.nodes[node].get("identical_branches", set()):
+            if br == branch:
+                continue
+            tag_new = branch_to_tag(br)
+            logger.info("Removing Docker image {}:{} ...", name, tag_new)
+            client.images.remove(f"{name}:{tag_new}")
 
     def _build_image_node(
         self, node, tag_build: str, copy_ssh_to: str, push: bool, data: List
