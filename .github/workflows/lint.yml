@@ -23,7 +23,8 @@ jobs:
         pip3 install -U git+https://github.com/dclong/xinstall@main
         xinstall --sudo pt -ic
         ~/.poetry/bin/poetry env use python3
-        ~/.poetry/bin/poetry install
+        cat pyproject.toml
+        ~/.poetry/bin/poetry install -E cv
     - name: Lint with pylint
       run: |
         ~/.poetry/bin/poetry run pylint -E dsutil/
