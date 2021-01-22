@@ -36,9 +36,13 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     :return: The time (in seconds) used to push the Docker image.
     """
     client = docker.from_env()
-    seconds = timeit.timeit(
-        lambda: client.images.push(repo, tag), timer=time.perf_counter_ns, number=1
-    ) / 1E9
+    logger.info("Pushing Docker image {}:{} ...", repo, tag)
+
+    def _push():
+        for line in client.images.push(repo, tag):
+            print(line)
+
+    seconds = timeit.timeit(_push, timer=time.perf_counter_ns, number=1) / 1E9
     return repo, tag, seconds, "push"
 
 
@@ -85,6 +89,15 @@ def branch_to_tag(branch: str) -> str:
     if branch == "dev":
         return "next"
     return branch
+
+
+@dataclass(frozen=True)
+class Node:
+    """A class similar to DockerImage for simplifying code.
+    """
+    git_url: str
+    branch: str
+    branch_fallback: str = ""
 
 
 class DockerImage:
@@ -287,14 +300,15 @@ class DockerImage:
                 )
         return pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
 
+    def node(self):
+        """Convert this DockerImage to a Node.
+        """
+        return Node(self.git_url, self.branch, self.branch_fallback)
 
-@dataclass
-class DockerImageLike:
-    """A class similar to DockerImage for simplifying code.
-    """
-    git_url: str
-    branch: str
-    branch_fallback: str
+    def base_node(self):
+        """Convert the base image of this DockerImage to a Node.
+        """
+        return Node(self.git_url_base, self.branch, self.branch_fallback)
 
 
 class DockerImageBuilder:
@@ -324,37 +338,31 @@ class DockerImageBuilder:
                 repo_path=self._repo_path
             ).get_deps(self._graph.nodes)
             if deps[0].git_url_base:
-                self._add_nodes(
-                    DockerImageLike(
-                        deps[0].git_url_base, deps[0].branch, self._branch_fallback
-                    ), deps[0]
-                )
+                self._add_nodes(deps[0].base_node(), deps[0].node())
             else:
-                self._add_root_node(deps[0].git_url, deps[0].branch)
+                self._add_root_node(deps[0].node())
             for idx in range(1, len(deps)):
-                self._add_nodes(deps[idx - 1], deps[idx])
+                self._add_nodes(deps[idx - 1].node(), deps[idx].node())
 
-    def _find_identical_node(
-        self, dep: Union[DockerImage, DockerImageLike]
-    ) -> Union[Tuple[str, str], None]:
+    def _find_identical_node(self, node: Node) -> Union[Node, None]:
         """Find node in the graph which has identical branch as the specified dependency.
         Notice that a node in the graph is represented as (git_url, branch).
 
-        :param dep: A dependency of the type DockerImage. 
+        :param node: A dependency of the type DockerImage. 
         """
-        branches = self._repo_branch.get(dep.git_url, [])
+        branches = self._repo_branch.get(node.git_url, [])
         if not branches:
             return None
-        path = self._repo_path[dep.git_url]
+        path = self._repo_path[node.git_url]
         for br in branches:
             if self._compare_git_branches(
-                path, (br, dep.branch), ("", dep.branch_fallback)
+                path, (br, node.branch), ("", node.branch_fallback)
             ):
-                inode = (dep.git_url, br)
+                inode = Node(node.git_url, br, self._branch_fallback)
                 # add extra branch info into the node
                 attr = self._graph.nodes[inode]
                 attr.setdefault("identical_branches", set())
-                attr.get("identical_branches").add(dep.branch)
+                attr["identical_branches"].add(node.branch)
                 return inode
         return None
 
@@ -386,34 +394,27 @@ class DockerImageBuilder:
         assert fallback_commit is not None
         return fallback_commit
 
-    def _add_root_node(self, git_url, branch):
-        inode = self._find_identical_node(
-            DockerImageLike(git_url, branch, self._branch_fallback)
-        )
+    def _add_root_node(self, node):
+        inode = self._find_identical_node(node)
         if inode is None:
-            root_node = (git_url, branch)
-            self._graph.add_node(root_node)
-            self._repo_branch.setdefault(git_url, [])
-            self._repo_branch[git_url].append(branch)
-            self._roots.add(root_node)
+            self._graph.add_node(node)
+            self._repo_branch.setdefault(node.git_url, [])
+            self._repo_branch[node.git_url].append(node.branch)
+            self._roots.add(node)
 
-    def _add_nodes(
-        self, dep1: Union[DockerImage, DockerImageLike], dep2: DockerImage
-    ) -> None:
-        inode1 = self._find_identical_node(dep1)
+    def _add_nodes(self, node1: Node, node2: Node) -> None:
+        inode1 = self._find_identical_node(node1)
         if inode1 is None:
-            raise LookupError(
-                f"The node {(dep1.git_url, dep1.branch)} which is expected in the graph is not found!"
-            )
-        inode2 = self._find_identical_node(dep2)
-        # In the following 2 situations we need to create a new node for dep2
+            raise LookupError(f"{node1} is expected in the graph but not found!")
+        inode2 = self._find_identical_node(node2)
+        # In the following 2 situations we need to create a new node for node2
         # 1. node2 does not have an identical node (inode2 is None)
         # 2. node2 has an identical node inode2 in the graph
         #     but inode2's parent is different from the parent of node2 (which is inode1)
         if inode2 is None or next(self._graph.predecessors(inode2)) != inode1:
-            self._graph.add_edge(inode1, (dep2.git_url, dep2.branch))
-            self._repo_branch.setdefault(dep2.git_url, [])
-            self._repo_branch[dep2.git_url].append(dep2.branch)
+            self._graph.add_edge(inode1, node2)
+            self._repo_branch.setdefault(node2.git_url, [])
+            self._repo_branch[node2.git_url].append(node2.branch)
 
     def _build_graph(self):
         if self._graph is not None:
@@ -453,6 +454,7 @@ class DockerImageBuilder:
         tag_build: str = None,
         copy_ssh_to: str = "",
         push: bool = True,
+        remove: bool = False,
     ) -> pd.DataFrame:
         """Build all Docker images in self.docker_images in order.
 
@@ -470,15 +472,17 @@ class DockerImageBuilder:
                 tag_build=tag_build,
                 copy_ssh_to=copy_ssh_to,
                 push=push,
+                remove=remove,
                 data=data
             )
         frame = pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
         return frame
 
     def _build_images_graph(
-        self, node, tag_build: str, copy_ssh_to: str, push: bool, data: List
-    ):
-        self._build_image_node(
+        self, node, tag_build: str, copy_ssh_to: str, push: bool, remove: bool,
+        data: List
+    ) -> None:
+        res = self._build_image_node(
             node=node,
             tag_build=tag_build,
             copy_ssh_to=copy_ssh_to,
@@ -492,32 +496,43 @@ class DockerImageBuilder:
                 tag_build=tag_build,
                 copy_ssh_to=copy_ssh_to,
                 push=push,
+                remove=remove,
                 data=data
             )
+        if not remove:
+            return
+        # remove images associate with node
+        client = docker.from_env()
+        for image_name, tag, *_ in res:
+            logger.info("Removing Docker image {}:{} ...", image_name, tag)
+            client.images.remove(f"{image_name}:{tag}")
 
     def _build_image_node(
-        self, node, tag_build: str, copy_ssh_to: str, push: bool, data: List
-    ):
-        git_url, branch = node
+        self, node, tag_build: str, copy_ssh_to: str, push: bool,
+        data: List[Tuple[str, str, float, str]]
+    ) -> List[Tuple[str, str, float, str]]:
         image = DockerImage(
-            git_url=git_url,
-            branch=branch,
+            git_url=node.git_url,
+            branch=node.branch,
             branch_fallback=self._branch_fallback,
             repo_path=self._repo_path
         )
+        res = []
         name, tag, time, type_ = image.build(
             tag_build=tag_build, copy_ssh_to=copy_ssh_to
         )
         # record building/pushing info
-        data.append((name, tag, time, type_))
+        res.append((name, tag, time, type_))
         if push:
-            data.append(_retry_docker(lambda: _push_image_timing(name, tag)))
+            res.append(_retry_docker(lambda: _push_image_timing(name, tag)))
         # create new tags on the built images corresponding to other branches
         for br in self._graph.nodes[node].get("identical_branches", set()):
-            if br == branch:
+            if br == node.branch:
                 continue
             tag_new = branch_to_tag(br)
             docker.from_env().images.get(f"{name}:{tag}").tag(name, tag_new, force=True)
             # record building/pushing info
             if push:
-                data.append(_retry_docker(lambda: _push_image_timing(name, tag_new)))  # pylint: disable=W0640
+                res.append(_retry_docker(lambda: _push_image_timing(name, tag_new)))  # pylint: disable=W0640
+        data.extend(res)
+        return res
