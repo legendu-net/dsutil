@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dsutil"
-version = "0.50.0"
+version = "0.51.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
@@ -48,4 +48,4 @@ requires = ["poetry>=1.0.0"]
 build-backend = "poetry.masonry.api"
 
 [tool.poetry.extras]
-cv = [opencv-python = ">=4.0.0.0"]
+cv = ["opencv-python>=4.0.0.0"]
