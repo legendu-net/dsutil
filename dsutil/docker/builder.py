@@ -350,6 +350,7 @@ class DockerImageBuilder:
 
         :param node: A dependency of the type DockerImage. 
         """
+        logger.debug("Finding identical node of {} in the graph ...", node)
         branches = self._repo_branch.get(node.git_url, [])
         if not branches:
             return None
