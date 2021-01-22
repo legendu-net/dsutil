@@ -504,7 +504,7 @@ class DockerImageBuilder:
         if not remove:
             return
         # remove images associate with node
-        for image_name, tag, _* in res:
+        for image_name, tag, *_ in res:
             logger.info("Removing Docker image {}:{} ...", image_name, tag)
             client.images.remove(f"{image_name}:{tag}")
 
