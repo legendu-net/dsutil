@@ -301,9 +301,13 @@ class DockerImage:
         return pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
 
     def node(self):
+        """Convert this DockerImage to a Node.
+        """
         return Node(self.git_url, self.branch, self.branch_fallback)
 
     def base_node(self):
+        """Convert the base image of this DockerImage to a Node.
+        """
         return Node(self.git_url_base, self.branch, self.branch_fallback)
 
 
@@ -401,9 +405,7 @@ class DockerImageBuilder:
     def _add_nodes(self, node1: Node, node2: Node) -> None:
         inode1 = self._find_identical_node(node1)
         if inode1 is None:
-            raise LookupError(
-                f"{node1} is expected in the graph but not found!"
-            )
+            raise LookupError(f"{node1} is expected in the graph but not found!")
         inode2 = self._find_identical_node(node2)
         # In the following 2 situations we need to create a new node for node2
         # 1. node2 does not have an identical node (inode2 is None)
