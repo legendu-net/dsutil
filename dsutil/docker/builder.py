@@ -401,6 +401,7 @@ class DockerImageBuilder:
         return fallback_commit
 
     def _add_root_node(self, node):
+        logger.debug("Adding root node {} into the graph ...", node)
         inode = self._find_identical_node(node)
         if inode is None:
             self._graph.add_node(node)
@@ -409,6 +410,7 @@ class DockerImageBuilder:
             self._roots.add(node)
 
     def _add_nodes(self, node1: Node, node2: Node) -> None:
+        logger.debug("Adding nodes ({}, {}) into the graph ...", node1, node2)
         inode1 = self._find_identical_node(node1)
         if inode1 is None:
             raise LookupError(f"{node1} is expected in the graph but not found!")
