@@ -523,16 +523,15 @@ class DockerImageBuilder:
         )
         # record building/pushing info
         res.append((name, tag, time, type_))
-        if push:
-            res.append(_retry_docker(lambda: _push_image_timing(name, tag)))
         # create new tags on the built images corresponding to other branches
         for br in self._graph.nodes[node].get("identical_branches", set()):
             if br == node.branch:
                 continue
             tag_new = branch_to_tag(br)
             docker.from_env().images.get(f"{name}:{tag}").tag(name, tag_new, force=True)
-            # record building/pushing info
-            if push:
-                res.append(_retry_docker(lambda: _push_image_timing(name, tag_new)))  # pylint: disable=W0640
+            res.append((name, tag_new, 0, "build"))
+        if push:
+            for name, tag, *_ in res.copy():
+                res.append(_retry_docker(lambda: _push_image_timing(name, tag)))  # pylint: disable=W0640
         data.extend(res)
         return res
