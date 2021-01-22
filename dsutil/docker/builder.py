@@ -344,25 +344,25 @@ class DockerImageBuilder:
             for idx in range(1, len(deps)):
                 self._add_nodes(deps[idx - 1].node(), deps[idx].node())
 
-    def _find_identical_node(self, dep: Node) -> Union[Node, None]:
+    def _find_identical_node(self, node: Node) -> Union[Node, None]:
         """Find node in the graph which has identical branch as the specified dependency.
         Notice that a node in the graph is represented as (git_url, branch).
 
-        :param dep: A dependency of the type DockerImage. 
+        :param node: A dependency of the type DockerImage. 
         """
-        branches = self._repo_branch.get(dep.git_url, [])
+        branches = self._repo_branch.get(node.git_url, [])
         if not branches:
             return None
-        path = self._repo_path[dep.git_url]
+        path = self._repo_path[node.git_url]
         for br in branches:
             if self._compare_git_branches(
-                path, (br, dep.branch), ("", dep.branch_fallback)
+                path, (br, node.branch), ("", node.branch_fallback)
             ):
-                inode = Node(dep.git_url, br, self._branch_fallback)
+                inode = Node(node.git_url, br, self._branch_fallback)
                 # add extra branch info into the node
                 attr = self._graph.nodes[inode]
                 attr.setdefault("identical_branches", set())
-                attr["identical_branches"].add(dep.branch)
+                attr["identical_branches"].add(node.branch)
                 return inode
         return None
 
