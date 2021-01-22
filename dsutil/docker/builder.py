@@ -40,7 +40,8 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
 
     def _push():
         for line in client.images.push(repo, tag):
-            print(line.decode())
+            print(type(line))
+            print(line)
 
     seconds = timeit.timeit(_push, timer=time.perf_counter_ns, number=1) / 1E9
     return repo, tag, seconds, "push"
