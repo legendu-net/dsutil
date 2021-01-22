@@ -352,6 +352,7 @@ class DockerImageBuilder:
         """
         logger.debug("Finding identical node of {} in the graph ...", node)
         branches = self._repo_branch.get(node.git_url, [])
+        logger.debug("Processed branches of the local repo {}: {}", node.git_url, branches)
         if not branches:
             return None
         path = self._repo_path[node.git_url]
