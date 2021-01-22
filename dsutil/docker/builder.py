@@ -379,6 +379,7 @@ class DockerImageBuilder:
         repo = Repo(path)
         b1, b2 = branches
         f1, f2 = fallbacks
+        logger.debug("Comparing branches {} (fallback to {}) and {} (fallback to {}) of the local repo {}", b1, f1, b2, f2, path)
         commit1 = self._get_branch_commit(repo, b1, f1)
         commit2 = self._get_branch_commit(repo, b2, f2)
         return not commit1.diff(commit2)
