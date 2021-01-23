@@ -128,6 +128,11 @@ class DockerImage:
         self._git_url_base = ""
         self._tag_build = None
 
+    def is_root(self) -> bool:
+        """Check whether this DockerImage is a root DockerImage.
+        """
+        return not self._git_url_base
+
     def clone_repo(self) -> None:
         """Clone the Git repository to a local directory.
 
@@ -316,10 +321,10 @@ class DockerImageBuilder:
                 branch_fallback=self._branch_fallback,
                 repo_path=self._repo_path
             ).get_deps(self._graph.nodes)
-            if deps[0].git_url_base:
-                self._add_nodes(deps[0].base_node(), deps[0].node())
-            else:
+            if deps[0].is_root():
                 self._add_root_node(deps[0].node())
+            else:
+                self._add_nodes(deps[0].base_node(), deps[0].node())
             for idx in range(1, len(deps)):
                 self._add_nodes(deps[idx - 1].node(), deps[idx].node())
 
