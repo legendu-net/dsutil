@@ -326,11 +326,13 @@ class DockerImageBuilder:
                 repo_path=self._repo_path
             ).get_deps(self._graph.nodes)
             if deps[0].is_root():
-                self._add_root_node(deps[0].node())
+                node_prev = self._add_root_node(deps[0].node())
             else:
-                self._add_edge(deps[0].base_node(), deps[0].node())
-            for idx in range(1, len(deps)):
-                self._add_edge(deps[idx - 1].node(), deps[idx].node())
+                node_prev = self._find_identical_node(deps[0].base_node())
+                assert node_prev in self._graph.nodes
+                self._add_edge(node_prev, deps[0].node())
+            for dep in deps[1:]:
+                node_prev = self._add_edge(node_prev, dep.node())
 
     def _find_identical_node(self, node: Node) -> Union[Node, None]:
         """Find node in the graph which has identical branch as the specified dependency.
@@ -375,7 +377,7 @@ class DockerImageBuilder:
                 return ref.commit
         raise LookupError(f"Branch {branch} is not found in the local repo {repo}!")
 
-    def _add_root_node(self, node):
+    def _add_root_node(self, node) -> Node:
         logger.debug("Adding root node {} into the graph ...", node)
         inode = self._find_identical_node(node)
         if inode is None:
@@ -383,29 +385,28 @@ class DockerImageBuilder:
             self._repo_nodes.setdefault(node.git_url, [])
             self._repo_nodes[node.git_url].append(node)
             self._roots.add(node)
-            return
+            return node
         self._add_identical_branch(inode, node.branch_effective)
+        return inode
 
-    def _add_edge(self, node1: Node, node2: Node) -> None:
+    def _add_edge(self, node1: Node, node2: Node) -> Node:
         logger.debug("Adding edge {} -> {} into the graph ...", node1, node2)
-        inode1 = self._find_identical_node(node1)
-        if inode1 is None:
-            raise LookupError(f"{node1} is expected in the graph but not found!")
         inode2 = self._find_identical_node(node2)
         # In the following 2 situations we need to create a new node for node2
         # 1. node2 does not have an identical node (inode2 is None)
         # 2. node2 has an identical node inode2 in the graph
         #     but inode2's parent is different from the parent of node2 (which is inode1)
         if inode2 is None:
-            self._graph.add_edge(inode1, node2)
+            self._graph.add_edge(node1, node2)
             self._repo_nodes.setdefault(node2.git_url, [])
             self._repo_nodes[node2.git_url].append(node2)
-            return
-        if next(self._graph.predecessors(inode2)) != inode1:
-            self._graph.add_edge(inode1, node2)
-            return
+            return node2
+        if next(self._graph.predecessors(inode2)) != node1:
+            self._graph.add_edge(node1, node2)
+            return node2
         # reuse inode2
         self._add_identical_branch(inode2, node2.branch_effective)
+        return inode2
 
     def _add_identical_branch(self, node: Node, branch: str):
         attr = self._graph.nodes[node]
