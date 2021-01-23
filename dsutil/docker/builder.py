@@ -99,6 +99,10 @@ class Node:
     branch: str
     branch_effective: str
 
+    def __str__(self):
+        index = self.git_url.rindex("/")
+        index = self.git_url.rindex("/", 0, index)
+        return self.git_url[(index + 1):] + f"[{self.branch}|{self.branch_effective}]"
 
 class DockerImage:
     """Class representing a Docker Image.
@@ -309,6 +313,7 @@ class DockerImageBuilder:
         self._branch_urls = branch_urls
         self._branch_fallback = branch_fallback
         self._graph = None
+        # TODO: rename it
         self._repo_branch: Dict[str, List[Node]] = {}
         self._repo_path = {}
         self._roots = set()
