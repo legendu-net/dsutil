@@ -170,7 +170,7 @@ class DockerImage:
                     logger.info("This image name: {}", self._name)
                 elif line.startswith("FROM "):
                     self._base_image = line[5:].strip()
-                    logger.info("Base image name: {}", self.base_image)
+                    logger.info("Base image name: {}", self._base_image)
                 elif line.startswith("# GIT:"):
                     self._git_url_base = line[6:].strip()
                     logger.info("Base image URL: {}", self._git_url_base)
@@ -309,7 +309,7 @@ class DockerImageBuilder:
         self._branch_urls = branch_urls
         self._branch_fallback = branch_fallback
         self._graph = None
-        self._repo_branch = {}
+        self._repo_branch: Dict[str, List[Node]] = {}
         self._repo_path = {}
         self._roots = set()
 
@@ -335,16 +335,16 @@ class DockerImageBuilder:
         :param node: A dependency of the type DockerImage. 
         """
         logger.debug("Finding identical node of {} in the graph ...", node)
-        branches = self._repo_branch.get(node.git_url, [])
+        nodes: List[Node] = self._repo_branch.get(node.git_url, [])
         logger.debug(
-            "Processed branches of the local repo {}: {}", node.git_url, branches
+            "Nodes associated with the repo {}: {}", node.git_url, nodes
         )
-        if not branches:
+        if not nodes:
             return None
         path = self._repo_path[node.git_url]
-        for br in branches:
-            if self._compare_git_branches(path, br, node.branch_effective):
-                return Node(git_url=node.git_url, branch=br, branch_effective=br)
+        for n in nodes:
+            if self._compare_git_branches(path, n.branch_effective, node.branch_effective):
+                return n
         return None
 
     def _compare_git_branches(self, path: str, b1: str, b2: str) -> bool:
@@ -376,7 +376,7 @@ class DockerImageBuilder:
         if inode is None:
             self._graph.add_node(node)
             self._repo_branch.setdefault(node.git_url, [])
-            self._repo_branch[node.git_url].append(node.branch_effective)
+            self._repo_branch[node.git_url].append(node)
             self._roots.add(node)
             return
         self._add_identical_branch(inode, node.branch_effective)
@@ -394,7 +394,7 @@ class DockerImageBuilder:
         if inode2 is None:
             self._graph.add_edge(inode1, node2)
             self._repo_branch.setdefault(node2.git_url, [])
-            self._repo_branch[node2.git_url].append(node2.branch_effective)
+            self._repo_branch[node2.git_url].append(node2)
             return
         if next(self._graph.predecessors(inode2)) != inode1:
             self._graph.add_edge(inode1, node2)
