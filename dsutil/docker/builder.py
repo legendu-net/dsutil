@@ -250,7 +250,7 @@ class DockerImage:
             tag_build = "latest"
         if not self._git_url_base:  # self is a root image
             _retry_docker(lambda: _pull_image_timing(*self._base_image.split(":")))
-        logger.info("Building the Docker image {}...", self._name)
+        logger.info("Building the Docker image {}:{} ...", self._name, tag_build)
         self._update_base_tag(tag_build)
         docker.from_env().images.build(
             path=str(self._path),
