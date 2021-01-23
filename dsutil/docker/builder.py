@@ -437,7 +437,7 @@ class DockerImageBuilder:
             # repos
             fout.write("repos:\n")
             for git_url, nodes in self._repo_nodes.items():
-                fout.write(f"  {gir_url}:\n")
+                fout.write(f"  {git_url}:\n")
                 for node in nodes:
                     fout.write(f"    - {node}\n")
 
