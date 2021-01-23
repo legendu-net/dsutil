@@ -103,6 +103,7 @@ class Node:
         index = self.git_url.rindex("/", 0, index)
         return self.git_url[(index + 1):] + f"[{self.branch}|{self.branch_effective}]"
 
+
 class DockerImage:
     """Class representing a Docker Image.
     """
