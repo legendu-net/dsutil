@@ -3,7 +3,6 @@
 from __future__ import annotations
 from typing import Union, List, Sequence, Deque, Tuple, Dict, Callable
 from dataclasses import dataclass
-import json
 import tempfile
 from pathlib import Path
 import time
@@ -313,8 +312,7 @@ class DockerImageBuilder:
         self._branch_urls = branch_urls
         self._branch_fallback = branch_fallback
         self._graph = None
-        # TODO: rename it
-        self._repo_branch: Dict[str, List[Node]] = {}
+        self._repo_nodes: Dict[str, List[Node]] = {}
         self._repo_path = {}
         self._roots = set()
 
@@ -340,7 +338,7 @@ class DockerImageBuilder:
         :param node: A dependency of the type DockerImage. 
         """
         logger.debug("Finding identical node of {} in the graph ...", node)
-        nodes: List[Node] = self._repo_branch.get(node.git_url, [])
+        nodes: List[Node] = self._repo_nodes.get(node.git_url, [])
         logger.debug("Nodes associated with the repo {}: {}", node.git_url, nodes)
         if not nodes:
             return None
@@ -380,8 +378,8 @@ class DockerImageBuilder:
         inode = self._find_identical_node(node)
         if inode is None:
             self._graph.add_node(node)
-            self._repo_branch.setdefault(node.git_url, [])
-            self._repo_branch[node.git_url].append(node)
+            self._repo_nodes.setdefault(node.git_url, [])
+            self._repo_nodes[node.git_url].append(node)
             self._roots.add(node)
             return
         self._add_identical_branch(inode, node.branch_effective)
@@ -398,8 +396,8 @@ class DockerImageBuilder:
         #     but inode2's parent is different from the parent of node2 (which is inode1)
         if inode2 is None:
             self._graph.add_edge(inode1, node2)
-            self._repo_branch.setdefault(node2.git_url, [])
-            self._repo_branch[node2.git_url].append(node2)
+            self._repo_nodes.setdefault(node2.git_url, [])
+            self._repo_nodes[node2.git_url].append(node2)
             return
         if next(self._graph.predecessors(inode2)) != inode1:
             self._graph.add_edge(inode1, node2)
@@ -433,7 +431,10 @@ class DockerImageBuilder:
                 )
                 fout.write(f"{node}: {list(identical_branches)}\n")
         with open("branches.txt", "w") as fout:
-            fout.write(json.dumps(self._repo_branch, indent=4))
+            for git_url, nodes in self._repo_nodes.items():
+                fout.write(git_url + ":\n")
+                for node in nodes:
+                    fout.write(f"  - {node}\n")
 
     #def _login_servers(self) -> None:
     #    servers = set()
