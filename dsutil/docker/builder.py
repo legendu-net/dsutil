@@ -101,7 +101,7 @@ class Node:
     def __str__(self):
         index = self.git_url.rindex("/")
         index = self.git_url.rindex("/", 0, index)
-        return self.git_url[(index + 1):] + f"[{self.branch}|{self.branch_effective}]"
+        return self.git_url[(index + 1):] + f"<{self.branch}|{self.branch_effective}>"
 
 
 class DockerImage:
@@ -419,24 +419,27 @@ class DockerImageBuilder:
         for branch, urls in self._branch_urls.items():
             self._build_graph_branch(branch, urls)
 
-    def save_graph(self) -> None:
+    def save_graph(self, output="graph.yaml") -> None:
         """Save the underlying graph structure to files.
         """
-        #nx.write_yaml(self._graph, "graph.yaml")
-        with open("edges.txt", "w") as fout:
-            for edge in self._graph.edges:
-                fout.write(str(edge) + "\n")
-        with open("nodes.txt", "w") as fout:
+        with open(output, "w") as fout:
+            # nodes and attributes
+            fout.write("nodes:\n")
             for node in self._graph.nodes:
                 identical_branches = self._graph.nodes[node].get(
                     "identical_branches", set()
                 )
-                fout.write(f"{node}: {list(identical_branches)}\n")
-        with open("branches.txt", "w") as fout:
+                fout.write(f"  {node}: {list(identical_branches)}\n")
+            # edges
+            fout.write("edges:\n")
+            for node1, node2 in self._graph.edges:
+                fout.write(f"  - {node1} -> {node2}\n")
+            # repos
+            fout.write("repos:\n")
             for git_url, nodes in self._repo_nodes.items():
-                fout.write(git_url + ":\n")
+                fout.write("  {gir_url}:\n")
                 for node in nodes:
-                    fout.write(f"  - {node}\n")
+                    fout.write(f"    - {node}\n")
 
     #def _login_servers(self) -> None:
     #    servers = set()
