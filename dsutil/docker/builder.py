@@ -340,7 +340,7 @@ class DockerImageBuilder:
         """
         logger.debug("Finding identical node of {} in the graph ...", node)
         nodes: List[Node] = self._repo_nodes.get(node.git_url, [])
-        logger.debug("Nodes associated with the repo {}: {}", node.git_url, nodes)
+        logger.debug("Nodes associated with the repo {}: {}", node.git_url, str(nodes))
         if not nodes:
             return None
         path = self._repo_path[node.git_url]
