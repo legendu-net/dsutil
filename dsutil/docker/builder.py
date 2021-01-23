@@ -328,9 +328,9 @@ class DockerImageBuilder:
             if deps[0].is_root():
                 self._add_root_node(deps[0].node())
             else:
-                self._add_nodes(deps[0].base_node(), deps[0].node())
+                self._add_edge(deps[0].base_node(), deps[0].node())
             for idx in range(1, len(deps)):
-                self._add_nodes(deps[idx - 1].node(), deps[idx].node())
+                self._add_edge(deps[idx - 1].node(), deps[idx].node())
 
     def _find_identical_node(self, node: Node) -> Union[Node, None]:
         """Find node in the graph which has identical branch as the specified dependency.
@@ -386,8 +386,8 @@ class DockerImageBuilder:
             return
         self._add_identical_branch(inode, node.branch_effective)
 
-    def _add_nodes(self, node1: Node, node2: Node) -> None:
-        logger.debug("Adding nodes ({}, {}) into the graph ...", node1, node2)
+    def _add_edge(self, node1: Node, node2: Node) -> None:
+        logger.debug("Adding edge {} -> {} into the graph ...", node1, node2)
         inode1 = self._find_identical_node(node1)
         if inode1 is None:
             raise LookupError(f"{node1} is expected in the graph but not found!")
