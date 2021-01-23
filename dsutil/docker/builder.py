@@ -158,7 +158,7 @@ class DockerImage:
                 break
         else:
             self._branch_effective = self._branch_fallback
-        repo.git.checkout(self._branch, force=True)
+        repo.git.checkout(self._branch_effective, force=True)
         self._parse_dockerfile()
 
     def _parse_dockerfile(self):
