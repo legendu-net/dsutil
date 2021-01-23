@@ -278,7 +278,11 @@ class DockerImage:
     def node(self):
         """Convert this DockerImage to a Node.
         """
-        return Node(git_url=self._git_url, branch=self._branch, branch_effective=self._branch_effective)
+        return Node(
+            git_url=self._git_url,
+            branch=self._branch,
+            branch_effective=self._branch_effective
+        )
 
     def base_node(self):
         """Convert the base image of this DockerImage to a Node.
@@ -327,7 +331,9 @@ class DockerImageBuilder:
         """
         logger.debug("Finding identical node of {} in the graph ...", node)
         branches = self._repo_branch.get(node.git_url, [])
-        logger.debug("Processed branches of the local repo {}: {}", node.git_url, branches)
+        logger.debug(
+            "Processed branches of the local repo {}: {}", node.git_url, branches
+        )
         if not branches:
             return None
         path = self._repo_path[node.git_url]
@@ -345,10 +351,7 @@ class DockerImageBuilder:
         :return: True if there are no differences between the 2 branches and false otherwise.
         """
         repo = Repo(path)
-        logger.debug(
-            "Comparing branches {} and {} of the local repo {}",
-            b1, b2, path
-        )
+        logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
         commit1 = self._get_branch_commit(repo, b1)
