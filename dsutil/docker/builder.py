@@ -365,7 +365,8 @@ class DockerImageBuilder:
             return True
         commit1 = self._get_branch_commit(repo, b1)
         commit2 = self._get_branch_commit(repo, b2)
-        return not commit1.diff(commit2)
+        diffs: List = commit1.diff(commit2)
+        return not any(diff.diff for diff in diffs)
 
     @staticmethod
     def _get_branch_commit(repo, branch: str):
