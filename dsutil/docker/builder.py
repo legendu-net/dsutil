@@ -1,7 +1,7 @@
 """Docker related utils.
 """
 from __future__ import annotations
-from typing import Union, List, Sequence, Deque, Tuple, Dict, Callable
+from typing import Union, List, Deque, Tuple, Dict, Callable
 from dataclasses import dataclass
 import tempfile
 from pathlib import Path
@@ -38,8 +38,10 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     logger.info("Pushing Docker image {}:{} ...", repo, tag)
 
     def _push():
-        for line in client.images.push(repo, tag, stream=True, decode=True):
-            print(line)
+        for msg in client.images.push(repo, tag, stream=True, decode=True):
+            if "id" not in msg or "status" not in msg:
+                continue
+            print(f"{msg['id']}: {msg['status']}: {msg.get('progress', '')}")
 
     seconds = timeit.timeit(_push, timer=time.perf_counter_ns, number=1) / 1E9
     return repo, tag, seconds, "push"
@@ -101,7 +103,7 @@ class Node:
     def __str__(self):
         index = self.git_url.rindex("/")
         index = self.git_url.rindex("/", 0, index)
-        return self.git_url[(index + 1):] + f"[{self.branch}|{self.branch_effective}]"
+        return self.git_url[(index + 1):] + f"<{self.branch}|{self.branch_effective}>"
 
 
 class DockerImage:
@@ -319,18 +321,21 @@ class DockerImageBuilder:
 
     def _build_graph_branch(self, branch, urls):
         for url in urls:
-            deps: Sequence[DockerImage] = DockerImage(
+            deps: Deque[DockerImage] = DockerImage(
                 git_url=url,
                 branch=branch,
                 branch_fallback=self._branch_fallback,
                 repo_path=self._repo_path
             ).get_deps(self._graph.nodes)
-            if deps[0].is_root():
-                self._add_root_node(deps[0].node())
+            dep0 = deps.popleft()
+            if dep0.is_root():
+                node_prev = self._add_root_node(dep0.node())
             else:
-                self._add_nodes(deps[0].base_node(), deps[0].node())
-            for idx in range(1, len(deps)):
-                self._add_nodes(deps[idx - 1].node(), deps[idx].node())
+                node_prev = self._find_identical_node(dep0.base_node())
+                assert node_prev in self._graph.nodes
+                self._add_edge(node_prev, dep0.node())
+            for dep in deps:
+                node_prev = self._add_edge(node_prev, dep.node())
 
     def _find_identical_node(self, node: Node) -> Union[Node, None]:
         """Find node in the graph which has identical branch as the specified dependency.
@@ -340,7 +345,7 @@ class DockerImageBuilder:
         """
         logger.debug("Finding identical node of {} in the graph ...", node)
         nodes: List[Node] = self._repo_nodes.get(node.git_url, [])
-        logger.debug("Nodes associated with the repo {}: {}", node.git_url, nodes)
+        logger.debug("Nodes associated with the repo {}: {}", node.git_url, str(nodes))
         if not nodes:
             return None
         path = self._repo_path[node.git_url]
@@ -365,7 +370,8 @@ class DockerImageBuilder:
             return True
         commit1 = self._get_branch_commit(repo, b1)
         commit2 = self._get_branch_commit(repo, b2)
-        return not commit1.diff(commit2)
+        diffs: List = commit1.diff(commit2)
+        return not any(diff.diff for diff in diffs)
 
     @staticmethod
     def _get_branch_commit(repo, branch: str):
@@ -374,7 +380,7 @@ class DockerImageBuilder:
                 return ref.commit
         raise LookupError(f"Branch {branch} is not found in the local repo {repo}!")
 
-    def _add_root_node(self, node):
+    def _add_root_node(self, node) -> Node:
         logger.debug("Adding root node {} into the graph ...", node)
         inode = self._find_identical_node(node)
         if inode is None:
@@ -382,29 +388,28 @@ class DockerImageBuilder:
             self._repo_nodes.setdefault(node.git_url, [])
             self._repo_nodes[node.git_url].append(node)
             self._roots.add(node)
-            return
+            return node
         self._add_identical_branch(inode, node.branch_effective)
+        return inode
 
-    def _add_nodes(self, node1: Node, node2: Node) -> None:
-        logger.debug("Adding nodes ({}, {}) into the graph ...", node1, node2)
-        inode1 = self._find_identical_node(node1)
-        if inode1 is None:
-            raise LookupError(f"{node1} is expected in the graph but not found!")
+    def _add_edge(self, node1: Node, node2: Node) -> Node:
+        logger.debug("Adding edge {} -> {} into the graph ...", node1, node2)
         inode2 = self._find_identical_node(node2)
         # In the following 2 situations we need to create a new node for node2
         # 1. node2 does not have an identical node (inode2 is None)
         # 2. node2 has an identical node inode2 in the graph
         #     but inode2's parent is different from the parent of node2 (which is inode1)
         if inode2 is None:
-            self._graph.add_edge(inode1, node2)
+            self._graph.add_edge(node1, node2)
             self._repo_nodes.setdefault(node2.git_url, [])
             self._repo_nodes[node2.git_url].append(node2)
-            return
-        if next(self._graph.predecessors(inode2)) != inode1:
-            self._graph.add_edge(inode1, node2)
-            return
+            return node2
+        if next(self._graph.predecessors(inode2)) != node1:
+            self._graph.add_edge(node1, node2)
+            return node2
         # reuse inode2
         self._add_identical_branch(inode2, node2.branch_effective)
+        return inode2
 
     def _add_identical_branch(self, node: Node, branch: str):
         attr = self._graph.nodes[node]
@@ -418,24 +423,27 @@ class DockerImageBuilder:
         for branch, urls in self._branch_urls.items():
             self._build_graph_branch(branch, urls)
 
-    def save_graph(self) -> None:
+    def save_graph(self, output="graph.yaml") -> None:
         """Save the underlying graph structure to files.
         """
-        #nx.write_yaml(self._graph, "graph.yaml")
-        with open("edges.txt", "w") as fout:
-            for edge in self._graph.edges:
-                fout.write(str(edge) + "\n")
-        with open("nodes.txt", "w") as fout:
+        with open(output, "w") as fout:
+            # nodes and attributes
+            fout.write("nodes:\n")
             for node in self._graph.nodes:
                 identical_branches = self._graph.nodes[node].get(
                     "identical_branches", set()
                 )
-                fout.write(f"{node}: {list(identical_branches)}\n")
-        with open("branches.txt", "w") as fout:
+                fout.write(f"  {node}: {list(identical_branches)}\n")
+            # edges
+            fout.write("edges:\n")
+            for node1, node2 in self._graph.edges:
+                fout.write(f"  - {node1} -> {node2}\n")
+            # repos
+            fout.write("repos:\n")
             for git_url, nodes in self._repo_nodes.items():
-                fout.write(git_url + ":\n")
+                fout.write(f"  {git_url}:\n")
                 for node in nodes:
-                    fout.write(f"  - {node}\n")
+                    fout.write(f"    - {node}\n")
 
     #def _login_servers(self) -> None:
     #    servers = set()
