@@ -1,7 +1,7 @@
 """Docker related utils.
 """
 from __future__ import annotations
-from typing import Union, List, Sequence, Deque, Tuple, Dict, Callable
+from typing import Union, List, Deque, Tuple, Dict, Callable
 from dataclasses import dataclass
 import tempfile
 from pathlib import Path
@@ -321,7 +321,7 @@ class DockerImageBuilder:
 
     def _build_graph_branch(self, branch, urls):
         for url in urls:
-            deps: Sequence[DockerImage] = DockerImage(
+            deps: Deque[DockerImage] = DockerImage(
                 git_url=url,
                 branch=branch,
                 branch_fallback=self._branch_fallback,
