@@ -3,7 +3,6 @@
 from __future__ import annotations
 from typing import Union, List, Sequence, Deque, Tuple, Dict, Callable
 from dataclasses import dataclass
-import json
 import tempfile
 from pathlib import Path
 import time
@@ -97,7 +96,12 @@ class Node:
     """
     git_url: str
     branch: str
-    branch_fallback: str = ""
+    branch_effective: str
+
+    def __str__(self):
+        index = self.git_url.rindex("/")
+        index = self.git_url.rindex("/", 0, index)
+        return self.git_url[(index + 1):] + f"[{self.branch}|{self.branch_effective}]"
 
 
 class DockerImage:
@@ -117,59 +121,66 @@ class DockerImage:
         :param git_url: URL of the remote Git repository.
         :param branch: The branch of the GitHub repository to use.
         """
-        self.git_url = git_url.strip()
-        self.branch = branch
-        self.branch_fallback = branch_fallback
+        self._git_url = git_url.strip()
+        self._branch = branch
+        self._branch_fallback = branch_fallback
+        self._branch_effective = ""
         self._repo_path = {} if repo_path is None else repo_path
-        self.path = None
-        self.name = ""
-        self.base_image = ""
-        self.git_url_base = ""
-        self.tag_build = None
+        self._path = None
+        self._name = ""
+        self._base_image = ""
+        self._git_url_base = ""
+        self._tag_build = None
+
+    def is_root(self) -> bool:
+        """Check whether this DockerImage is a root DockerImage.
+        """
+        return not self._git_url_base
 
     def clone_repo(self) -> None:
         """Clone the Git repository to a local directory.
 
         :param repo_branch: A dick containing mapping of git_url to its local path.
         """
-        if self.path:
+        if self._path:
             return
-        if self.git_url in self._repo_path:
-            self.path = self._repo_path[self.git_url]
-            repo = Repo(self.path)
+        if self._git_url in self._repo_path:
+            self._path = self._repo_path[self._git_url]
+            repo = Repo(self._path)
             logger.info(
-                "{} has already been cloned into {} previously.", self.git_url,
-                self.path
+                "{} has already been cloned into {} previously.", self._git_url,
+                self._path
             )
         else:
-            self.path = Path(tempfile.mkdtemp())
-            logger.info("Cloning {} into {}", self.git_url, self.path)
-            repo = Repo.clone_from(self.git_url, self.path)
-            self._repo_path[self.git_url] = self.path
+            self._path = Path(tempfile.mkdtemp())
+            logger.info("Cloning {} into {}", self._git_url, self._path)
+            repo = Repo.clone_from(self._git_url, self._path)
+            self._repo_path[self._git_url] = self._path
         for ref in repo.refs:
-            if ref.name.endswith("/" + self.branch):
-                repo.git.checkout(self.branch, force=True)
+            if ref.name.endswith("/" + self._branch):
+                self._branch_effective = self._branch
                 break
         else:
-            repo.git.checkout(self.branch_fallback)
+            self._branch_effective = self._branch_fallback
+        repo.git.checkout(self._branch_effective, force=True)
         self._parse_dockerfile()
 
     def _parse_dockerfile(self):
-        dockerfile = self.path / DockerImage.DOCKERFILE
+        dockerfile = self._path / DockerImage.DOCKERFILE
         with dockerfile.open() as fin:
             for line in fin:
                 if line.startswith("# NAME:"):
-                    self.name = line[7:].strip()
-                    logger.info("This image name: {}", self.name)
+                    self._name = line[7:].strip()
+                    logger.info("This image name: {}", self._name)
                 elif line.startswith("FROM "):
-                    self.base_image = line[5:].strip()
-                    logger.info("Base image name: {}", self.base_image)
+                    self._base_image = line[5:].strip()
+                    logger.info("Base image name: {}", self._base_image)
                 elif line.startswith("# GIT:"):
-                    self.git_url_base = line[6:].strip()
-                    logger.info("Base image URL: {}", self.git_url_base)
-        if not self.name:
+                    self._git_url_base = line[6:].strip()
+                    logger.info("Base image URL: {}", self._git_url_base)
+        if not self._name:
             raise LookupError("The name tag '# NAME:' is not found in the Dockerfile!")
-        if not self.base_image:
+        if not self._base_image:
             raise LookupError("The FROM line is not found in the Dockerfile!")
 
     def get_deps(self, repo_branch) -> Deque[DockerImage]:
@@ -182,18 +193,24 @@ class DockerImage:
         self.clone_repo()
         deps = deque([self])
         obj = self
-        while (obj.git_url_base, obj.branch) not in repo_branch:
-            if not obj.git_url_base:
+        while (obj._git_url_base, obj._branch) not in repo_branch:  # pylint: disable=W0212
+            if not obj._git_url_base:  # pylint: disable=W0212
                 break
-            obj = DockerImage(
-                git_url=obj.git_url_base,
-                branch=obj.branch,
-                branch_fallback=self.branch_fallback,
-                repo_path=self._repo_path
-            )
-            obj.clone_repo()
+            obj = obj.base_image()
             deps.appendleft(obj)
         return deps
+
+    def base_image(self) -> DockerImage:
+        """Get the base DockerImage of this DockerImage.
+        """
+        image = DockerImage(
+            git_url=self._git_url_base,
+            branch=self._branch,
+            branch_fallback=self._branch_fallback,
+            repo_path=self._repo_path
+        )
+        image.clone_repo()
+        return image
 
     def _copy_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
@@ -201,7 +218,7 @@ class DockerImage:
             if not ssh_src.is_dir():
                 logger.warning("~/.ssh does NOT exists!")
                 return
-            ssh_dst = self.path / copy_ssh_to
+            ssh_dst = self._path / copy_ssh_to
             try:
                 shutil.rmtree(ssh_dst)
             except FileNotFoundError:
@@ -228,36 +245,36 @@ class DockerImage:
         self.clone_repo()
         self._copy_ssh(copy_ssh_to)
         if tag_build is None:
-            tag_build = branch_to_tag(self.branch)
+            tag_build = branch_to_tag(self._branch)
         elif tag_build == "":
             tag_build = "latest"
-        if not self.git_url_base:  # self is a root image
-            _retry_docker(lambda: _pull_image_timing(*self.base_image.split(":")))
-        logger.info("Building the Docker image {}...", self.name)
+        if not self._git_url_base:  # self is a root image
+            _retry_docker(lambda: _pull_image_timing(*self._base_image.split(":")))
+        logger.info("Building the Docker image {}:{} ...", self._name, tag_build)
         self._update_base_tag(tag_build)
         docker.from_env().images.build(
-            path=str(self.path),
-            tag=f"{self.name}:{tag_build}",
+            path=str(self._path),
+            tag=f"{self._name}:{tag_build}",
             rm=True,
             pull=False,
             cache_from=None
         )
-        self.tag_build = tag_build
+        self._tag_build = tag_build
         self._remove_ssh(copy_ssh_to)
         end = time.perf_counter_ns()
-        return self.name, tag_build, (end - start) / 1E9, "build"
+        return self._name, tag_build, (end - start) / 1E9, "build"
 
     def _remove_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
             try:
-                shutil.rmtree(self.path / copy_ssh_to)
+                shutil.rmtree(self._path / copy_ssh_to)
             except FileNotFoundError:
                 pass
 
     def _update_base_tag(self, tag_build: str) -> None:
-        if not self.git_url_base:  # self is a root image
+        if not self._git_url_base:  # self is a root image
             return
-        dockerfile = self.path / DockerImage.DOCKERFILE
+        dockerfile = self._path / DockerImage.DOCKERFILE
         with dockerfile.open() as fin:
             lines = fin.readlines()
         for idx, line in enumerate(lines):
@@ -267,48 +284,19 @@ class DockerImage:
         with dockerfile.open("w") as fout:
             fout.writelines(lines)
 
-    def push(
-        self,
-        tag_tran_fun: Callable = tag_date,
-        retry: int = 3,
-        seconds: float = 60
-    ) -> pd.DataFrame:
-        """Push the built Docker image to the container repository.
-
-        :param tag_tran_fun: A function takeing a tag as the parameter
-            and generating a new tag to tag Docker images before pushing.
-        :param retry: The number of times (default 3) to retry pushing the Docker image.
-        :param seconds: The number of seconds (default 60) to wait before retrying.
-        :return: A pandas DataFrame with 2 columns "image" (name of the built Docker image) 
-            and "seconds" (time taken to build the Docker image).
-        """
-        data = [
-            _retry_docker(
-                lambda: _push_image_timing(self.name, self.tag_build), retry, seconds
-            )
-        ]
-        if tag_tran_fun:
-            tag_new = tag_tran_fun(self.tag_build)
-            if tag_new != self.tag_build:
-                docker.from_env().images.get(f"{self.name}:{self.tag_build}").tag(
-                    self.name, tag_new, force=True
-                )
-                data.append(
-                    _retry_docker(
-                        lambda: _push_image_timing(self.name, tag_new), retry, seconds
-                    )
-                )
-        return pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
-
     def node(self):
         """Convert this DockerImage to a Node.
         """
-        return Node(self.git_url, self.branch, self.branch_fallback)
+        return Node(
+            git_url=self._git_url,
+            branch=self._branch,
+            branch_effective=self._branch_effective
+        )
 
     def base_node(self):
         """Convert the base image of this DockerImage to a Node.
         """
-        return Node(self.git_url_base, self.branch, self.branch_fallback)
+        return self.base_image().node()
 
 
 class DockerImageBuilder:
@@ -325,7 +313,7 @@ class DockerImageBuilder:
         self._branch_urls = branch_urls
         self._branch_fallback = branch_fallback
         self._graph = None
-        self._repo_branch = {}
+        self._repo_nodes: Dict[str, List[Node]] = {}
         self._repo_path = {}
         self._roots = set()
 
@@ -337,10 +325,10 @@ class DockerImageBuilder:
                 branch_fallback=self._branch_fallback,
                 repo_path=self._repo_path
             ).get_deps(self._graph.nodes)
-            if deps[0].git_url_base:
-                self._add_nodes(deps[0].base_node(), deps[0].node())
-            else:
+            if deps[0].is_root():
                 self._add_root_node(deps[0].node())
+            else:
+                self._add_nodes(deps[0].base_node(), deps[0].node())
             for idx in range(1, len(deps)):
                 self._add_nodes(deps[idx - 1].node(), deps[idx].node())
 
@@ -351,63 +339,54 @@ class DockerImageBuilder:
         :param node: A dependency of the type DockerImage. 
         """
         logger.debug("Finding identical node of {} in the graph ...", node)
-        branches = self._repo_branch.get(node.git_url, [])
-        if not branches:
+        nodes: List[Node] = self._repo_nodes.get(node.git_url, [])
+        logger.debug("Nodes associated with the repo {}: {}", node.git_url, nodes)
+        if not nodes:
             return None
         path = self._repo_path[node.git_url]
-        for br in branches:
+        for n in nodes:
             if self._compare_git_branches(
-                path, (br, node.branch), ("", node.branch_fallback)
+                path, n.branch_effective, node.branch_effective
             ):
-                inode = Node(node.git_url, br, self._branch_fallback)
-                # add extra branch info into the node
-                attr = self._graph.nodes[inode]
-                attr.setdefault("identical_branches", set())
-                attr["identical_branches"].add(node.branch)
-                return inode
+                return n
         return None
 
-    def _compare_git_branches(
-        self, path: str, branches: Tuple[str, str], fallbacks: Tuple[str, str]
-    ) -> bool:
+    def _compare_git_branches(self, path: str, b1: str, b2: str) -> bool:
         """Compare whether 2 branches of a repo are identical.
 
         :param path: The path to a local Git repository.
-        :param branches: A pair of branches to compare.
-        :param fallbacks: A pair of fallback branches to use fo the 2 branches respecitively.
+        :param b1: A branches.
+        :param b2: Another branches.
         :return: True if there are no differences between the 2 branches and false otherwise.
         """
         repo = Repo(path)
-        b1, b2 = branches
-        f1, f2 = fallbacks
-        logger.debug(
-            "Comparing branches {} (fallback to {}) and {} (fallback to {}) of the local repo {}",
-            b1, f1, b2, f2, path
-        )
-        commit1 = self._get_branch_commit(repo, b1, f1)
-        commit2 = self._get_branch_commit(repo, b2, f2)
+        logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
+        if b1 == b2:
+            return True
+        commit1 = self._get_branch_commit(repo, b1)
+        commit2 = self._get_branch_commit(repo, b2)
         return not commit1.diff(commit2)
 
     @staticmethod
-    def _get_branch_commit(repo, branch: str, fallback: str):
-        fallback_commit = None
+    def _get_branch_commit(repo, branch: str):
         for ref in repo.refs:
             if ref.name.endswith("/" + branch):
                 return ref.commit
-            if ref.name.endswith("/" + fallback):
-                fallback_commit = ref.commit
-        assert fallback_commit is not None
-        return fallback_commit
+        raise LookupError(f"Branch {branch} is not found in the local repo {repo}!")
 
     def _add_root_node(self, node):
+        logger.debug("Adding root node {} into the graph ...", node)
         inode = self._find_identical_node(node)
         if inode is None:
             self._graph.add_node(node)
-            self._repo_branch.setdefault(node.git_url, [])
-            self._repo_branch[node.git_url].append(node.branch)
+            self._repo_nodes.setdefault(node.git_url, [])
+            self._repo_nodes[node.git_url].append(node)
             self._roots.add(node)
+            return
+        self._add_identical_branch(inode, node.branch_effective)
 
     def _add_nodes(self, node1: Node, node2: Node) -> None:
+        logger.debug("Adding nodes ({}, {}) into the graph ...", node1, node2)
         inode1 = self._find_identical_node(node1)
         if inode1 is None:
             raise LookupError(f"{node1} is expected in the graph but not found!")
@@ -416,10 +395,21 @@ class DockerImageBuilder:
         # 1. node2 does not have an identical node (inode2 is None)
         # 2. node2 has an identical node inode2 in the graph
         #     but inode2's parent is different from the parent of node2 (which is inode1)
-        if inode2 is None or next(self._graph.predecessors(inode2)) != inode1:
+        if inode2 is None:
             self._graph.add_edge(inode1, node2)
-            self._repo_branch.setdefault(node2.git_url, [])
-            self._repo_branch[node2.git_url].append(node2.branch)
+            self._repo_nodes.setdefault(node2.git_url, [])
+            self._repo_nodes[node2.git_url].append(node2)
+            return
+        if next(self._graph.predecessors(inode2)) != inode1:
+            self._graph.add_edge(inode1, node2)
+            return
+        # reuse inode2
+        self._add_identical_branch(inode2, node2.branch_effective)
+
+    def _add_identical_branch(self, node: Node, branch: str):
+        attr = self._graph.nodes[node]
+        attr.setdefault("identical_branches", set())
+        attr["identical_branches"].add(branch)
 
     def _build_graph(self):
         if self._graph is not None:
@@ -442,7 +432,10 @@ class DockerImageBuilder:
                 )
                 fout.write(f"{node}: {list(identical_branches)}\n")
         with open("branches.txt", "w") as fout:
-            fout.write(json.dumps(self._repo_branch, indent=4))
+            for git_url, nodes in self._repo_nodes.items():
+                fout.write(git_url + ":\n")
+                for node in nodes:
+                    fout.write(f"  - {node}\n")
 
     #def _login_servers(self) -> None:
     #    servers = set()

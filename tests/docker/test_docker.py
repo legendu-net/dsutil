@@ -28,7 +28,7 @@ def test_remove_images():
 
 def test_copy_ssh():
     builder = dsutil.docker.DockerImage(git_url="")
-    builder.path = BASE_DIR
+    builder._path = BASE_DIR
     builder._copy_ssh("ssh")
 
 
