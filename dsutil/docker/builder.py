@@ -327,13 +327,14 @@ class DockerImageBuilder:
                 branch_fallback=self._branch_fallback,
                 repo_path=self._repo_path
             ).get_deps(self._graph.nodes)
-            if deps[0].is_root():
-                node_prev = self._add_root_node(deps[0].node())
+            dep0 = deps.popleft()
+            if dep0.is_root():
+                node_prev = self._add_root_node(dep0.node())
             else:
-                node_prev = self._find_identical_node(deps[0].base_node())
+                node_prev = self._find_identical_node(dep0.base_node())
                 assert node_prev in self._graph.nodes
-                self._add_edge(node_prev, deps[0].node())
-            for dep in deps[1:]:
+                self._add_edge(node_prev, dep0.node())
+            for dep in deps:
                 node_prev = self._add_edge(node_prev, dep.node())
 
     def _find_identical_node(self, node: Node) -> Union[Node, None]:
