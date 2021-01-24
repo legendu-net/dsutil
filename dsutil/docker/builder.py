@@ -533,8 +533,6 @@ class DockerImageBuilder:
         res.append((name, tag, time, type_))
         # create new tags on the built images corresponding to other branches
         for br in self._graph.nodes[node].get("identical_branches", set()):
-            if br == node.branch:
-                continue
             tag_new = branch_to_tag(br)
             docker.from_env().images.get(f"{name}:{tag}").tag(name, tag_new, force=True)
             res.append((name, tag_new, 0, "build"))
