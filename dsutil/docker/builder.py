@@ -39,10 +39,15 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     logger.info("Pushing Docker image {}:{} ...", repo, tag)
 
     def _push():
+        id = ""
         for msg in client.images.push(repo, tag, stream=True, decode=True):
             if "id" not in msg or "status" not in msg:
                 continue
-            print(f"{msg['id']}: {msg['status']}: {msg.get('progress', '')}")
+            print(
+                f"{msg['id']}: {msg['status']}: {msg.get('progress', '')}",
+                end="\r" if msg["id"] == id else "\n"
+            )
+            id = msg["id"]
 
     seconds = timeit.timeit(_push, timer=time.perf_counter_ns, number=1) / 1E9
     return repo, tag, seconds, "push"
@@ -368,7 +373,7 @@ class DockerImageBuilder:
         #commit2 = self._get_branch_commit(repo, b2)
         #diffs: List = commit1.diff(commit2)
         #return not any(diff.diff for diff in diffs)
-        cmd = f"git -C {path} diff origin/{b1}..origin/{b2}"
+        cmd = f"git -C {path} diff {b1}..{b2}"
         return not sp.run(cmd, shell=True, check=True, capture_output=True).stdout
 
     @staticmethod
