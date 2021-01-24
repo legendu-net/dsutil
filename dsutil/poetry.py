@@ -210,6 +210,7 @@ def format_code(
         repo.index.commit("format code")
         for remote in repo.remotes:
             remote.push(repo.active_branch)
+        print(repo.git.status())
 
 
 def _lint_code(proj_dir: Union[Path, None], linter: Union[str, List[str]]):
