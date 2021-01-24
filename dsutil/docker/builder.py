@@ -50,7 +50,8 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
             if not "progressDetail" in msg:
                 continue
             detail = msg["progressDetail"]
-            if "current" in detail and "total" in detail and detail["current"] >= detail["total"]:
+            if "current" in detail and "total" in detail and detail["current"
+                                                                   ] >= detail["total"]:
                 msg_all.pop(id_)
                 print()
 
