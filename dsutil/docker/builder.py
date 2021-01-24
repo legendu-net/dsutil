@@ -58,11 +58,7 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
 
 
 def _is_image_pushed(msg: Dict[str, Any]):
-    phrases = [
-        "Mounted from",
-        "Pushed",
-        "Layer already exists"
-    ]
+    phrases = ["Mounted from", "Pushed", "Layer already exists"]
     status = msg["status"]
     if any(status.startswith(phrase) for phrase in phrases):
         return True
