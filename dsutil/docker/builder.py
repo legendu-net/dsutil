@@ -10,6 +10,7 @@ import timeit
 import datetime
 from collections import deque
 import shutil
+import subprocess as sp
 import yaml
 from loguru import logger
 import pandas as pd
@@ -356,7 +357,8 @@ class DockerImageBuilder:
                 return n
         return None
 
-    def _compare_git_branches(self, path: str, b1: str, b2: str) -> bool:
+    @staticmethod
+    def _compare_git_branches(path: str, b1: str, b2: str) -> bool:
         """Compare whether 2 branches of a repo are identical.
 
         :param path: The path to a local Git repository.
@@ -364,14 +366,16 @@ class DockerImageBuilder:
         :param b2: Another branches.
         :return: True if there are no differences between the 2 branches and false otherwise.
         """
-        repo = Repo(path)
+        #repo = Repo(path)
         logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
-        commit1 = self._get_branch_commit(repo, b1)
-        commit2 = self._get_branch_commit(repo, b2)
-        diffs: List = commit1.diff(commit2)
-        return not any(diff.diff for diff in diffs)
+        #commit1 = self._get_branch_commit(repo, b1)
+        #commit2 = self._get_branch_commit(repo, b2)
+        #diffs: List = commit1.diff(commit2)
+        #return not any(diff.diff for diff in diffs)
+        cmd = f"git -C {path} diff origin/{b1}..origin/{b2}"
+        return not sp.run(cmd, shell=True, check=True, capture_output=True).stdout
 
     @staticmethod
     def _get_branch_commit(repo, branch: str):
