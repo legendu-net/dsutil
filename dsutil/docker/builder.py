@@ -16,7 +16,7 @@ from loguru import logger
 import pandas as pd
 import docker
 import networkx as nx
-from git import Repo
+import git
 
 
 def tag_date(tag: str) -> str:
@@ -99,12 +99,11 @@ class Node:
     """
     git_url: str
     branch: str
-    branch_effective: str
 
     def __str__(self):
         index = self.git_url.rindex("/")
         index = self.git_url.rindex("/", 0, index)
-        return self.git_url[(index + 1):] + f"<{self.branch}|{self.branch_effective}>"
+        return self.git_url[(index + 1):] + f"<{self.branch}>"
 
 
 class DockerImage:
@@ -127,7 +126,6 @@ class DockerImage:
         self._git_url = git_url.strip()
         self._branch = branch
         self._branch_fallback = branch_fallback
-        self._branch_effective = ""
         self._repo_path = {} if repo_path is None else repo_path
         self._path = None
         self._name = ""
@@ -149,7 +147,7 @@ class DockerImage:
             return
         if self._git_url in self._repo_path:
             self._path = self._repo_path[self._git_url]
-            repo = Repo(self._path)
+            repo = git.Repo(self._path)
             logger.info(
                 "{} has already been cloned into {} previously.", self._git_url,
                 self._path
@@ -157,15 +155,14 @@ class DockerImage:
         else:
             self._path = Path(tempfile.mkdtemp())
             logger.info("Cloning {} into {}", self._git_url, self._path)
-            repo = Repo.clone_from(self._git_url, self._path)
+            repo = git.Repo.clone_from(self._git_url, self._path)
             self._repo_path[self._git_url] = self._path
-        for ref in repo.refs:
-            if ref.name.endswith("/" + self._branch):
-                self._branch_effective = self._branch
-                break
-        else:
-            self._branch_effective = self._branch_fallback
-        repo.git.checkout(self._branch_effective, force=True)
+        # checkout or create self._branch (from self._branch_fallback)
+        try:
+            repo.git.checkout(self._branch, force=True)
+        except git.GitCommandError:
+            repo.git.checkout(self._branch_fallback, force=True)
+            repo.git.checkout(b=self._branch, force=True)
         self._parse_dockerfile()
 
     def _parse_dockerfile(self):
@@ -293,7 +290,6 @@ class DockerImage:
         return Node(
             git_url=self._git_url,
             branch=self._branch,
-            branch_effective=self._branch_effective
         )
 
     def base_node(self):
@@ -351,9 +347,7 @@ class DockerImageBuilder:
             return None
         path = self._repo_path[node.git_url]
         for n in nodes:
-            if self._compare_git_branches(
-                path, n.branch_effective, node.branch_effective
-            ):
+            if self._compare_git_branches(path, n.branch, node.branch):
                 return n
         return None
 
@@ -366,7 +360,7 @@ class DockerImageBuilder:
         :param b2: Another branches.
         :return: True if there are no differences between the 2 branches and false otherwise.
         """
-        #repo = Repo(path)
+        #repo = git.Repo(path)
         logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
@@ -393,7 +387,7 @@ class DockerImageBuilder:
             self._repo_nodes[node.git_url].append(node)
             self._roots.add(node)
             return node
-        self._add_identical_branch(inode, node.branch_effective)
+        self._add_identical_branch(inode, node.branch)
         return inode
 
     def _add_edge(self, node1: Node, node2: Node) -> Node:
@@ -412,10 +406,12 @@ class DockerImageBuilder:
             self._graph.add_edge(node1, node2)
             return node2
         # reuse inode2
-        self._add_identical_branch(inode2, node2.branch_effective)
+        self._add_identical_branch(inode2, node2.branch)
         return inode2
 
-    def _add_identical_branch(self, node: Node, branch: str):
+    def _add_identical_branch(self, node: Node, branch: str) -> None:
+        if node.branch == branch:
+            return
         attr = self._graph.nodes[node]
         attr.setdefault("identical_branches", set())
         attr["identical_branches"].add(branch)
@@ -535,8 +531,6 @@ class DockerImageBuilder:
         res.append((name, tag, time, type_))
         # create new tags on the built images corresponding to other branches
         for br in self._graph.nodes[node].get("identical_branches", set()):
-            if br == node.branch:
-                continue
             tag_new = branch_to_tag(br)
             docker.from_env().images.get(f"{name}:{tag}").tag(name, tag_new, force=True)
             res.append((name, tag_new, 0, "build"))
