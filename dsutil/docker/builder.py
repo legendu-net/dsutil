@@ -39,7 +39,7 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     logger.info("Pushing Docker image {}:{} ...", repo, tag)
 
     def _push():
-        msg_all: Dict[str, str] = {}
+        msg_all: Dict[str, Dict] = {}
         for msg in client.images.push(repo, tag, stream=True, decode=True):
             if "id" not in msg or "status" not in msg:
                 continue
