@@ -47,16 +47,23 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
             id_ = next(iter(msg_all))
             msg = msg_all[id_]
             print(f"{id_}: {msg['status']}: {msg.get('progress', '')}", end="\r")
-            if not "progressDetail" in msg:
-                continue
-            detail = msg["progressDetail"]
-            if "current" in detail and "total" in detail and detail["current"
-                                                                   ] >= detail["total"]:
+            if _is_image_pushed(msg):
                 msg_all.pop(id_)
                 print()
+        print()
 
     seconds = timeit.timeit(_push, timer=time.perf_counter_ns, number=1) / 1E9
     return repo, tag, seconds, "push"
+
+
+def _is_image_pushed(msg: Dict[str, Any]):
+    status = msg["status"]
+    if status.startswith("Mounted from ") or status.startswith("Pushed"):
+        return True
+    if not "progressDetail" in msg:
+        return False
+    detail = msg["progressDetail"]
+    return "current" in detail and "total" in detail and detail["current"] >= detail["total"]
 
 
 def _retry_docker(task: Callable,
