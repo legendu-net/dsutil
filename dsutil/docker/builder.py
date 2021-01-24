@@ -1,7 +1,7 @@
 """Docker related utils.
 """
 from __future__ import annotations
-from typing import Union, List, Deque, Tuple, Dict, Callable
+from typing import Union, List, Deque, Tuple, Dict, Callable, Any
 from dataclasses import dataclass
 import tempfile
 from pathlib import Path
@@ -11,6 +11,7 @@ import datetime
 from collections import deque
 import shutil
 import subprocess as sp
+import urllib3
 import yaml
 from loguru import logger
 import pandas as pd
@@ -47,16 +48,25 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
             id_ = next(iter(msg_all))
             msg = msg_all[id_]
             print(f"{id_}: {msg['status']}: {msg.get('progress', '')}", end="\r")
-            if not "progressDetail" in msg:
-                continue
-            detail = msg["progressDetail"]
-            if "current" in detail and "total" in detail and detail["current"
-                                                                   ] >= detail["total"]:
+            if _is_image_pushed(msg):
                 msg_all.pop(id_)
                 print()
+        print()
 
     seconds = timeit.timeit(_push, timer=time.perf_counter_ns, number=1) / 1E9
     return repo, tag, seconds, "push"
+
+
+def _is_image_pushed(msg: Dict[str, Any]):
+    phrases = ["Mounted from", "Pushed", "Layer already exists"]
+    status = msg["status"]
+    if any(status.startswith(phrase) for phrase in phrases):
+        return True
+    if not "progressDetail" in msg:
+        return False
+    detail = msg["progressDetail"]
+    return "current" in detail and "total" in detail and detail["current"] >= detail[
+        "total"]
 
 
 def _retry_docker(task: Callable,
@@ -73,7 +83,7 @@ def _retry_docker(task: Callable,
     for _ in range(retry):
         try:
             return task()
-        except docker.errors.APIError:
+        except (docker.errors.APIError, urllib3.exceptions.ReadTimeoutError):
             time.sleep(seconds)
     return task()
 
