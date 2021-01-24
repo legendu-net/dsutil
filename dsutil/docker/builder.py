@@ -39,10 +39,13 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     logger.info("Pushing Docker image {}:{} ...", repo, tag)
 
     def _push():
+        id = ""
         for msg in client.images.push(repo, tag, stream=True, decode=True):
             if "id" not in msg or "status" not in msg:
                 continue
+            end = "\r" if msg["id"] == id else "\n"
             print(f"{msg['id']}: {msg['status']}: {msg.get('progress', '')}")
+            id = msg["id"]
 
     seconds = timeit.timeit(_push, timer=time.perf_counter_ns, number=1) / 1E9
     return repo, tag, seconds, "push"
