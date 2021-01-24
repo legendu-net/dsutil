@@ -64,7 +64,8 @@ def _is_image_pushed(msg: Dict[str, Any]):
     if not "progressDetail" in msg:
         return False
     detail = msg["progressDetail"]
-    return "current" in detail and "total" in detail and detail["current"] >= detail["total"]
+    return "current" in detail and "total" in detail and detail["current"] >= detail[
+        "total"]
 
 
 def _retry_docker(task: Callable,
