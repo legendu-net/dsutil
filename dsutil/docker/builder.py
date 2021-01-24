@@ -11,6 +11,7 @@ import datetime
 from collections import deque
 import shutil
 import subprocess as sp
+import urllib3
 import yaml
 from loguru import logger
 import pandas as pd
@@ -80,7 +81,7 @@ def _retry_docker(task: Callable,
     for _ in range(retry):
         try:
             return task()
-        except docker.errors.APIError:
+        except (docker.errors.APIError, urllib3.exceptions.ReadTimeoutError):
             time.sleep(seconds)
     return task()
 
