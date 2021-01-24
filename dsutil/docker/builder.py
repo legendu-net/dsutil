@@ -375,7 +375,7 @@ class DockerImageBuilder:
         #diffs: List = commit1.diff(commit2)
         #return not any(diff.diff for diff in diffs)
         cmd = f"git -C {path} diff origin/{b1}..origin/{b2}"
-        return not sp.run(cmd, shell=True, capture_output=True).stdout
+        return not sp.run(cmd, shell=True, check=True, capture_output=True).stdout
 
     @staticmethod
     def _get_branch_commit(repo, branch: str):
