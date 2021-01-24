@@ -16,7 +16,7 @@ from loguru import logger
 import pandas as pd
 import docker
 import networkx as nx
-from git import Repo
+import git
 
 
 def tag_date(tag: str) -> str:
@@ -147,7 +147,7 @@ class DockerImage:
             return
         if self._git_url in self._repo_path:
             self._path = self._repo_path[self._git_url]
-            repo = Repo(self._path)
+            repo = git.Repo(self._path)
             logger.info(
                 "{} has already been cloned into {} previously.", self._git_url,
                 self._path
@@ -155,12 +155,12 @@ class DockerImage:
         else:
             self._path = Path(tempfile.mkdtemp())
             logger.info("Cloning {} into {}", self._git_url, self._path)
-            repo = Repo.clone_from(self._git_url, self._path)
+            repo = git.Repo.clone_from(self._git_url, self._path)
             self._repo_path[self._git_url] = self._path
         # checkout or create self._branch (from self._branch_fallback)
         try:
             repo.git.checkout(self._branch, force=True)
-        except git.GitCommandError as err:
+        except git.GitCommandError:
             repo.git.checkout(self._branch_fallback, force=True)
             repo.git.checkout(b=self._branch, force=True)
         self._parse_dockerfile()
@@ -362,7 +362,7 @@ class DockerImageBuilder:
         :param b2: Another branches.
         :return: True if there are no differences between the 2 branches and false otherwise.
         """
-        #repo = Repo(path)
+        #repo = git.Repo(path)
         logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
