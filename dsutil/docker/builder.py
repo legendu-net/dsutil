@@ -531,9 +531,10 @@ class DockerImageBuilder:
         logger.debug("res: {}\n", res)
         # remove images associate with node
         client = docker.from_env()
-        for image_name, tag, *_ in res:
-            logger.info("Removing Docker image {}:{} ...", image_name, tag)
-            client.images.remove(f"{image_name}:{tag}")
+        for image_name, tag, _, type_ in res:
+            if type_ == "build":
+                logger.info("Removing Docker image {}:{} ...", image_name, tag)
+                client.images.remove(f"{image_name}:{tag}")
 
     def _build_image_node(
         self, node, tag_build: str, copy_ssh_to: str, push: bool,
