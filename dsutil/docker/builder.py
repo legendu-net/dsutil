@@ -199,6 +199,8 @@ class DockerImage:
                     logger.info("This image name: {}", self._name)
                 elif line.startswith("FROM "):
                     self._base_image = line[5:].strip()
+                    if ":" not in self._base_image:
+                        self._base_image += ":latest"
                     logger.info("Base image name: {}", self._base_image)
                 elif line.startswith("# GIT:"):
                     self._git_url_base = line[6:].strip()
