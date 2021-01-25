@@ -550,9 +550,7 @@ class DockerImageBuilder:
             branch=node.branch,
             branch_fallback=self._branch_fallback,
             repo_path=self._repo_path
-        ).build(
-            tag_build=tag_build, copy_ssh_to=copy_ssh_to
-        )
+        ).build(tag_build=tag_build, copy_ssh_to=copy_ssh_to)
         res.append((name, tag, time, "build"))
         # create a historical tag
         image = docker.from_env().images.get(f"{name}:{tag}")
