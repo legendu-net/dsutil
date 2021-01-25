@@ -21,10 +21,10 @@ import git
 
 
 def tag_date(tag: str) -> str:
-    """Get the current date as a 6-digit string.
+    """Suffix a tag with the current date as a 6-digit string.
 
     :param tag: A tag of Docker image.
-    :return: The current in 6-digit format.
+    :return: A new tag.
     """
     mmddhh = datetime.datetime.now().strftime("%m%d%H")
     return mmddhh if tag in ("", "latest") else f"{tag}_{mmddhh}"
@@ -249,7 +249,7 @@ class DockerImage:
 
     def build(self,
               tag_build: str = None,
-              copy_ssh_to: str = "") -> Tuple[str, str, float, str]:
+              copy_ssh_to: str = "") -> Tuple[str, str, float]:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
@@ -283,7 +283,7 @@ class DockerImage:
         self._tag_build = tag_build
         self._remove_ssh(copy_ssh_to)
         end = time.perf_counter_ns()
-        return self._name, tag_build, (end - start) / 1E9, "build"
+        return self._name, tag_build, (end - start) / 1E9
 
     def _remove_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
@@ -529,33 +529,37 @@ class DockerImageBuilder:
         if not remove:
             return
         # remove images associate with node
-        client = docker.from_env()
+        images = docker.from_env().images
         for image_name, tag, _, type_ in res:
             if type_ == "build":
                 logger.info("Removing Docker image {}:{} ...", image_name, tag)
-                client.images.remove(f"{image_name}:{tag}")
+                images.remove(f"{image_name}:{tag}")
+
+    @staticmethod
+    def _tag_image(image, name: str, tag_new: str, res: List) -> None:
+        image.tag(name, tag_new, force=True)
+        res.append((name, tag_new, 0, "build"))
 
     def _build_image_node(
         self, node, tag_build: str, copy_ssh_to: str, push: bool,
         data: List[Tuple[str, str, float, str]]
     ) -> List[Tuple[str, str, float, str]]:
-        image = DockerImage(
+        res = []
+        name, tag, time = DockerImage(
             git_url=node.git_url,
             branch=node.branch,
             branch_fallback=self._branch_fallback,
             repo_path=self._repo_path
-        )
-        res = []
-        name, tag, time, type_ = image.build(
-            tag_build=tag_build, copy_ssh_to=copy_ssh_to
-        )
-        # record building/pushing info
-        res.append((name, tag, time, type_))
+        ).build(tag_build=tag_build, copy_ssh_to=copy_ssh_to)
+        res.append((name, tag, time, "build"))
+        # create a historical tag
+        image = docker.from_env().images.get(f"{name}:{tag}")
+        self._tag_image(image, name, tag_date(tag), res)
         # create new tags on the built images corresponding to other branches
         for br in self._graph.nodes[node].get("identical_branches", set()):
             tag_new = branch_to_tag(br)
-            docker.from_env().images.get(f"{name}:{tag}").tag(name, tag_new, force=True)
-            res.append((name, tag_new, 0, "build"))
+            self._tag_image(image, name, tag_new, res)
+            self._tag_image(image, name, tag_date(tag_new), res)
         if push:
             for name, tag, *_ in res.copy():
                 res.append(_retry_docker(lambda: _push_image_timing(name, tag)))  # pylint: disable=W0640
