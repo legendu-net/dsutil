@@ -122,9 +122,13 @@ class Node:
     branch: str
 
     def __str__(self):
-        index = self.git_url.rindex("/")
-        index = self.git_url.rindex("/", 0, index)
-        return self.git_url[(index + 1):] + f"<{self.branch}>"
+        rindex = self.git_url.rindex("/")
+        # HTTP urls, e.g., https://github.com/dclong/docker-jupyterhub-ds.git
+        index = self.git_url.rfind("/", 0, rindex)
+        if index < 0:
+            # SSH urls, e.g., git@github.com:dclong/docker-jupyterhub-ds.git
+            index = self.git_url.rindex(":", 0, rindex)
+        return self.git_url[(index + 1):-4] + f"<{self.branch}>"
 
 
 class DockerImage:
