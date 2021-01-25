@@ -528,7 +528,6 @@ class DockerImageBuilder:
             )
         if not remove:
             return
-        logger.debug("res: {}\n", res)
         # remove images associate with node
         client = docker.from_env()
         for image_name, tag, _, type_ in res:
