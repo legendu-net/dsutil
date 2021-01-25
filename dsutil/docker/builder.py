@@ -324,6 +324,18 @@ class DockerImage:
         """
         return self.base_image().node()
 
+    def docker_servers(self) -> Set[str]:
+        """Get 3rd-party Docker image hosts associated with this DockerImage and its base DockerImage.
+
+        :return: A set of 3rdd-party Docker image hosts.
+        """
+        servers = set()
+        if self._base_image.count("/") > 1:
+            servers.add(self._base_image.split("/", maxsplit=1)[0])
+        if self._name.count("/") > 1:
+            servers.add(self._name.split("/", maxsplit=1)[0])
+        return servers
+
 
 class DockerImageBuilder:
     """A class for build many Docker images at once.
@@ -342,6 +354,11 @@ class DockerImageBuilder:
         self._repo_nodes: Dict[str, List[Node]] = {}
         self._repo_path = {}
         self._roots = set()
+        self._servers = set()
+
+    def _record_docker_servers(self, deps: Deque[DockerImage]):
+        for dep in deps:
+            self._servers.update(dep.docker_servers())
 
     def _build_graph_branch(self, branch, urls):
         for url in urls:
@@ -351,6 +368,7 @@ class DockerImageBuilder:
                 branch_fallback=self._branch_fallback,
                 repo_path=self._repo_path
             ).get_deps(self._graph.nodes)
+            self._record_docker_servers(deps)
             dep0 = deps.popleft()
             if dep0.is_root():
                 node_prev = self._add_root_node(dep0.node())
@@ -472,15 +490,9 @@ class DockerImageBuilder:
                 for node in nodes:
                     fout.write(f"    - {node}\n")
 
-    #def _login_servers(self) -> None:
-    #    servers = set()
-    #    for _, image in self.docker_images.items():
-    #        if image.base_image.count("/") > 1:
-    #            servers.add(image.base_image.split("/")[0])
-    #        if image.name.count("/") > 1:
-    #            servers.add(image.name.split("/")[0])
-    #    for server in servers:
-    #        sp.run(f"docker login {server}", shell=True, check=True)
+    def _login_servers(self) -> None:
+        for server in self._servers:
+            sp.run(f"docker login {server}", shell=True, check=True)
 
     def build_images(
         self,
@@ -498,6 +510,7 @@ class DockerImageBuilder:
         :return: A pandas DataFrame summarizing building information.
         """
         self._build_graph()
+        self._login_servers()
         data = []
         for node in self._roots:
             self._build_images_graph(
