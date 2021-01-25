@@ -90,7 +90,7 @@ def _retry_docker(task: Callable,
 
 def _pull_image_timing(repo: str, tag: str) -> Tuple[str, str, float]:
     client = docker.from_env()
-    logger.info("Pulling the Docker image {repo}:{tag} ...", repo, tag)
+    logger.info("Pulling the Docker image {}:{} ...", repo, tag)
     seconds = timeit.timeit(
         lambda: client.images.pull(repo, tag), timer=time.perf_counter_ns, number=1
     ) / 1E9
