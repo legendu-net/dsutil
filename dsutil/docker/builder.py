@@ -88,12 +88,13 @@ def _retry_docker(task: Callable,
     return task()
 
 
-def _pull_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
+def _pull_image_timing(repo: str, tag: str) -> Tuple[str, str, float]:
     client = docker.from_env()
+    logger.info("Pulling the Docker image {repo}:{tag} ...", repo, tag)
     seconds = timeit.timeit(
         lambda: client.images.pull(repo, tag), timer=time.perf_counter_ns, number=1
     ) / 1E9
-    return repo, tag, seconds, "pull"
+    return repo, tag, seconds
 
 
 def _ignore_socket(dir_, files):
