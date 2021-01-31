@@ -397,7 +397,8 @@ class DockerImageBuilder:
                 return n
         return None
 
-    def _compare_git_branches(self, path: str, b1: str, b2: str) -> bool:
+    @staticmethod
+    def _compare_git_branches(path: str, b1: str, b2: str) -> bool:
         """Compare whether 2 branches of a repo are identical.
 
         :param path: The path to a local Git repository.
