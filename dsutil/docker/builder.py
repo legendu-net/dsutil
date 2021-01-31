@@ -410,7 +410,7 @@ class DockerImageBuilder:
         logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
-        diffs: List = repo.commit(b1).diff(repo.commit(b2)) 
+        diffs: List = repo.commit(b1).diff(repo.commit(b2))
         return not diffs
 
     def _add_root_node(self, node) -> Node:
