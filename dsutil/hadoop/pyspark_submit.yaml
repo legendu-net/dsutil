@@ -32,6 +32,8 @@ conf:
   spark.network.timeout: 300s
   spark.driver.maxResultSize: 8g
   spark.executor.memoryOverhead: 4G
+  spark.yarn.appMasterEnv.ARROW_PRE_0_15_IPC_FORMAT: 1
+  spark.executorEnv.ARROW_PRE_0_15_IPC_FORMAT: 1
   spark.executor.extraJavaOptions: -XX:MaxDirectMemorySize=8G
   spark.sql.shuffle.partitions: 1000
   spark.pyspark.driver.python: ./env/bin/python3

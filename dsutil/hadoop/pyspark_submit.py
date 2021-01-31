@@ -270,7 +270,11 @@ def _submit_local(args, config: Dict[str, Any]) -> bool:
     ]
     if config["jars"]:
         lines.append(f"--jars {config['jars']}")
-    lines.append("--conf spark.yarn.maxAppAttempts=1")
+    lines.extend([
+        "--conf spark.yarn.maxAppAttempts=1",
+        "--conf spark.yarn.appMasterEnv.ARROW_PRE_0_15_IPC_FORMAT=1",
+        "--conf spark.executorEnv.ARROW_PRE_0_15_IPC_FORMAT=1",
+    ])
     python = _python(config)
     lines.append(f"--conf spark.pyspark.driver.python={python}")
     lines.append(f"--conf spark.pyspark.python={python}")
