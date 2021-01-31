@@ -409,20 +409,11 @@ class DockerImageBuilder:
         logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
-        commit1 = self._get_branch_commit(repo, b1)
-        commit2 = self._get_branch_commit(repo, b2)
-        diffs: List = commit1.diff(commit2)
+        diffs: List = repo.commit(b1).diff(repo.commit(b2)) 
         return not diffs
         #return not any(diff for diff in diffs)
         #cmd = f"git -C {path} diff {b1}..{b2}"
         #return not sp.run(cmd, shell=True, check=True, capture_output=True).stdout
-
-    @staticmethod
-    def _get_branch_commit(repo, branch: str):
-        for ref in repo.refs:
-            if ref.name.endswith("/" + branch):
-                return ref.commit
-        raise LookupError(f"Branch {branch} is not found in the local repo {repo}!")
 
     def _add_root_node(self, node) -> Node:
         logger.debug("Adding root node {} into the graph ...", node)
