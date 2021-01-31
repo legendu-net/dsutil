@@ -410,12 +410,13 @@ class DockerImageBuilder:
         logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
-        #commit1 = self._get_branch_commit(repo, b1)
-        #commit2 = self._get_branch_commit(repo, b2)
-        #diffs: List = commit1.diff(commit2)
-        #return not any(diff.diff for diff in diffs)
-        cmd = f"git -C {path} diff {b1}..{b2}"
-        return not sp.run(cmd, shell=True, check=True, capture_output=True).stdout
+        commit1 = self._get_branch_commit(repo, b1)
+        commit2 = self._get_branch_commit(repo, b2)
+        diffs: List = commit1.diff(commit2)
+        return not diffs
+        #return not any(diff for diff in diffs)
+        #cmd = f"git -C {path} diff {b1}..{b2}"
+        #return not sp.run(cmd, shell=True, check=True, capture_output=True).stdout
 
     @staticmethod
     def _get_branch_commit(repo, branch: str):
