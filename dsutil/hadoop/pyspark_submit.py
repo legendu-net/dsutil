@@ -275,6 +275,7 @@ def _submit_local(args, config: Dict[str, Any]) -> bool:
             "--conf spark.yarn.maxAppAttempts=1",
             "--conf spark.yarn.appMasterEnv.ARROW_PRE_0_15_IPC_FORMAT=1",
             "--conf spark.executorEnv.ARROW_PRE_0_15_IPC_FORMAT=1",
+            "--conf spark.sql.execution.arrow.enabled=True",
         ]
     )
     python = _python(config)
