@@ -13,6 +13,7 @@ match_memory = "dsutil:memory.main"
 [tool.poetry.dependencies]
 python = ">=3.7.1,<3.10"
 dateparser = ">=0.7.1"
+numba = ">=0.53.0rc1.post1"
 pandas = ">=1.2.0"
 loguru = ">=0.3.2"
 toml = ">=0.10.0"
