@@ -79,13 +79,7 @@ def remove(aggressive: bool = False, choice: str = "") -> None:
     """Remove exited Docker containers and images without tags.
     """
     docker.from_env().containers.prune()
-    remove_images(tag="none", choice=choice)
-    if aggressive:
-        remove_images(tag="[a-z]*_?[0-9]{4}", choice=choice)
-        imgs = images().groupby("image_id").apply(  # pylint: disable=E1101
-            lambda frame: frame.query("tag == 'next'") if frame.shape[0] > 1 else None
-        )
-        _remove_images(imgs, choice=choice)
+    remove_images(tag="none", aggressive=aggressive)
 
 
 def pull():
@@ -102,6 +96,7 @@ def remove_images(
     id_: str = "",
     name: str = "",
     tag: str = "",
+    aggressive: bool = False,
     frame: Union[pd.DataFrame, None] = None,
     choice: str = ""
 ) -> None:
@@ -120,6 +115,11 @@ def remove_images(
         frames.append(imgs[imgs.repository.str.contains(name, case=False)])
     if tag:
         frames.append(imgs[imgs.tag.str.contains(tag, case=False)])
+    if aggressive:
+        frames.append(imgs[imgs.tag.str.contains("[a-z]*_?[0-9]{4}", case=False)])
+        frames.append(imgs.groupby("image_id").apply(
+            lambda frame: frame.query("tag == 'next'") if frame.shape[0] > 1 else None
+        ))
     _remove_images_frame(pd.concat(frames, ignore_index=True), choice=choice)
 
 
