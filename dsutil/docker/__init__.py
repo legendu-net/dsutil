@@ -19,7 +19,9 @@ def _get_image_repo(image):
 
 
 def images() -> pd.DataFrame:
-    """Return Docker images as a pandas DataFrame.
+    """Get information of Docker images.
+    
+    :return: A pandas DataFrame with columns: repository, tag, image_id, created and size.
     """
     data = []
     for image in docker.from_env().images.list():
@@ -108,24 +110,23 @@ def remove_images(
     :param name: A (regex) pattern of names of images to remove.
     :param tag: Remove images whose tags containing specified tag.
     """
+    frames = []
+    if frame:
+        frames.append(frame)
+    imgs = images()
     if id_:
-        imgs = images()
-        _remove_images(imgs[imgs.image_id.str.contains(id_, case=False)], choice=choice)
+        frames.append(imgs[imgs.image_id.str.contains(id_, case=False)])
     if name:
-        imgs = images()
-        _remove_images(
-            imgs[imgs.repository.str.contains(name, case=False)], choice=choice
-        )
+        frames.append(imgs[imgs.repository.str.contains(name, case=False)])
     if tag:
-        imgs = images()
-        _remove_images(imgs[imgs.tag.str.contains(tag, case=False)], choice=choice)
-    if frame is not None:
-        _remove_images(frame, choice=choice)
+        frames.append(imgs[imgs.tag.str.contains(tag, case=False)])
+    _remove_images_frame(pd.concat(frames, ignore_index=True), choice=choice)
 
 
-def _remove_images(imgs, choice: str = ""):
+def _remove_images_frame(imgs, choice: str = ""):
     if imgs.empty:
         return
+    imgs = imgs.drop_duplicates().sort_values("created", ascending=False)
     print("\n", imgs, "\n")
     sys.stdout.flush()
     sys.stderr.flush()
