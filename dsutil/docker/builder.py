@@ -285,7 +285,8 @@ class DockerImage:
             rm=True,
             pull=self.is_root(),
             cache_from=None,
-            decode=True):
+            decode=True
+        ):
             if "stream" in msg:
                 print(msg["stream"], end="")
         self._tag_build = tag_build
