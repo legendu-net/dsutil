@@ -276,17 +276,18 @@ class DockerImage:
             tag_build = branch_to_tag(self._branch)
         elif tag_build == "":
             tag_build = "latest"
-        if self.is_root():
-            _retry_docker(lambda: _pull_image_timing(*self._base_image.split(":")))
         logger.info("Building the Docker image {}:{} ...", self._name, tag_build)
         self._update_base_tag(tag_build)
-        docker.from_env().images.build(
+        client = docker.APIClient(base_url="unix://var/run/docker.sock")
+        for msg in client.build(
             path=str(self._path),
             tag=f"{self._name}:{tag_build}",
             rm=True,
-            pull=False,
-            cache_from=None
-        )
+            pull=self.is_root(),
+            cache_from=None,
+            decode=True):
+            if "stream" in msg:
+                print(msg["stream"], end="")
         self._tag_build = tag_build
         self._remove_ssh(copy_ssh_to)
         end = time.perf_counter_ns()
