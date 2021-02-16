@@ -276,7 +276,7 @@ class DockerImage:
             tag_build = branch_to_tag(self._branch)
         elif tag_build == "":
             tag_build = "latest"
-        if not self._git_url_base:  # self is a root image
+        if self.is_root():
             _retry_docker(lambda: _pull_image_timing(*self._base_image.split(":")))
         logger.info("Building the Docker image {}:{} ...", self._name, tag_build)
         self._update_base_tag(tag_build)
