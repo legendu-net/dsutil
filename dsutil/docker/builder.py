@@ -575,4 +575,6 @@ class DockerImageBuilder:
             for name, tag, *_ in res.copy():
                 res.append(_retry_docker(lambda: _push_image_timing(name, tag)))  # pylint: disable=W0640
         data.extend(res)
+        if logger._core.min_level <= logger.level("DEBUG").no:  # pylint: disable=W0212
+            sp.run("docker images && df -lh", shell=True, check=False)
         return res
