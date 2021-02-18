@@ -97,7 +97,7 @@ def _format_notebook(path: Path, style_file: str):
 
 
 def _get_jupyter_paths():
-    proc = sp.run("jupyter --path", shell=True, capture_output=True)
+    proc = sp.run("jupyter --path", shell=True, check=True, capture_output=True)
     lines = proc.stdout.decode().strip().split("\n")
     lines = (line.strip() for line in lines)
     return [line for line in lines if line.startswith("/")]
@@ -124,6 +124,12 @@ def _find_path_path(path, pattern):
 
 
 def find_jupyter_path(pattern, content: bool):
+    """Find Jupyter/Lab paths match a pattern.
+
+    :param pattern: The pattern to search for.
+    :param content: If True, search file content for the pattern;
+    otherwise, ssearch path name for the pattern.
+    """
     paths = _get_jupyter_paths()
     if content:
         paths = [_find_path_content(path, pattern) for path in paths]
