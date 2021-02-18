@@ -4,6 +4,8 @@
 import os
 from typing import Union, Dict
 from pathlib import Path
+import subprocess as sp
+import itertools as it
 import tempfile
 import nbformat
 from loguru import logger
@@ -92,3 +94,39 @@ def _format_notebook(path: Path, style_file: str):
         logger.info('The notebook "{}" is formatted.\n', path)
     else:
         logger.info('No change is made to the notebook "{}".\n', path)
+
+
+def _get_jupyter_paths():
+    proc = sp.run("jupyter --path", shell=True, capture_output=True)
+    lines = proc.stdout.decode().strip().split("\n")
+    lines = (line.strip() for line in lines)
+    return [line for line in lines if line.startswith("/")]
+
+
+def _find_path_content(path, pattern):
+    if isinstance(path, str):
+        path = Path(path)
+    for p in path.glob("**/*"):
+        if p.is_file():
+            try:
+                if pattern in p.read_text():
+                    yield p
+            except:
+                pass
+
+
+def _find_path_path(path, pattern):
+    if isinstance(path, str):
+        path = Path(path)
+    for p in path.glob("**/*"):
+        if pattern in str(p):
+            yield p
+
+
+def find_jupyter_path(pattern, content: bool):
+    paths = _get_jupyter_paths()
+    if content:
+        paths = [_find_path_content(path, pattern) for path in paths]
+    else:
+        paths = [_find_path_path(path, pattern) for path in paths]
+    return list(it.chain.from_iterable(paths))
