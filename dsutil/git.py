@@ -2,13 +2,13 @@
 # encoding: utf-8
 """Git related utils.
 """
+from __future__ import annotations
 import subprocess as sp
 from pathlib import Path
-from typing import List, Set
 from loguru import logger
 
 
-def _git_status(gcmd) -> List[bytes]:
+def _git_status(gcmd) -> list[bytes]:
     proc = sp.run(gcmd + ["status"], check=True, stdout=sp.PIPE, stderr=sp.STDOUT)
     lines = [line.strip() for line in proc.stdout.splitlines()]
     # get rid of the leading #
@@ -18,7 +18,7 @@ def _git_status(gcmd) -> List[bytes]:
     return [line.lower() for line in lines if line != b""]
 
 
-def _changes_status(status, changes: List[str]) -> None:
+def _changes_status(status, changes: list[str]) -> None:
     mapping = {
         b"new file:": "new",
         b"deleted:": "deleted",
@@ -62,7 +62,7 @@ def _git_current_branch(gcmd) -> bytes:
     return next(line[1:].strip() for line in lines if line.startswith(b"*"))
 
 
-def _git_remotes(gcmd) -> Set[bytes]:
+def _git_remotes(gcmd) -> set[bytes]:
     proc = sp.run(gcmd + ["remote", "-v"], check=True, stdout=sp.PIPE, stderr=sp.STDOUT)
     lines = [line.strip() for line in proc.stdout.splitlines() if line.strip() != b""]
     return set(line.split()[0] for line in lines)

@@ -1,6 +1,7 @@
 """Computer vision related utils.
 """
-from typing import Union, Tuple, Iterable
+from __future__ import annotations
+from typing import Union, Iterable
 from pathlib import Path
 from tqdm import tqdm
 import numpy as np
@@ -28,7 +29,7 @@ def video_to_image(video, frames_per_image: int = 60, output: str = "frame_{:0>7
 
 def resize_image(
     paths: Union[str, Path, Iterable[Path]], desdir: Union[str, Path, None],
-    size: Tuple[int]
+    size: tuple[int]
 ) -> None:
     """Resize images to a given size.
 
@@ -201,8 +202,8 @@ def deshade_3(img, threshold=0.4, cutoff=30) -> Image.Image:
 
 
 def highlight_frame(
-    rgb: Tuple[int, int, int],
-    shape: Tuple[int, int],
+    rgb: tuple[int, int, int],
+    shape: tuple[int, int],
     thickness: int = 3
 ) -> Image.Image:
     """Generate a rectangle frame with the specified color and thickness.
@@ -231,7 +232,7 @@ def highlight_frame(
 
 
 def frame_image(
-    img: Image.Image, rgb: Tuple[int, int, int], thickness: int = 3
+    img: Image.Image, rgb: tuple[int, int, int], thickness: int = 3
 ) -> Image.Image:
     """Add a highlight frame to an image.
 

@@ -2,14 +2,15 @@
 """
 #!/usr/bin/env python3
 # encoding: utf-8
-from typing import Union, List
+from __future__ import annotations
+from typing import Union
 import sys
 from pathlib import Path
 from loguru import logger
 
 
 def has_header(
-    files: Union[str, Path, List[Union[str, Path]]],
+    files: Union[str, Path, list[Union[str, Path]]],
     num_files_checking: int = 5
 ) -> bool:
     """Check whether the files have headers.
@@ -40,7 +41,7 @@ def has_header(
 
 
 def _merge_with_headers(
-    files: Union[str, Path, List[Union[str, Path]]],
+    files: Union[str, Path, list[Union[str, Path]]],
     output: Union[str, Path] = ""
 ) -> None:
     """Merge files with headers. Keep only one header.
@@ -61,7 +62,7 @@ def _merge_with_headers(
 
 
 def _merge_without_header(
-    files: Union[str, Path, List[Union[str, Path]]],
+    files: Union[str, Path, list[Union[str, Path]]],
     output: Union[str, Path] = ""
 ) -> None:
     """Merge files without header.
@@ -79,7 +80,7 @@ def _merge_without_header(
 
 
 def merge(
-    files: Union[str, Path, List[Union[str, Path]]],
+    files: Union[str, Path, list[Union[str, Path]]],
     output: str = "",
     num_files_checking: int = 5
 ) -> None:
@@ -123,7 +124,7 @@ def dedup_header(file: Union[str, Path], output: Union[str, Path] = "") -> None:
 
 def select(
     path: Union[str, Path],
-    columns: Union[str, List[str]],
+    columns: Union[str, list[str]],
     delimiter: str,
     output: str = ""
 ):

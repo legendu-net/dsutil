@@ -1,7 +1,7 @@
 """Docker related utils.
 """
 from __future__ import annotations
-from typing import Union, List, Deque, Tuple, Set, Dict, Callable, Any
+from typing import Union, Callable, Any
 from dataclasses import dataclass
 import tempfile
 from pathlib import Path
@@ -30,7 +30,7 @@ def tag_date(tag: str) -> str:
     return mmddhh if tag in ("", "latest") else f"{tag}_{mmddhh}"
 
 
-def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
+def _push_image_timing(repo: str, tag: str) -> tuple[str, str, float, str]:
     """Push a Docker image to Docker Hub and time the pushing.
     :param repo: The local repository of the Docker image.
     :param tag: The tag of the Docker image to push.
@@ -40,7 +40,7 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     logger.info("Pushing Docker image {}:{} ...", repo, tag)
 
     def _push():
-        msg_all: Dict[str, Dict] = {}
+        msg_all: dict[str, dict] = {}
         for msg in client.images.push(repo, tag, stream=True, decode=True):
             if "id" not in msg or "status" not in msg:
                 continue
@@ -57,7 +57,7 @@ def _push_image_timing(repo: str, tag: str) -> Tuple[str, str, float, str]:
     return repo, tag, seconds, "push"
 
 
-def _is_image_pushed(msg: Dict[str, Any]):
+def _is_image_pushed(msg: dict[str, Any]):
     phrases = ["Mounted from", "Pushed", "Layer already exists"]
     status = msg["status"]
     if any(status.startswith(phrase) for phrase in phrases):
@@ -71,7 +71,7 @@ def _is_image_pushed(msg: Dict[str, Any]):
 
 def _retry_docker(task: Callable,
                   retry: int = 3,
-                  seconds: float = 60) -> Tuple[str, str, float, str]:
+                  seconds: float = 60) -> tuple[str, str, float, str]:
     """Retry a Docker API on failure (for a few times).
     :param task: The task to run.
     :param retry: The total number of times to retry.
@@ -88,7 +88,7 @@ def _retry_docker(task: Callable,
     return task()
 
 
-def _pull_image_timing(repo: str, tag: str) -> Tuple[str, str, float]:
+def _pull_image_timing(repo: str, tag: str) -> tuple[str, str, float]:
     client = docker.from_env()
     logger.info("Pulling the Docker image {}:{} ...", repo, tag)
     seconds = timeit.timeit(
@@ -142,7 +142,7 @@ class DockerImage:
         git_url: str,
         branch: str = "dev",
         branch_fallback: str = "dev",
-        repo_path: Dict[str, str] = None
+        repo_path: dict[str, str] = None
     ):
         """Initialize a DockerImage object.
 
@@ -211,7 +211,7 @@ class DockerImage:
         if not self._base_image:
             raise LookupError("The FROM line is not found in the Dockerfile!")
 
-    def get_deps(self, repo_branch) -> Deque[DockerImage]:
+    def get_deps(self, repo_branch) -> deque[DockerImage]:
         """Get all dependencies of this DockerImage in order.
 
         :param repo_branch: A set-like collection containing tuples of (git_url, branch).
@@ -256,7 +256,7 @@ class DockerImage:
 
     def build(self,
               tag_build: str = None,
-              copy_ssh_to: str = "") -> Tuple[str, str, float]:
+              copy_ssh_to: str = "") -> tuple[str, str, float]:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
@@ -327,7 +327,7 @@ class DockerImage:
         """
         return self.base_image().node()
 
-    def docker_servers(self) -> Set[str]:
+    def docker_servers(self) -> set[str]:
         """Get 3rd-party Docker image hosts associated with this DockerImage and its base DockerImage.
 
         :return: A set of 3rdd-party Docker image hosts.
@@ -345,7 +345,7 @@ class DockerImageBuilder:
     """
     def __init__(
         self,
-        branch_urls: Union[Dict[str, List[str]], str, Path],
+        branch_urls: Union[dict[str, list[str]], str, Path],
         branch_fallback: str = "dev"
     ):
         if isinstance(branch_urls, (str, Path)):
@@ -354,18 +354,18 @@ class DockerImageBuilder:
         self._branch_urls = branch_urls
         self._branch_fallback = branch_fallback
         self._graph = None
-        self._repo_nodes: Dict[str, List[Node]] = {}
+        self._repo_nodes: dict[str, list[Node]] = {}
         self._repo_path = {}
         self._roots = set()
         self._servers = set()
 
-    def _record_docker_servers(self, deps: Deque[DockerImage]):
+    def _record_docker_servers(self, deps: deque[DockerImage]):
         for dep in deps:
             self._servers.update(dep.docker_servers())
 
     def _build_graph_branch(self, branch, urls):
         for url in urls:
-            deps: Deque[DockerImage] = DockerImage(
+            deps: deque[DockerImage] = DockerImage(
                 git_url=url,
                 branch=branch,
                 branch_fallback=self._branch_fallback,
@@ -389,7 +389,7 @@ class DockerImageBuilder:
         :param node: A dependency of the type DockerImage. 
         """
         logger.debug("Finding identical node of {} in the graph ...", node)
-        nodes: List[Node] = self._repo_nodes.get(node.git_url, [])
+        nodes: list[Node] = self._repo_nodes.get(node.git_url, [])
         logger.debug("Nodes associated with the repo {}: {}", node.git_url, str(nodes))
         if not nodes:
             return None
@@ -412,7 +412,7 @@ class DockerImageBuilder:
         logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
-        diffs: List = repo.commit(b1).diff(repo.commit(b2))
+        diffs: list = repo.commit(b1).diff(repo.commit(b2))
         return not diffs
 
     def _add_root_node(self, node) -> Node:
@@ -518,7 +518,7 @@ class DockerImageBuilder:
 
     def _build_images_graph(
         self, node, tag_build: str, copy_ssh_to: str, push: bool, remove: bool,
-        data: List
+        data: list
     ) -> None:
         res = self._build_image_node(
             node=node,
@@ -547,14 +547,14 @@ class DockerImageBuilder:
                 images.remove(f"{image_name}:{tag}")
 
     @staticmethod
-    def _tag_image(image, name: str, tag_new: str, res: List) -> None:
+    def _tag_image(image, name: str, tag_new: str, res: list) -> None:
         image.tag(name, tag_new, force=True)
         res.append((name, tag_new, 0, "build"))
 
     def _build_image_node(
         self, node, tag_build: str, copy_ssh_to: str, push: bool,
-        data: List[Tuple[str, str, float, str]]
-    ) -> List[Tuple[str, str, float, str]]:
+        data: list[tuple[str, str, float, str]]
+    ) -> list[tuple[str, str, float, str]]:
         res = []
         name, tag, time = DockerImage(
             git_url=node.git_url,

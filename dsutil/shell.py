@@ -1,6 +1,7 @@
 """Shell command related utils.
 """
-from typing import List, Union
+from __future__ import annotations
+from typing import Union
 import re
 import subprocess as sp
 import pandas as pd
@@ -9,9 +10,9 @@ import pandas as pd
 def to_frame(
     cmd="",
     split: str = r"  +",
-    header: Union[int, List[str], None] = None,
-    skip: Union[int, List[int]] = (),
-    lines: List[str] = (),
+    header: Union[int, list[str], None] = None,
+    skip: Union[int, list[int]] = (),
+    lines: list[str] = (),
     split_by_header: bool = False
 ) -> pd.DataFrame:
     """Convert the result of a shell command to a DataFrame.
@@ -43,9 +44,9 @@ def to_frame(
 
 
 def _to_frame_space(
-    lines: List[str],
+    lines: list[str],
     split: str = r"  +",
-    header: Union[int, List[str], None] = None,
+    header: Union[int, list[str], None] = None,
 ) -> pd.DataFrame:
     """Convert the result of a shell command to a DataFrame.
 
@@ -69,7 +70,7 @@ def _to_frame_space(
     return frame.astype(str)
 
 
-def _to_frame_title(lines: List[str], split: str = r"  +") -> pd.DataFrame:
+def _to_frame_title(lines: list[str], split: str = r"  +") -> pd.DataFrame:
     """Convert the result of a shell command to a DataFrame.
 
     :param lines: The output of the shell command as list of lines.

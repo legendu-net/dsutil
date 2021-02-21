@@ -2,7 +2,8 @@
 # encoding: utf-8
 """A module makes it easy to run Scala/Python Spark job.
 """
-from typing import Union, List, Dict, Callable, Any
+from __future__ import annotations
+from typing import Union, Callable, Any
 import os
 import sys
 from argparse import Namespace, ArgumentParser
@@ -20,7 +21,7 @@ import notifiers
 class SparkSubmit:
     """A class for submitting Spark jobs.
     """
-    def __init__(self, email: Union[Dict, None] = None, level: str = "INFO"):
+    def __init__(self, email: Union[dict, None] = None, level: str = "INFO"):
         """Initialize a SparkSubmit instance.
 
         :param email: A dict object containing email information ("from", "to" and "host").
@@ -36,7 +37,7 @@ class SparkSubmit:
         self.email = email
 
     def _spark_log_filter_helper_keyword(
-        self, line: str, keyword: str, mutual_exclusive: List[str],
+        self, line: str, keyword: str, mutual_exclusive: list[str],
         time_delta: datetime.timedelta
     ) -> bool:
         if keyword not in line:
@@ -54,7 +55,7 @@ class SparkSubmit:
         return False
 
     def _spark_log_filter_helper_keywords(
-        self, line: str, keywords: List[str], mutual_exclusive: bool,
+        self, line: str, keywords: list[str], mutual_exclusive: bool,
         time_delta: datetime.timedelta
     ) -> bool:
         mutual_exclusive = keywords if mutual_exclusive else ()
@@ -122,7 +123,7 @@ class SparkSubmit:
             return True
         return False
 
-    def submit(self, cmd: str, attachments: Union[None, List[str]] = None) -> bool:
+    def submit(self, cmd: str, attachments: Union[None, list[str]] = None) -> bool:
         """Submit a Spark job.
 
         :param cmd: The Python script command to run.
@@ -189,7 +190,7 @@ class SparkSubmit:
         )
 
     @staticmethod
-    def _app_id(stdout: List[str]) -> str:
+    def _app_id(stdout: list[str]) -> str:
         """Parse the application ID.
 
         :param stdout: Standard output as a list of strings.
@@ -202,7 +203,7 @@ class SparkSubmit:
         return ""
 
     @staticmethod
-    def _final_status(stdout: List[str]) -> str:
+    def _final_status(stdout: list[str]) -> str:
         """Parse the final status of the Spark application.
 
         :param stdout: Standard output as a list of strings.
@@ -214,7 +215,7 @@ class SparkSubmit:
         return ""
 
 
-def _files(config: Dict) -> str:
+def _files(config: dict) -> str:
     """Get a list of valid configuration files to use with the option --files.
 
     :param config: A dict object containing configurations.
@@ -243,7 +244,7 @@ def _files(config: Dict) -> str:
     return ",".join(files)
 
 
-def _python(config: Dict) -> str:
+def _python(config: dict) -> str:
     if "python-local" not in config:
         bins = ["python3", "python"]
     else:
@@ -258,7 +259,7 @@ def _python(config: Dict) -> str:
     raise ValueError("No valid local python executable specified for python-local!")
 
 
-def _submit_local(args, config: Dict[str, Any]) -> bool:
+def _submit_local(args, config: dict[str, Any]) -> bool:
     spark_submit = config.get("spark-submit-local", "")
     if not spark_submit:
         return True
@@ -287,7 +288,7 @@ def _submit_local(args, config: Dict[str, Any]) -> bool:
     return SparkSubmit().submit(" \\\n".join(lines) + "\n", args.cmd[:1])
 
 
-def _submit_cluster(args, config: Dict[str, Any]) -> bool:
+def _submit_cluster(args, config: dict[str, Any]) -> bool:
     spark_submit = config.get("spark-submit", "")
     if not spark_submit:
         logger.warning("The filed spark-submit is not defined!")

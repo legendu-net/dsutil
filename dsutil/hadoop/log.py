@@ -1,5 +1,6 @@
 """Module for log filtering.
 """
+from __future__ import annotations
 import sys
 import os
 import re
@@ -83,7 +84,6 @@ class LogFilter:
         self.keywords = keywords if keywords else LogFilter.KEYWORDS
         self.keywords = keywords
         self.patterns = patterns if patterns else LogFilter.PATTERNS
-        self.patterns = [re.compile(p) for p in self.patterns]
         self.case_sensitive = case_sensitive
         if not self.case_sensitive:
             self.keywords = [kw.lower() for kw in self.keywords]
@@ -107,7 +107,7 @@ class LogFilter:
         :return: The regularized the line message.
         """
         for pattern in self.patterns:
-            line = pattern.sub("", line)
+            line = re.sub(pattern, "", line)
         return line
 
     def _dump_queue(self, lines) -> None:

@@ -1,10 +1,11 @@
 """This module makes it easy to work with poetry to managing your Python project.
 """
+from __future__ import annotations
+from typing import Union, Iterable
+from pathlib import Path
 import sys
 import os
 import shutil
-from pathlib import Path
-from typing import Union, List, Iterable
 import subprocess as sp
 import toml
 from loguru import logger
@@ -213,7 +214,7 @@ def format_code(
         print(repo.git.status())
 
 
-def _lint_code(proj_dir: Union[Path, None], linter: Union[str, List[str]]):
+def _lint_code(proj_dir: Union[Path, None], linter: Union[str, list[str]]):
     funcs = {
         "pylint": _lint_code_pylint,
         "flake8": _lint_code_flake8,
