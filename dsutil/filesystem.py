@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Filesystem related util functions.
 """
+from __future__ import annotations
 import os
 import re
 import shutil
@@ -134,7 +135,7 @@ def split_dir(dir_: Union[str, Path], batch_size: int, wildcard: str = "*") -> N
 
 
 def _split_dir_1(
-    desdir: Path, files: List[Path], batch_idx: int, batch_size: int
+    desdir: Path, files: list[Path], batch_idx: int, batch_size: int
 ) -> None:
     """Helper method of split_dir.
 
