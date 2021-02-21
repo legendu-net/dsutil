@@ -82,8 +82,8 @@ class LogFilter:
         self.context_size = context_size
         self.keywords = keywords if keywords else LogFilter.KEYWORDS
         self.keywords = keywords
-        self.patterns = patterns if patterns else LogFilter.PATTERNS
-        self.patterns = [re.compile(p) for p in self.patterns]
+        patterns = patterns if patterns else LogFilter.PATTERNS
+        self.patterns = [re.compile(p) for p in patterns]
         self.case_sensitive = case_sensitive
         if not self.case_sensitive:
             self.keywords = [kw.lower() for kw in self.keywords]
