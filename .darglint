@@ -1,3 +1,0 @@
-[darglint]
-docstring_style=sphinx
-message_template={path}:{line}: {msg_id}: {msg}
