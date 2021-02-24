@@ -1510,6 +1510,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 
 [extras]
 admin = ["psutil"]
+all = ["opencv-python", "pillow", "docker", "networkx", "requests", "PyPDF2", "nbformat", "nbconvert", "psutil"]
 cv = ["opencv-python", "pillow"]
 docker = ["docker", "networkx", "requests"]
 jupyter = ["nbformat", "nbconvert"]
@@ -1518,7 +1519,7 @@ pdf = ["PyPDF2"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<3.10"
-content-hash = "391453481cae5c4ae670cc36070b6d61719ae60e072b913045b50e7015387410"
+content-hash = "5cf96409bd8cc7d952baa0a10580c829715412f3cd32ede4aa4d1f91b4d6b150"
 
 [metadata.files]
 appnope = [
