@@ -29,7 +29,7 @@ jobs:
         xinstall --sudo docker -ic --user-to-docker ""
         xinstall pt -ic
         ~/.poetry/bin/poetry env use python3
-        ~/.poetry/bin/poetry install
+        ~/.poetry/bin/poetry install -E all
         brew install libmagic
         brew link libmagic
     - name: Test with pytest
