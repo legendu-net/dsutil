@@ -33,7 +33,8 @@ jobs:
         $env:Path += ";$env:Userprofile\.poetry\bin"
         poetry env use python
         poetry install -E all
-        pip3 install pytest
+        poetry run pip3 install docker yapf
+        poetry run pip3 install pytest
     - name: Test with pytest
       run: |
         $env:Path += ";$env:Userprofile\.poetry\bin"
