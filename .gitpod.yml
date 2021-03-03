@@ -6,4 +6,4 @@ tasks:
 
 vscode:
   extensions:
-    - vscodevim.vim@1.16.0:/5VFvnA8Qrf16ESjAohurw==
+    - vscodevim.vim
