@@ -39,7 +39,8 @@ def update_shebang(script_dir: Union[Path, str], shebang: str):
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
 
-    :param args: The arguments to parse. If None, the arguments from command line is parsed.
+    :param args: The arguments to parse. 
+        If None, the arguments from command line is parsed.
     :param namespace: An inital Namespace object.
     :return: A Namespace object containing parsed options.
     """

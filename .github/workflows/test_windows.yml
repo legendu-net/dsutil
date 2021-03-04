@@ -32,9 +32,9 @@ jobs:
         xinstall pt -ic --python python
         $env:Path += ";$env:Userprofile\.poetry\bin"
         poetry env use python
-        poetry install --no-dev
-        pip3 install pytest
-        pip3 install ./
+        poetry run pip3 install .
+        poetry run pip3 install docker yapf
+        poetry run pip3 install pytest
     - name: Test with pytest
       run: |
         $env:Path += ";$env:Userprofile\.poetry\bin"

@@ -348,7 +348,8 @@ def submit(args: Namespace) -> None:
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
 
-    :param args: Arguments to parse. If None, arguments from command line is used.
+    :param args: Arguments to parse. 
+    If None, arguments from command line is used.
     :param namespace: An initial Namespace object to use.
     :return: A Namespace object containing command-line options.
     """

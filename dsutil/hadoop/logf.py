@@ -51,10 +51,11 @@ def fetch(args):
 
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
-
-    :param args: Arguments to parse.
-    :param namespace: An initial namespace.
-    :return: Parse arguments as a Namespace object.
+    
+    :param args: The arguments to parse. 
+        If None, the arguments from command-line are parsed.
+    :param namespace: An inital Namespace object.
+    :return: A namespace object containing parsed options.
     """
     parser = ArgumentParser(description='Spark/Hadoop log utils.')
     subparsers = parser.add_subparsers(help='Sub commands.')

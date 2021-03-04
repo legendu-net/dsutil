@@ -129,7 +129,8 @@ def authenticate(password: str, email: Dict[str, str], user: str = "") -> None:
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments for the script.
 
-    :param args: The arguments to parse. If None, the command-line arguments are parsed.
+    :param args: The arguments to parse. 
+    If None, the command-line arguments are parsed.
     :param namespace: An initial Namespace object.
     :return: A Namespace object containing parsed command-line options.
     """
