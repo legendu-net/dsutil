@@ -2,7 +2,7 @@
 """Jupyter/Lab notebooks related utils.
 """
 import os
-from typing import Union, Dict
+from typing import Union
 from pathlib import Path
 import subprocess as sp
 import itertools as it
@@ -14,7 +14,7 @@ from yapf.yapflib.yapf_api import FormatCode
 HOME = Path.home()
 
 
-def _format_cell(cell: Dict, style_file: str) -> bool:
+def _format_cell(cell: dict, style_file: str) -> bool:
     """Format a cell in a Jupyter notebook.
 
     :param cell: A cell in the notebook.

@@ -2,10 +2,10 @@
 """Filesystem related util functions.
 """
 from __future__ import annotations
+from typing import Union, Iterable, Callable
 import os
 import re
 import shutil
-from typing import Union, Iterable, Dict, List, Tuple, Set, Callable
 import math
 from pathlib import Path
 import subprocess as sp
@@ -149,7 +149,7 @@ def _split_dir_1(
         path.rename(desdir / path.name)
 
 
-def find_images(root_dir: Union[str, Path, List[str], List[Path]]) -> List[Path]:
+def find_images(root_dir: Union[str, Path, list[str], list[Path]]) -> list[Path]:
     """Find all PNG images in a (sequence) of dir(s) or its/their subdirs.
 
     :param root_dir: A (list) of dir(s).
@@ -170,7 +170,7 @@ def find_data_tables(
     filter_: Callable = lambda _: True,
     extensions: Iterable[str] = (),
     patterns: Iterable[str] = (),
-) -> Set[str]:
+) -> set[str]:
     """Find keywords which are likely data table names.
 
     :param root: The root directory or a GitHub repo URL in which to find data table names.
@@ -212,7 +212,7 @@ def find_data_tables(
     )
 
 
-def _find_data_tables_file(file, filter_, patterns) -> Set[str]:
+def _find_data_tables_file(file, filter_, patterns) -> set[str]:
     if isinstance(file, str):
         file = Path(file)
     text = file.read_text().lower()
@@ -232,7 +232,7 @@ def _find_data_tables_file(file, filter_, patterns) -> Set[str]:
     return set(table for table in tables if filter_(table))
 
 
-def find_data_tables_sql(sql: str, filter_: Union[Callable, None] = None) -> Set[str]:
+def find_data_tables_sql(sql: str, filter_: Union[Callable, None] = None) -> set[str]:
     """Find keywords which are likely data table names in a SQL string.
 
     :param sql: A SQL query.
@@ -274,7 +274,7 @@ def _ignore(path: Path) -> bool:
     return False
 
 
-def remove_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> List[Path]:
+def remove_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> list[Path]:
     """Remove essentially empty directories under a path.
 
     :param path: The path to the directory to check.
@@ -293,7 +293,7 @@ def remove_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> List
     return fail
 
 
-def find_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> List[Path]:
+def find_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> list[Path]:
     """Find essentially empty sub directories under a directory.
 
     :param path: The path to the directory to check.
@@ -311,7 +311,7 @@ def find_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> List[P
 
 
 def _find_ess_empty(
-    path: Path, ignore: Callable, ess_empty: Dict[Path, bool], ess_empty_dir: List[str]
+    path: Path, ignore: Callable, ess_empty: dict[Path, bool], ess_empty_dir: list[str]
 ):
     if is_ess_empty(path=path, ignore=ignore, ess_empty=ess_empty):
         ess_empty_dir.append(path)
@@ -324,7 +324,7 @@ def _find_ess_empty(
 
 
 def is_ess_empty(
-    path: Path, ignore: Callable = _ignore, ess_empty: Dict[Path, bool] = None
+    path: Path, ignore: Callable = _ignore, ess_empty: dict[Path, bool] = None
 ):
     """Check if a directory is essentially empty.
 
@@ -363,8 +363,8 @@ def is_ess_empty(
 
 def update_file(
     path: Path,
-    regex: List[Tuple[str, str]] = None,
-    exact: List[Tuple[str, str]] = None,
+    regex: list[tuple[str]] = None,
+    exact: list[tuple[str]] = None,
     append: Union[str, Iterable[str]] = None,
     exist_skip: bool = True,
 ) -> None:
@@ -395,7 +395,7 @@ def update_file(
     path.write_text(text)
 
 
-def get_files(dir_: Union[str, Path], exts: Union[str, List[str]]) -> Iterable[Path]:
+def get_files(dir_: Union[str, Path], exts: Union[str, list[str]]) -> Iterable[Path]:
     """Get files with the specified file extensions.
 
     :param dir_: The path to a directory.
@@ -409,7 +409,7 @@ def get_files(dir_: Union[str, Path], exts: Union[str, List[str]]) -> Iterable[P
     yield from _get_files(dir_, exts)
 
 
-def _get_files(dir_: Path, exts: List[str]) -> Iterable[Path]:
+def _get_files(dir_: Path, exts: list[str]) -> Iterable[Path]:
     for path in dir_.iterdir():
         if path.is_file():
             if path.suffix.lower() in exts:

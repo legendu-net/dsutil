@@ -1,6 +1,7 @@
 """Pandas DataFrame related utils.
 """
-from typing import List, Union
+from __future__ import annotations
+from typing import Union
 from pathlib import Path
 from loguru import logger
 import pandas as pd
@@ -9,7 +10,7 @@ from pandas_profiling import ProfileReport
 
 def table_2w(
     frame: Union[pd.DataFrame, pd.Series],
-    columns: Union[str, List[str], None],
+    columns: Union[str, list[str], None],
     na_as=None
 ) -> pd.DataFrame:
     """Create 2-way table from columns of a DataFrame.

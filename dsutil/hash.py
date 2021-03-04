@@ -1,7 +1,8 @@
 """Hash code related utils.
 """
+from __future__ import annotations
 import hashlib
-from typing import Union, List, Tuple
+from typing import Union
 from pathlib import Path
 from loguru import logger
 
@@ -27,7 +28,7 @@ def rmd5(path: Union[str, Path], output: Union[str, Path] = "") -> str:
     return hashlib.md5(text.encode()).hexdigest()
 
 
-def _rmd5(path: Path, res: List[Tuple[str, str]]) -> None:
+def _rmd5(path: Path, res: list[tuple[str]]) -> None:
     """Helper function of rmd5.
 
     :param path: The Path object of a file or directory.

@@ -1,6 +1,7 @@
 """Utils functions for Hadoop.
 """
-from typing import Union, List
+from __future__ import annotations
+from typing import Union
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, spark_partition_id, rank, coalesce, lit, max, sum
 
@@ -33,7 +34,7 @@ def sample(
     return frame.sample(ratio)
 
 
-def calc_global_rank(frame: DataFrame, order_by: Union[str, List[str]]) -> DataFrame:
+def calc_global_rank(frame: DataFrame, order_by: Union[str, list[str]]) -> DataFrame:
     """Calculate global ranks.
     This function uses a smart algorithm to avoding shuffling all rows
     to a single node which causes OOM.

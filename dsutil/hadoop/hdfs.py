@@ -1,6 +1,7 @@
 """Wrapping HDFS commands.
 """
-from typing import List, Dict, Union
+from __future__ import annotations
+from typing import Union
 from pathlib import Path
 import os
 import subprocess as sp
@@ -143,7 +144,7 @@ class Hdfs():
         )
 
     @staticmethod
-    def _file_size_1(path: str, size: int, dir_size: Dict[str, int]):
+    def _file_size_1(path: str, size: int, dir_size: dict[str, int]):
         while path != "/":
             path = os.path.dirname(path)
             dir_size.setdefault(path, 0)
@@ -212,7 +213,7 @@ class Hdfs():
 
     def fetch_partition_names(self,
                               path: str,
-                              extension: str = ".parquet") -> List[str]:
+                              extension: str = ".parquet") -> list[str]:
         """Get Parquet partition names (with the parent directory) under a HDFS path.
 
         :param path: A HDFS path.
@@ -240,7 +241,7 @@ class Hdfs():
     def rm_robust(self,
                   path: str,
                   skip_trash: bool = False,
-                  user: str = "") -> List[str]:
+                  user: str = "") -> list[str]:
         """Remove a HDFS path in a robust way. 
             If removing a directory fails, 
             the method continues to remove its subfiles and subdirs 

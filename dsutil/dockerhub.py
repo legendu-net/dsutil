@@ -1,6 +1,6 @@
 """DockerHub
 """
-from typing import List
+from __future__ import annotations
 import requests
 
 
@@ -11,7 +11,7 @@ class DockerHub():
         self.user = user
         self._token = self.token(password) if password else token
 
-    def tags(self, image: str) -> List[str]:
+    def tags(self, image: str) -> list[str]:
         """Get tags of a Docker image on Docker Hub.
 
         :param image: The name of a Docker image, e.g., "jupyterhub-ds".
