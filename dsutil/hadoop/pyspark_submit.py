@@ -254,7 +254,7 @@ def _get_first_valid_file(key: str, files: List[str]) -> str:
 
 
 def _files_xml(files: Iterable[str]) -> List[str]:
-    groups = [key: list(val) for key, val in it.groupby(files, os.path.basename)]
+    groups = [(key, list(val)) for key, val in it.groupby(files, os.path.basename)]
     files = (_get_first_valid_file(key, files) for key, files in groups)
     return [for file in files if file]
 
