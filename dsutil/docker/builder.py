@@ -88,13 +88,13 @@ def _retry_docker(task: Callable,
     return task()
 
 
-def _pull_image_timing(repo: str, tag: str) -> tuple[str, str, float]:
+def _pull_image_timing(repo: str, tag: str) -> tuple[str, str, float, str]:
     client = docker.from_env()
     logger.info("Pulling the Docker image {}:{} ...", repo, tag)
     seconds = timeit.timeit(
         lambda: client.images.pull(repo, tag), timer=time.perf_counter_ns, number=1
     ) / 1E9
-    return repo, tag, seconds
+    return repo, tag, seconds, "pull"
 
 
 def _ignore_socket(dir_, files):
@@ -256,7 +256,7 @@ class DockerImage:
 
     def build(self,
               tag_build: str = None,
-              copy_ssh_to: str = "") -> tuple[str, str, float]:
+              copy_ssh_to: str = "") -> tuple[str, str, float, str]:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
@@ -292,7 +292,7 @@ class DockerImage:
         self._tag_build = tag_build
         self._remove_ssh(copy_ssh_to)
         end = time.perf_counter_ns()
-        return self._name, tag_build, (end - start) / 1E9
+        return self._name, tag_build, (end - start) / 1E9, "build"
 
     def _remove_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
@@ -556,13 +556,14 @@ class DockerImageBuilder:
         data: list[tuple[str, str, float, str]]
     ) -> list[tuple[str, str, float, str]]:
         res = []
-        name, tag, time = DockerImage(
+        res_build = DockerImage(
             git_url=node.git_url,
             branch=node.branch,
             branch_fallback=self._branch_fallback,
             repo_path=self._repo_path
         ).build(tag_build=tag_build, copy_ssh_to=copy_ssh_to)
-        res.append((name, tag, time, "build"))
+        res.append(res_build)
+        name, tag, _, _ = res_build
         # create a historical tag
         image = docker.from_env().images.get(f"{name}:{tag}")
         self._tag_image(image, name, tag_date(tag), res)
