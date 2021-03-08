@@ -223,8 +223,8 @@ def _files(config: dict) -> str:
     :return: A string containing Spark configuration files separated by comma.
     """
     files = config["files"]
-    files_xml = _files_xml(for file in files if file.endswith(".xml")) 
-    files_non_xml = _files_non_xml(for file in files if not file.endswith(".xml"))
+    files_xml = _files_xml(file for file in files if file.endswith(".xml")) 
+    files_non_xml = _files_non_xml(file for file in files if not file.endswith(".xml"))
     return ",".join(files_xml + files_non_xml)
 
 
