@@ -222,7 +222,7 @@ def _files(config: dict) -> str:
     :param config: A dict object containing configurations.
     :return: A string containing Spark configuration files separated by comma.
     """
-    files = config["files"]:
+    files = config["files"]
     files_xml = _files_xml(for file in files if file.endswith(".xml")) 
     files_non_xml = _files_non_xml(for file in files if not file.endswith(".xml"))
     return ",".join(files_xml + files_non_xml)
@@ -260,7 +260,13 @@ def _files_xml(files: Iterable[str]) -> List[str]:
 
 
 def _files_non_xml(files: Iterable[str]) -> List[str]:
-    return [file for file in files if _file_exists(file)]
+    res = []
+    for file in files:
+        if _file_exists(file):
+            res.append(file)
+        else:
+            logger.warning("The file {} does NOT exist!", file)
+    return res
 
 
 def _python(config: dict) -> str:
