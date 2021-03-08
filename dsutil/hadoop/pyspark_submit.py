@@ -359,8 +359,8 @@ def submit(args: Namespace) -> None:
     if args.python_local:
         config["python-local"] = args.python_local
     if "files" not in config:
-        config["files"] = {}
-    config["files"] = _files(config)
+        config["files"] = []
+    config["files"] = _files(config) + args.files
     if "jars" not in config:
         config["jars"] = ""
     if isinstance(config["jars"], (list, tuple)):
@@ -383,7 +383,6 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "-c",
         "--config",
         dest="config",
-        required=False,
         default="",
         help="The configuration file to use."
     )
@@ -391,7 +390,6 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "--ssl",
         "--spark-submit-local",
         dest="spark_submit_local",
-        required=False,
         default="",
         help="The local path to spark-submit."
     )
@@ -399,7 +397,6 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "--pl",
         "--python-local",
         dest="python_local",
-        required=False,
         default="",
         help="The local path to Python."
     )
@@ -408,8 +405,14 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "--gen-config",
         "--generate-config",
         dest="gen_config",
-        required=False,
         help="Specify a path for generating a configration example."
+    )
+    parser.add_argument(
+        "--files",
+        dest="files",
+        nargs="+",
+        default=()
+        help="Additional files to upload."
     )
     parser.add_argument(
         dest="cmd", nargs="+", help="The command to submit to Spark to run."
