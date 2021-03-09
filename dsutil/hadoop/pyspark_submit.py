@@ -3,7 +3,7 @@
 """A module makes it easy to run Scala/Python Spark job.
 """
 from __future__ import annotations
-from typing import Union, Callable, Any
+from typing import Union, Callable, Any, Iterable
 import os
 import sys
 import itertools as it
@@ -223,26 +223,24 @@ def _files(config: dict) -> str:
     :return: A string containing Spark configuration files separated by comma.
     """
     files = config["files"]
-    files_xml = _files_xml(file for file in files if file.endswith(".xml")) 
+    files_xml = _files_xml(file for file in files if file.endswith(".xml"))
     files_non_xml = _files_non_xml(file for file in files if not file.endswith(".xml"))
     return ",".join(files_xml + files_non_xml)
 
 
-def _file_exists(file: str) -> bool:
+def _file_exists(path: str) -> bool:
     if path.startswith("file://") and os.path.isfile(path[7:]):
         return True
     if path.startswith("viewfs://") or path.startswith("hdfs://"):
         process = sp.run(
-            f"/apache/hadoop/bin/hdfs dfs -test -f {path}",
-            shell=True,
-            check=False
+            f"/apache/hadoop/bin/hdfs dfs -test -f {path}", shell=True, check=False
         )
         if process.returncode == 0:
             return True
     return False
 
 
-def _get_first_valid_file(key: str, files: List[str]) -> str:
+def _get_first_valid_file(key: str, files: list[str]) -> str:
     for file in files:
         if _file_exists(file):
             return file
@@ -253,13 +251,13 @@ def _get_first_valid_file(key: str, files: List[str]) -> str:
     return ""
 
 
-def _files_xml(files: Iterable[str]) -> List[str]:
+def _files_xml(files: Iterable[str]) -> list[str]:
     groups = [(key, list(val)) for key, val in it.groupby(files, os.path.basename)]
     files = (_get_first_valid_file(key, files) for key, files in groups)
     return [file for file in files if file]
 
 
-def _files_non_xml(files: Iterable[str]) -> List[str]:
+def _files_non_xml(files: Iterable[str]) -> list[str]:
     res = []
     for file in files:
         if _file_exists(file):
