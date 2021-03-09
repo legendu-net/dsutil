@@ -3,9 +3,10 @@
 """A module makes it easy to run Scala/Python Spark job.
 """
 from __future__ import annotations
-from typing import Union, Callable, Any
+from typing import Union, Callable, Any, Iterable
 import os
 import sys
+import itertools as it
 from argparse import Namespace, ArgumentParser
 from pathlib import Path
 import shutil
@@ -221,27 +222,49 @@ def _files(config: dict) -> str:
     :param config: A dict object containing configurations.
     :return: A string containing Spark configuration files separated by comma.
     """
-    files = []
-    for key, paths in config["files"].items():
-        for path in paths:
-            if path.startswith("file://") and os.path.isfile(path[7:]):
-                files.append(path)
-                break
-            if path.startswith("viewfs://") or path.startswith("hdfs://"):
-                process = sp.run(
-                    f"/apache/hadoop/bin/hdfs dfs -test -f {path}",
-                    shell=True,
-                    check=False
-                )
-                if process.returncode == 0:
-                    files.append(path)
-                    break
+    files = config["files"]
+    files_xml = _files_xml(file for file in files if file.endswith(".xml"))
+    files_non_xml = _files_non_xml(file for file in files if not file.endswith(".xml"))
+    return ",".join(files_xml + files_non_xml)
+
+
+def _file_exists(path: str) -> bool:
+    if path.startswith("file://") and os.path.isfile(path[7:]):
+        return True
+    if path.startswith("viewfs://") or path.startswith("hdfs://"):
+        process = sp.run(
+            f"/apache/hadoop/bin/hdfs dfs -test -f {path}", shell=True, check=False
+        )
+        if process.returncode == 0:
+            return True
+    return False
+
+
+def _get_first_valid_file(key: str, files: list[str]) -> str:
+    for file in files:
+        if _file_exists(file):
+            return file
+    logger.warning(
+        "None of the specified configuration file for {} exists.\n    ", key,
+        "\n".join("    " + file for file in files)
+    )
+    return ""
+
+
+def _files_xml(files: Iterable[str]) -> list[str]:
+    groups = [(key, list(val)) for key, val in it.groupby(files, os.path.basename)]
+    files = (_get_first_valid_file(key, files) for key, files in groups)
+    return [file for file in files if file]
+
+
+def _files_non_xml(files: Iterable[str]) -> list[str]:
+    res = []
+    for file in files:
+        if _file_exists(file):
+            res.append(file)
         else:
-            logger.warning(
-                "None of the specified configuration file for {} exists.\n    ", key,
-                "\n".join("    " + path for path in paths)
-            )
-    return ",".join(files)
+            logger.warning("The file {} does NOT exist!", file)
+    return res
 
 
 def _python(config: dict) -> str:
