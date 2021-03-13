@@ -57,7 +57,7 @@ darglint = ">=1.5.8"
 yapf = ">=0.31.0"
 pyspark = ">=3.0.1"
 
-[tool.yapf.style]
+[tool.yapf]
 based_on_style = "facebook"
 column_limit = 88
 
