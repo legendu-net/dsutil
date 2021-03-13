@@ -40,19 +40,6 @@ nbformat = { version = ">=5.0.7", optional = true }
 nbconvert = { version = ">=5.6.1", optional = true }
 yapf = { version = ">=0.30.0", optional = true}
 
-[tool.poetry.dev-dependencies]
-pytest = ">=3.0"
-pylint = ">=2.7.0"
-flake8 = ">=3.8.4"
-pytype = { version = ">=2020.08.10", python = "<3.9" }
-darglint = ">=1.5.8"
-yapf = ">=0.30.0"
-pyspark = ">=3.0.1"
-
-[build-system]
-requires = ["poetry>=1.0.0"]
-build-backend = "poetry.masonry.api"
-
 [tool.poetry.extras]
 cv = ["opencv-python", "pillow"]
 docker = ["docker", "networkx", "requests"]
@@ -60,3 +47,33 @@ pdf = ["PyPDF2"]
 jupyter = ["nbformat", "nbconvert", "yapf"]
 admin = ["psutil"]
 all = ["opencv-python", "pillow", "docker", "networkx", "requests", "PyPDF2", "nbformat", "nbconvert", "yapf", "psutil"]
+
+[tool.poetry.dev-dependencies]
+pytest = ">=3.0"
+pylint = ">=2.7.0"
+flake8 = ">=3.8.4"
+pytype = { version = ">=2020.08.10", python = "<3.9" }
+darglint = ">=1.5.8"
+yapf = ">=0.31.0"
+pyspark = ">=3.0.1"
+
+[tool.yapf]
+based_on_style = "facebook"
+column_limit = 88
+
+[tool.pylint.master]
+ignore = ".venv,.ipynb_checkpoints"
+unsafe-load-any-extension = "no"
+extension-pkg-whitelist = "numpy,cv2,pyspark"
+generated-members = "sqlite3.*,cv2.*,pyspark.*"
+ignored-modules = "pyspark.sql.functions"
+
+[tool.pylint.typecheck]
+ignored-classes = "Namespace"
+
+[tool.pylint.messages_control]
+disable = "C0103,C0200,C0301,C0303,C0330,R0902,R0903,R0911,R0912,R0913,W0621,W0622,W0702,W0703,W1116"
+
+[build-system]
+requires = ["poetry>=1.0.0"]
+build-backend = "poetry.masonry.api"
