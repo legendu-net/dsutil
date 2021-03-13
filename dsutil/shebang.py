@@ -4,6 +4,7 @@ from typing import Union
 from pathlib import Path
 from argparse import ArgumentParser, Namespace
 from magic import Magic
+
 FILE = Path(__file__).resolve()
 print(f"Location of the shebang.py: {FILE}")
 

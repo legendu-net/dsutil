@@ -4,6 +4,7 @@ import re
 from argparse import ArgumentParser, Namespace
 import subprocess as sp
 from .log import LogFilter
+
 YARN = '/apache/hadoop/bin/yarn'
 
 

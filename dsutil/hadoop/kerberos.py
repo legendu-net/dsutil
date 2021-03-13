@@ -18,6 +18,7 @@ from argparse import ArgumentParser, Namespace
 import yaml
 from loguru import logger
 import notifiers
+
 PROFILE = Path.home() / ".kinit_profile"
 HOST = socket.gethostname()
 HOST_IP = socket.gethostbyname(HOST)

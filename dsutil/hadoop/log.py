@@ -7,6 +7,7 @@ import re
 from collections import deque
 from difflib import SequenceMatcher
 import time
+
 DASH_50 = "-" * 50
 
 
