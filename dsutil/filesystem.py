@@ -15,6 +15,7 @@ from tqdm import tqdm
 import pandas as pd
 from loguru import logger
 import git
+
 HOME = Path.home()
 
 
@@ -363,8 +364,8 @@ def is_ess_empty(
 
 def update_file(
     path: Path,
-    regex: list[tuple[str]] = None,
-    exact: list[tuple[str]] = None,
+    regex: list[tuple[str, str]] = None,
+    exact: list[tuple[str, str]] = None,
     append: Union[str, Iterable[str]] = None,
     exist_skip: bool = True,
 ) -> None:
