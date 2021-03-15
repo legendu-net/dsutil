@@ -202,7 +202,8 @@ def format_code(
     proc = sp.run(cmd, shell=True, check=False, stdout=sp.PIPE)
     if proc.returncode:
         logger.warning(
-            "Please format the code: {}\n{}", cmd.replace(" -dr ", " -ir "), proc.stdout.decode()
+            "Please format the code: {}\n{}", cmd.replace(" -dr ", " -ir "),
+            proc.stdout.decode()
         )
         sys.stdout.flush()
         sys.stderr.flush()
