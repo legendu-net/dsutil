@@ -116,8 +116,9 @@ def remove_images(
     if tag:
         frames.append(imgs[imgs.tag.str.contains(tag, case=False)])
     if aggressive:
-        frames.append(imgs[imgs.tag.str.contains("[a-z]*_?[0-9]{4}", case=False)])
-        frames.append(imgs.groupby("image_id").apply(  # pylint: disable=E1101
+        frames.append(imgs[imgs.tag.str.contains(r"[a-z]*_?\d{4,}", case=False)])
+        frames.append(
+            imgs[~imgs.tag.str.contains(r"\d{4,}")].groupby("image_id").apply(  # pylint: disable=E1101
             lambda frame: frame.query("tag == 'next'") if frame.shape[0] > 1 else None
         ))
     _remove_images_frame(pd.concat(frames, ignore_index=True), choice=choice)
