@@ -87,7 +87,7 @@ def _format_notebook(path: Path, style_file: str) -> None:
         return
     logger.info('Formatting code in the notebook "{}".', path)
     notebook = nbformat.read(path, as_version=nbformat.NO_CONVERT)
-    nbformat.validate(notebook)
+    #nbformat.validate(notebook)
     changed = False
     for cell in notebook.cells:
         changed |= _format_cell(cell, style_file=style_file)
