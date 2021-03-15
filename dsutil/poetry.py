@@ -179,7 +179,7 @@ def format_code(
     :param files: An iterable of Python scripts to format.
         If empty, then the whole project is formatted.
     """
-    cmd = ["yapf"]
+    cmd = [f"PATH={proj_dir}/.venv/bin:$PATH", "yapf"]
     if inplace:
         cmd.append("-ir")
         logger.info("Formatting code...")
@@ -224,86 +224,52 @@ def _lint_code(proj_dir: Union[Path, None], linter: Union[str, list[str]]):
     }
     if isinstance(linter, str):
         linter = [linter]
-    pyvenv_path = _pyvenv_path()
     for lint in linter:
-        funcs[lint](proj_dir, pyvenv_path)
+        funcs[lint](proj_dir)
 
 
-def _pyvenv_path() -> str:
-    path = Path(".venv/pyvenv.cfg")
-    if not path.is_file():
-        return ""
-    with path.open("r") as fin:
-        for line in fin:
-            if line.startswith("home = "):
-                return line[7:].strip()
-    return ""
-
-
-def _lint_code_pytype(proj_dir: Union[Path, None], pyvenv_path: str):
+def _lint_code_pytype(proj_dir: Union[Path, None]):
     logger.info("Linting code using pytype ...")
     if not proj_dir:
         proj_dir = _project_dir()
     pkg = _project_name(proj_dir)
-    if not pyvenv_path:
-        pyvenv_path = _pyvenv_path()
-    if pyvenv_path:
-        pyvenv_path += ":"
-    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH pytype {proj_dir / pkg} {proj_dir / 'tests'}"
+    cmd = f"PATH={proj_dir}/.venv/bin:$PATH pytype {proj_dir / pkg} {proj_dir / 'tests'}"
     try:
         sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
         logger.error("Please fix errors: {}", cmd)
 
 
-def _lint_code_pylint(proj_dir: Union[Path, None], pyvenv_path: str):
+def _lint_code_pylint(proj_dir: Union[Path, None]):
     logger.info("Linting code using pylint ...")
     if not proj_dir:
         proj_dir = _project_dir()
-    if not pyvenv_path:
-        pyvenv_path = _pyvenv_path()
     pkg = _project_name(proj_dir)
-    if not pyvenv_path:
-        pyvenv_path = _pyvenv_path()
-    if pyvenv_path:
-        pyvenv_path += ":"
-    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH pylint {proj_dir / pkg}"
+    cmd = f"PATH={proj_dir}/.venv/bin:$PATH pylint {proj_dir / pkg}"
     try:
         sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
         logger.error("Please fix errors: {}", cmd)
 
 
-def _lint_code_flake8(proj_dir: Union[Path, None], pyvenv_path: str):
+def _lint_code_flake8(proj_dir: Union[Path, None]):
     logger.info("Linting code using flake8 ...")
     if not proj_dir:
         proj_dir = _project_dir()
-    if not pyvenv_path:
-        pyvenv_path = _pyvenv_path()
     pkg = _project_name(proj_dir)
-    if not pyvenv_path:
-        pyvenv_path = _pyvenv_path()
-    if pyvenv_path:
-        pyvenv_path += ":"
-    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH flake8 {proj_dir / pkg}"
+    cmd = f"PATH={proj_dir}/.venv/bin:$PATH flake8 {proj_dir / pkg}"
     try:
         sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
         logger.error("Please fix errors: {}", cmd)
 
 
-def _lint_code_darglint(proj_dir: Union[Path, None], pyvenv_path: str):
+def _lint_code_darglint(proj_dir: Union[Path, None]):
     logger.info("Linting docstring using darglint ...")
     if not proj_dir:
         proj_dir = _project_dir()
-    if not pyvenv_path:
-        pyvenv_path = _pyvenv_path()
     pkg = _project_name(proj_dir)
-    if not pyvenv_path:
-        pyvenv_path = _pyvenv_path()
-    if pyvenv_path:
-        pyvenv_path += ":"
-    cmd = f"PATH={pyvenv_path}{proj_dir}/.venv/bin:$PATH darglint {proj_dir / pkg}"
+    cmd = f"PATH={proj_dir}/.venv/bin:$PATH darglint {proj_dir / pkg}"
     try:
         sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
