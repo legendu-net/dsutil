@@ -79,11 +79,12 @@ def nbconvert_notebooks(root_dir: Union[str, Path], cache: bool = False) -> None
         html.write_text(code, encoding="utf-8")
 
 
-def _format_notebook(path: Path, style_file: str):
+def _format_notebook(path: Path, style_file: str) -> None:
     if isinstance(path, str):
         path = Path(path)
     if path.suffix != ".ipynb":
-        raise ValueError(f"{path} is not a notebook!")
+        logger.warning(f"{path} is skipped as it is not a notebook!")
+        return
     logger.info('Formatting code in the notebook "{}".', path)
     notebook = nbformat.read(path, as_version=nbformat.NO_CONVERT)
     nbformat.validate(notebook)
