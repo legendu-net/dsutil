@@ -1,31 +1,36 @@
 """Module for log filtering.
 """
 from __future__ import annotations
+from typing import Sequence, TextIO
 import sys
 import os
 import re
 from collections import deque
 from difflib import SequenceMatcher
 import time
+from tqdm import tqdm
 
 DASH_50 = "-" * 50
+DASH_100 = "-" * 100
 
 
-class LogCluster:
-    """Clustering similar lines
+class LogDeduper:
+    """Dedup similar log lines.
     """
-    def __init__(self):
-        self.cluster = []
+    def __init__(self, threshold: float = 0.5):
+        self._lines = []
+        self._threshold = threshold
 
-    @staticmethod
-    def similarity(line1, line2):
+    def similarity(self, line):
         """Calcualte similarity between 2 lines.
 
         :param line1: A line of logging message.
         :param line2: Another line of logging message.
         :return: A similarity score (between 0 and 1) between the 2 lines.
         """
-        return SequenceMatcher(None, line1, line2).ratio()
+        return max(
+            (SequenceMatcher(None, line, target).ratio() for target in self._lines), default=0
+        )
 
     def add(self, line, line_num):
         """Add a line.
@@ -33,20 +38,16 @@ class LogCluster:
         :param line: A line of logging message.
         :param line_num: The row number (0-based) of the line.
         """
-        LINE = "L{line_num}: {line}\n"
-        similarity = max(
-            (self.similarity(line, target) for target in self.cluster), default=0
-        )
-        if similarity < 0.5:
-            self.cluster.append(LINE.format(line=line, line_num=line_num))
+        if self.similarity(line) < self._threshold:
+            self._lines.append(f"L{line_num}: {line}\n")
 
-    def write(self, fout):
-        """Write deduplicated log to a file.
+    def write(self, fout: TextIO):
+        """Write deduplicated log into a file.
 
-        :param fout: A file handler for writing.
+        :param fout: A file handler for outputing log.
         """
         fout.write(DASH_50 + "SUMMARY" + DASH_50 + "\n")
-        for line in self.cluster:
+        for line in self._lines:
             fout.write(line)
 
 
@@ -54,16 +55,18 @@ class LogFilter:
     """A class for log filtering.
     """
     KEYWORDS = (
-        "Exception",
-        "Error",
         "User class threw exception",
-        "OOM",
         "spark.yarn.executor.memoryOverhead",
         "FileAlreadyExists",
         "InvalidResourceRequestException",
-        "exec /bin/bash ",
         "has no attribute",
         "not found",
+        "exec /bin/bash ",
+        "OOM",
+        "Error",
+        "error",
+        "Exception",
+        "exception",
     )
     PATTERNS = (
         r"\d\d[\/](0?[1-9]|1[0-2])[\/](0?[1-9]|[12][0-9]|3[01])\s\d+[:]\d+:\d+",
@@ -75,39 +78,36 @@ class LogFilter:
         self,
         log_file,
         context_size=5,
-        keywords=KEYWORDS,
-        patterns=PATTERNS,
-        case_sensitive: bool = True,
+        keywords: Sequence[str] = KEYWORDS,
+        patterns: Sequence[str] = PATTERNS,
         output_file: str = "",
     ):
         self._log_file = log_file
-        self.context_size = context_size
-        self.keywords = keywords if keywords else LogFilter.KEYWORDS
-        self.keywords = keywords
-        self.patterns = patterns if patterns else LogFilter.PATTERNS
-        self.case_sensitive = case_sensitive
-        if not self.case_sensitive:
-            self.keywords = [kw.lower() for kw in self.keywords]
-        self.num_rows = None
-        self.step = None
-        self.unique = set()
-        self.lookup = {}
-        self.queue = deque()
-        self.output_file = self._output_file(output_file)
+        self._context_size = context_size
+        self._keywords = keywords
+        self._patterns = patterns
+        self._num_rows = None
+        self._lookup = {}
+        self._queue = deque()
+        self._output_file = self._get_output_file(output_file)
 
-    def _output_file(self, output_file):
+    def _get_output_file(self, output_file):
+        """Get a valid output file.
+
+        :param output_file: The path to the output file.
+        """
         if output_file:
             return output_file
         title, ext = os.path.splitext(self._log_file)
         return title + "_s" + ext
 
-    def regularize(self, line) -> str:
+    def _regularize(self, line) -> str:
         """Get rid of substrings with patterns specified by the regular expressions.
 
         :param line: A line of logging message.
         :return: The regularized the line message.
         """
-        for pattern in self.patterns:
+        for pattern in self._patterns:
             line = re.sub(pattern, "", line)
         return line
 
@@ -116,83 +116,70 @@ class LogFilter:
 
         :param lines: A list to dump the queue to.
         """
-        lines.append("-" * 100 + "\n")
-        lines.extend(self.queue)
-        self.queue.clear()
+        lines.append(DASH_100 + "\n")
+        lines.extend(self._queue)
+        self._queue.clear()
 
-    def keep(self, idx: int, line: str) -> bool:
+    def _keep(self, idx: int, line: str) -> bool:
         """Check whether the line should be kept.
 
         :param idx: The original row number (0-based) of the line. 
         :param line: A line of logging message.
         :return: True if the line is to be kept and False otherwise.
         """
-        if not self.case_sensitive:
-            line = line.lower()
-        if any(kw in line for kw in self.keywords):
-            line = self.regularize(line)
-            if line not in self.unique:
-                self.unique.add(line)
-                self.lookup[line] = idx
+        # TODO: group by keywords and dedup in each group first
+        if any(kw in line for kw in self._keywords):
+            line = self._regularize(line)
+            if line not in self._lookup:
+                self._lookup[line] = idx
                 return True
         return False
 
-    def _calc_rows(self):
+    def _count_rows(self):
         """Count the total number of rows.
         """
-        if self.num_rows is not None:
+        if self._num_rows is not None:
             return
-        print('Calculating total number of rows ...')
-        self.num_rows = sum(1 for line in open(self._log_file, 'r'))
-        print('Total number of rows: ', '{:,}'.format(self.num_rows))
-        self.step = max(self.num_rows // 1000, 1000)
+        print("Counting total number of rows ...")
+        with open(self._log_file, "r") as fin:
+            self._num_rows = sum(1 for line in fin)
+        print(f"Total number of rows: {self._num_rows:,}")
 
     def filter(self):
         """Filter informative liens from a Spark application log.
         """
-        self._calc_rows()
-        lines = [DASH_50 + 'START' + DASH_50 + '\n']
-        with open(self._log_file, 'r') as fin:
+        self._count_rows()
+        lines = [DASH_50 + "START" + DASH_50 + "\n"]
+        with open(self._log_file, "r") as fin:
             dump_flag = -1
-            time_begin = time.time()
-            for idx, line in enumerate(fin):
-                line_with_num = f'L{idx}: {line}'
-                self.queue.append(line_with_num)
-                keep = self.keep(idx, line)
+            for idx, line in tqdm(enumerate(fin), total=self._num_rows):
+                line_with_num = f"L{idx}: {line}"
+                self._queue.append(line_with_num)
+                keep = self._keep(idx, line)
                 # fill up context_head with anything only if found
-                if len(self.queue) < self.context_size and not keep:
-                    self.queue.append(line_with_num)
+                if len(self._queue) < self._context_size and not keep:
+                    self._queue.append(line_with_num)
                     continue
                 if not keep and dump_flag == -1:
-                    self.queue.popleft()
+                    self._queue.popleft()
                 elif not keep and dump_flag >= 0:
                     dump_flag += 1
-                    if dump_flag == self.context_size:
+                    if dump_flag == self._context_size:
                         self._dump_queue(lines)
                         dump_flag = -1
                 else:
                     dump_flag = 0
-                # print progress
-                if idx % self.step == 0:
-                    time_end = time.time()
-                    time_used = time_end - time_begin
-                    time_left = time_used / idx * (self.num_rows - idx)
-                    msg = LogFilter.MSG.format(
-                        line_num='{:,}'.format(idx),
-                        progress=round(idx / self.num_rows * 100, 1),
-                        time_used=round(time_used, 1),
-                        time_left=round(time_left, 1)
-                    )
-                    sys.stdout.write(msg)
-            print('\n')
-            lines.append(DASH_50 + 'EOF' + DASH_50 + '\n')
+            lines.append(DASH_50 + "EOF" + DASH_50 + "\n")
             self._dump_queue(lines)
-        # dedup to get a summary
-        cluster = LogCluster()
-        for line in self.unique:
-            cluster.add(line, self.lookup[line])
-        cluster.write(sys.stdout)
-        with open(self.output_file, 'w') as fout:
-            cluster.write(fout)
+        self._dedup_dump_log(lines)
+
+    def _dedup_dump_log(self, lines):
+        print("Deduplicating logs ...")
+        deduper = LogDeduper()
+        for line, idx in tqdm(self._lookup):
+            deduper.add(line, idx)
+        deduper.write(sys.stdout)
+        with open(self._output_file, "w") as fout:
+            deduper.write(fout)
             fout.writelines(lines)
-        sys.stdout.write(f'\nFile saved in {self.output_file}\n')
+        print(f"\nFile saved in {self._output_file}\n")
