@@ -179,30 +179,31 @@ def format_code(
     :param files: An iterable of Python scripts to format.
         If empty, then the whole project is formatted.
     """
-    cmd = [f"PATH={proj_dir}/.venv/bin:$PATH", "yapf"]
+    PATH = os.environ["PATH"]
+    cmd = f"PATH={proj_dir}/.venv/bin:{PATH} yapf"
     if inplace:
-        cmd.append("-ir")
+        cmd += " -ir"
         logger.info("Formatting code...")
     else:
-        cmd.append("-dr")
+        cmd += " -dr"
         logger.info("Checking code formatting...")
     if files:
-        cmd.extend(files)
+        cmd += " " + " ".join(files)
     else:
         if proj_dir is None:
             proj_dir = _project_dir()
         # source dir
         pkg = _project_name(proj_dir)
-        cmd.append(str(proj_dir / pkg))
+        cmd += " " + str(proj_dir / pkg)
         # tests dir
         test = proj_dir / "tests"
         if test.is_dir():
-            cmd.append(str(test))
-    proc = sp.run(cmd, check=False, stdout=sp.PIPE)
+            cmd += " " + str(test)
+    proc = sp.run(cmd, shell=True, check=False, stdout=sp.PIPE)
     if proc.returncode:
-        cmd[1] = "-ir"
         logger.warning(
-            "Please format the code: {}\n{}", " ".join(cmd), proc.stdout.decode()
+            "Please format the code: {}\n{}", cmd.replace(" -dr ", " -ir "),
+            proc.stdout.decode()
         )
         sys.stdout.flush()
         sys.stderr.flush()
