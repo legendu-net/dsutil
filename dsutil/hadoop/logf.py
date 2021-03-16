@@ -18,7 +18,6 @@ def filter_(args):
         context_size=args.context_size,
         keywords=args.keywords,
         patterns=args.patterns,
-        case_sensitive=args.case_sensitive
     )
     logf.filter()
 
