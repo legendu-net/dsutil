@@ -7,7 +7,6 @@ import os
 import re
 from collections import deque
 from difflib import SequenceMatcher
-import time
 from tqdm import tqdm
 
 DASH_50 = "-" * 50
@@ -127,7 +126,6 @@ class LogFilter:
         :param line: A line of logging message.
         :return: True if the line is to be kept and False otherwise.
         """
-        # TODO: group by keywords and dedup in each group first
         if any(kw in line for kw in self._keywords):
             line = self._regularize(line)
             if line not in self._lookup:
