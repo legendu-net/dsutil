@@ -80,7 +80,7 @@ class LogFilter:
         context_size=5,
         keywords: Sequence[str] = KEYWORDS,
         patterns: Sequence[str] = PATTERNS,
-        output_file: str = "",
+        output: str = "",
         threshold: float = 0.5,
     ):
         self._log_file = log_file
@@ -90,16 +90,16 @@ class LogFilter:
         self._num_rows = None
         self._lookup = {}
         self._queue = deque()
-        self._output_file = self._get_output_file(output_file)
+        self._output = self._get_output(output)
         self._threshold = threshold
 
-    def _get_output_file(self, output_file):
+    def _get_output(self, output):
         """Get a valid output file.
 
-        :param output_file: The path to the output file.
+        :param output: The path to the output file.
         """
-        if output_file:
-            return output_file
+        if output and output != self._log_file:
+            return output
         title, ext = os.path.splitext(self._log_file)
         return title + "_s" + ext
 
@@ -181,7 +181,7 @@ class LogFilter:
         for line, idx in tqdm(self._lookup.items()):
             deduper.add(line, idx)
         deduper.write(sys.stdout)
-        with open(self._output_file, "w") as fout:
+        with open(self._output, "w") as fout:
             deduper.write(fout)
             fout.writelines(lines)
-        print(f"\nFile saved in {self._output_file}\n")
+        print(f"\nFile saved in {self._output}\n")

@@ -19,6 +19,7 @@ def filter_(args):
         context_size=args.context_size,
         keywords=args.keywords,
         patterns=args.patterns,
+        output=args.output,
         threshold=args.threshold
     )
     logf.filter()
