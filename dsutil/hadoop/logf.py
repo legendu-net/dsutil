@@ -1,5 +1,6 @@
 """Script for fetch and filtering Spark application logs.
 """
+from typing import Optional
 import re
 from argparse import ArgumentParser, Namespace
 import subprocess as sp
@@ -46,7 +47,8 @@ def fetch(args):
         cmd = cmd + ['-appOwner', args.user]
     with open(output, 'w', encoding='utf-8') as fout:
         sp.run(cmd, stdout=fout, check=True)
-    LogFilter(log_file=output).filter()
+    args.log_file = output
+    filter_(args)
 
 
 def parse_args(args=None, namespace=None) -> Namespace:
@@ -144,10 +146,11 @@ def _subparser_filter(subparsers):
     parser_filter.set_defaults(func=filter_)
 
 
-def main():
+def main(args: Optional[Namespace] = None):
     """The main function for script usage.
     """
-    args = parse_args()
+    if args is None:
+        args = parse_args()
     args.func(args)
 
 

@@ -1,0 +1,469 @@
+LogAggregationType: AGGREGATED
+==============================================================================================================================
+LogType:stderr
+LogLastModifiedTime:Sat Feb 27 08:25:21 +0000 2021
+LogLength:559
+LogContents:
+SLF4J: Class path contains multiple SLF4J bindings.
+SLF4J: Found binding in [jar:file:/hadoop/6/yarn/local/usercache/dclong/filecache/140/__spark_libs__2914772172935991564.zip/slf4j-log4j12-1.7.16.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: Found binding in [jar:file:/apache/releases/hadoop-2.7.3.2.6.4.1.0.39/share/hadoop/common/lib/slf4j-log4j12-1.7.10.jar!/org/slf4j/impl/StaticLoggerBinder.class]
+SLF4J: See http://www.slf4j.org/codes.html#multiple_bindings for an explanation.
+SLF4J: Actual binding is of type [org.slf4j.impl.Log4jLoggerFactory]
+
+End of LogType:stderr
+***********************************************************************
+
+LogAggregationType: AGGREGATED
+==============================================================================================================================
+LogType:stdout
+LogLastModifiedTime:Sat Feb 27 08:25:21 +0000 2021
+LogLength:5151
+LogContents:
+21/02/27 01:25:16 INFO SignalUtils: Registered signal handler for TERM
+21/02/27 01:25:16 INFO SignalUtils: Registered signal handler for HUP
+21/02/27 01:25:16 INFO SignalUtils: Registered signal handler for INT
+21/02/27 01:25:16 WARN SparkConf: The configuration key 'spark.yarn.access.namenodes' has been deprecated as of Spark 2.2 and may be removed in the future. Please use the new key 'spark.yarn.access.hadoopFileSystems' instead.
+21/02/27 01:25:16 WARN SparkConf: The configuration key 'spark.scheduler.listenerbus.eventqueue.size' has been deprecated as of Spark 2.3 and may be removed in the future. Please use the new key 'spark.scheduler.listenerbus.eventqueue.capacity' instead.
+21/02/27 01:25:16 INFO SecurityManager: Changing view acls to: dclong,*
+21/02/27 01:25:16 INFO SecurityManager: Changing modify acls to: dclong
+21/02/27 01:25:16 INFO SecurityManager: Changing view acls groups to: 
+21/02/27 01:25:16 INFO SecurityManager: Changing modify acls groups to: 
+21/02/27 01:25:16 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users  with view permissions: Set(dclong, *); groups with view permissions: Set(); users  with modify permissions: Set(dclong); groups with modify permissions: Set()
+21/02/27 01:25:17 WARN Configuration: __spark_hadoop_conf__.xml:an attempt to override final parameter: yarn.nodemanager.log-dirs;  Ignoring.
+21/02/27 01:25:17 WARN Configuration: __spark_hadoop_conf__.xml:an attempt to override final parameter: yarn.nodemanager.local-dirs;  Ignoring.
+21/02/27 01:25:17 INFO ApplicationMaster: Preparing Local resources
+21/02/27 01:25:18 WARN Configuration: __spark_hadoop_conf__.xml:an attempt to override final parameter: yarn.nodemanager.log-dirs;  Ignoring.
+21/02/27 01:25:18 WARN Configuration: __spark_hadoop_conf__.xml:an attempt to override final parameter: yarn.nodemanager.local-dirs;  Ignoring.
+21/02/27 01:25:18 INFO ApplicationMaster: ApplicationAttemptId: appattempt_1611634725250_1347938_000001
+21/02/27 01:25:18 INFO ApplicationMaster: Starting the user application in a separate Thread
+21/02/27 01:25:18 INFO ApplicationMaster: Waiting for spark context initialization...
+21/02/27 01:25:18 WARN SparkConf: The configuration key 'spark.yarn.access.namenodes' has been deprecated as of Spark 2.2 and may be removed in the future. Please use the new key 'spark.yarn.access.hadoopFileSystems' instead.
+21/02/27 01:25:18 WARN SparkConf: The configuration key 'spark.scheduler.listenerbus.eventqueue.size' has been deprecated as of Spark 2.3 and may be removed in the future. Please use the new key 'spark.scheduler.listenerbus.eventqueue.capacity' instead.
+  File "02c81b44-0774-44d9-a836-6f2ff5fcb441_data2.py", line 50
+    """
+      ^
+SyntaxError: invalid syntax
+21/02/27 01:25:19 ERROR ApplicationMaster: User application exited with status 1
+21/02/27 01:25:19 INFO ApplicationMaster: Final app status: FAILED, exitCode: 13, (reason: User application exited with status 1)
+21/02/27 01:25:19 ERROR ApplicationMaster: Uncaught exception: 
+org.apache.spark.SparkException: Exception thrown in awaitResult: 
+        at org.apache.spark.util.ThreadUtils$.awaitResult(ThreadUtils.scala:207)
+        at org.apache.spark.deploy.yarn.ApplicationMaster.runDriver(ApplicationMaster.scala:498)
+        at org.apache.spark.deploy.yarn.ApplicationMaster.org$apache$spark$deploy$yarn$ApplicationMaster$$runImpl(ApplicationMaster.scala:345)
+        at org.apache.spark.deploy.yarn.ApplicationMaster$$anonfun$run$2.apply$mcV$sp(ApplicationMaster.scala:260)
+        at org.apache.spark.deploy.yarn.ApplicationMaster$$anonfun$run$2.apply(ApplicationMaster.scala:260)
+        at org.apache.spark.deploy.yarn.ApplicationMaster$$anonfun$run$2.apply(ApplicationMaster.scala:260)
+        at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$5.run(ApplicationMaster.scala:815)
+        at java.security.AccessController.doPrivileged(Native Method)
+        at javax.security.auth.Subject.doAs(Subject.java:422)
+        at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1869)
+        at org.apache.spark.deploy.yarn.ApplicationMaster.doAsUser(ApplicationMaster.scala:814)
+        at org.apache.spark.deploy.yarn.ApplicationMaster.run(ApplicationMaster.scala:259)
+        at org.apache.spark.deploy.yarn.ApplicationMaster$.main(ApplicationMaster.scala:839)
+        at org.apache.spark.deploy.yarn.ApplicationMaster.main(ApplicationMaster.scala)
+Caused by: org.apache.spark.SparkUserAppException: User application exited with 1
+        at org.apache.spark.deploy.PythonRunner$.main(PythonRunner.scala:106)
+        at org.apache.spark.deploy.PythonRunner.main(PythonRunner.scala)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:498)
+        at org.apache.spark.deploy.yarn.ApplicationMaster$$anon$4.run(ApplicationMaster.scala:721)
+21/02/27 01:25:19 INFO ShutdownHookManager: Shutdown hook called
+
+End of LogType:stdout
+***********************************************************************
+
+LogAggregationType: AGGREGATED
+==============================================================================================================================
+LogType:directory.info
+LogLastModifiedTime:Sat Feb 27 08:25:21 +0000 2021
+LogLength:34116
+LogContents:
+ls -l:
+total 16
+lrwxrwxrwx 1 dclong hadoop   95 Feb 27 01:25 02c81b44-0774-44d9-a836-6f2ff5fcb441_data2.py -> /hadoop/3/yarn/local/usercache/dclong/filecache/139/02c81b44-0774-44d9-a836-6f2ff5fcb441_data2.py
+-rw------- 1 dclong hadoop  603 Feb 27 01:25 container_tokens
+lrwxrwxrwx 1 dclong hadoop   87 Feb 27 01:25 data-lineage-spark-0.1.0-SNAPSHOT.jar -> /hadoop/8/yarn/local/usercache/dclong/filecache/135/data-lineage-spark-0.1.0-SNAPSHOT.jar
+lrwxrwxrwx 1 dclong hadoop   63 Feb 27 01:25 features.txt -> /hadoop/11/yarn/local/usercache/dclong/filecache/137/features.txt
+lrwxrwxrwx 1 dclong hadoop   64 Feb 27 01:25 hive-site.xml -> /hadoop/11/yarn/local/usercache/dclong/filecache/143/hive-site.xml
+-rwx------ 1 dclong hadoop 8976 Feb 27 01:25 launch_container.sh
+lrwxrwxrwx 1 dclong hadoop   87 Feb 27 01:25 packages_incremental_bbowac_etl_2.zip -> /hadoop/6/yarn/local/usercache/dclong/filecache/134/packages_incremental_bbowac_etl_2.zip
+lrwxrwxrwx 1 dclong hadoop   69 Feb 27 01:25 py4j-0.10.7-src.zip -> /hadoop/9/yarn/local/usercache/dclong/filecache/142/py4j-0.10.7-src.zip
+lrwxrwxrwx 1 dclong hadoop   61 Feb 27 01:25 pyspark.zip -> /hadoop/9/yarn/local/usercache/dclong/filecache/136/pyspark.zip
+lrwxrwxrwx 1 dclong hadoop   68 Feb 27 01:25 __spark_conf__ -> /hadoop/8/yarn/local/usercache/dclong/filecache/141/__spark_conf__.zip
+lrwxrwxrwx 1 dclong hadoop   87 Feb 27 01:25 __spark_libs__ -> /hadoop/6/yarn/local/usercache/dclong/filecache/140/__spark_libs__2914772172935991564.zip
+lrwxrwxrwx 1 dclong hadoop   65 Feb 27 01:25 ssl-client.xml -> /hadoop/12/yarn/local/usercache/dclong/filecache/138/ssl-client.xml
+drwxr-s--- 2 dclong hadoop    6 Feb 27 01:25 tmp
+find -L . -maxdepth 5 -ls:
+2147518607    4 drwxr-s---   3 dclong     hadoop       4096 Feb 27 01:25 .
+6442644967    0 drwxr-s---   2 dclong     hadoop          6 Feb 27 01:25 ./tmp
+2147519732   12 -rwx------   1 dclong     hadoop       8976 Feb 27 01:25 ./launch_container.sh
+2147521644    4 -rw-------   1 dclong     hadoop        603 Feb 27 01:25 ./container_tokens
+4298810460    4 -r-x------   1 dclong     hdmi-mptna     1168 Feb 27 01:25 ./features.txt
+321068   36 -r-x------   1 dclong     hdmi-mptna    36093 Feb 27 01:25 ./02c81b44-0774-44d9-a836-6f2ff5fcb441_data2.py
+6442666690  536 -r-x------   1 dclong     hdmi-mptna   544977 Feb 27 01:25 ./pyspark.zip
+6442672973 1056 -r-x------   1 dclong     hdmi-mptna  1079533 Feb 27 01:25 ./packages_incremental_bbowac_etl_2.zip
+2147539776   44 -r-x------   1 dclong     hdmi-mptna    42437 Feb 27 01:25 ./py4j-0.10.7-src.zip
+ 86091   24 -r-x------   1 dclong     hdmi-mptna    22566 Feb 27 01:25 ./hive-site.xml
+2148425162    4 -r-x------   1 dclong     hdmi-mptna     2393 Feb 27 01:25 ./ssl-client.xml
+4298820408   12 drwx------   2 dclong     hdmi-mptna     8192 Feb 27 01:25 ./__spark_libs__
+4298821779  184 -r-x------   1 dclong     hdmi-mptna   185140 Feb 27 01:25 ./__spark_libs__/commons-io-2.4.jar
+4298821984 2280 -r-x------   1 dclong     hdmi-mptna  2333186 Feb 27 01:25 ./__spark_libs__/zstd-jni-1.3.2-2.jar
+4298862631  472 -r-x------   1 dclong     hdmi-mptna   479881 Feb 27 01:25 ./__spark_libs__/commons-lang3-3.5.jar
+4298862656 2120 -r-x------   1 dclong     hdmi-mptna  2170396 Feb 27 01:25 ./__spark_libs__/spark-streaming_2.11-2.3.1.1.1.2.jar
+4298862658  180 -r-x------   1 dclong     hdmi-mptna   183849 Feb 27 01:25 ./__spark_libs__/spark-mllib-local_2.11-2.3.1.1.1.2.jar
+4298862663  188 -r-x------   1 dclong     hdmi-mptna   190432 Feb 27 01:25 ./__spark_libs__/gson-2.2.4.jar
+4298862665   16 -r-x------   1 dclong     hdmi-mptna    14766 Feb 27 01:25 ./__spark_libs__/aopalliance-repackaged-2.4.0-b34.jar
+4298862666   72 -r-x------   1 dclong     hdmi-mptna    72733 Feb 27 01:25 ./__spark_libs__/jersey-media-jaxb-2.22.2.jar
+4298862674 14760 -r-x------   1 dclong     hdmi-mptna 15113382 Feb 27 01:25 ./__spark_libs__/breeze_2.11-0.13.2.jar
+4298862681  320 -r-x------   1 dclong     hdmi-mptna   325335 Feb 27 01:25 ./__spark_libs__/RoaringBitmap-0.7.45.jar
+4298863046  228 -r-x------   1 dclong     hdmi-mptna   232248 Feb 27 01:25 ./__spark_libs__/jackson-core-asl-1.9.13.jar
+4298863054  164 -r-x------   1 dclong     hdmi-mptna   167421 Feb 27 01:25 ./__spark_libs__/jersey-client-2.22.2.jar
+4298863061  176 -r-x------   1 dclong     hdmi-mptna   177131 Feb 27 01:25 ./__spark_libs__/jetty-util-6.1.26.jar
+4298863077  248 -r-x------   1 dclong     hdmi-mptna   250989 Feb 27 01:25 ./__spark_libs__/parquet-hadoop-1.8.3.jar
+4298863080  696 -r-x------   1 dclong     hdmi-mptna   708710 Feb 27 01:25 ./__spark_libs__/spark-graphx_2.11-2.3.1.1.1.2.jar
+4298863086  328 -r-x------   1 dclong     hdmi-mptna   334662 Feb 27 01:25 ./__spark_libs__/antlr4-runtime-4.7.jar
+4298863090  700 -r-x------   1 dclong     hdmi-mptna   714194 Feb 27 01:25 ./__spark_libs__/javassist-3.18.1-GA.jar
+4298863312  232 -r-x------   1 dclong     hdmi-mptna   234201 Feb 27 01:25 ./__spark_libs__/libthrift-0.9.3.jar
+4298863318  332 -r-x------   1 dclong     hdmi-mptna   339666 Feb 27 01:25 ./__spark_libs__/datanucleus-api-jdo-3.2.6.jar
+4298863319  280 -r-x------   1 dclong     hdmi-mptna   284184 Feb 27 01:25 ./__spark_libs__/commons-codec-1.10.jar
+4298863327  128 -r-x------   1 dclong     hdmi-mptna   130802 Feb 27 01:25 ./__spark_libs__/aircompressor-0.8.jar
+4298863685  164 -r-x------   1 dclong     hdmi-mptna   164422 Feb 27 01:25 ./__spark_libs__/core-1.1.2.jar
+4298863688 1140 -r-x------   1 dclong     hdmi-mptna  1165323 Feb 27 01:25 ./__spark_libs__/jackson-databind-2.6.7.1.jar
+4298863693  968 -r-x------   1 dclong     hdmi-mptna   990924 Feb 27 01:25 ./__spark_libs__/mysql-connector-java-5.1.40-bin.jar
+4298863712 1204 -r-x------   1 dclong     hdmi-mptna  1229125 Feb 27 01:25 ./__spark_libs__/xercesImpl-2.9.1.jar
+4298863714 1772 -r-x------   1 dclong     hdmi-mptna  1812090 Feb 27 01:25 ./__spark_libs__/spark-hive-thriftserver_2.11-2.3.1.1.1.2.jar
+4298863721   16 -r-x------   1 dclong     hdmi-mptna    15010 Feb 27 01:25 ./__spark_libs__/xmlenc-0.52.jar
+4298865545   76 -r-x------   1 dclong     hdmi-mptna    76114 Feb 27 01:25 ./__spark_libs__/spark-launcher_2.11-2.3.1.1.1.2.jar
+4298865549  132 -r-x------   1 dclong     hdmi-mptna   134595 Feb 27 01:25 ./__spark_libs__/commons-crypto-1.0.0.jar
+4298865569   20 -r-x------   1 dclong     hdmi-mptna    16430 Feb 27 01:25 ./__spark_libs__/jcl-over-slf4j-1.7.16.jar
+4298865598   24 -r-x------   1 dclong     hdmi-mptna    23346 Feb 27 01:25 ./__spark_libs__/stax-api-1.0-2.jar
+4298865618  420 -r-x------   1 dclong     hdmi-mptna   427780 Feb 27 01:25 ./__spark_libs__/jodd-core-3.5.2.jar
+4298866145 7560 -r-x------   1 dclong     hdmi-mptna  7738529 Feb 27 01:25 ./__spark_libs__/spark-mllib_2.11-2.3.1.1.1.2.jar
+4298866146 1848 -r-x------   1 dclong     hdmi-mptna  1890075 Feb 27 01:25 ./__spark_libs__/datanucleus-core-3.2.10.jar
+4298866150  640 -r-x------   1 dclong     hdmi-mptna   651903 Feb 27 01:25 ./__spark_libs__/spark-yarn_2.11-2.3.1.1.1.2.jar
+4298866151   48 -r-x------   1 dclong     hdmi-mptna    46986 Feb 27 01:25 ./__spark_libs__/jackson-annotations-2.6.7.jar
+4298866153 12996 -r-x------   1 dclong     hdmi-mptna 13307349 Feb 27 01:25 ./__spark_libs__/spark-core_2.11-2.3.1.1.1.2.jar
+4298866154   16 -r-x------   1 dclong     hdmi-mptna    15469 Feb 27 01:25 ./__spark_libs__/spark-tags_2.11-2.3.1.1.1.2.jar
+4298866156   24 -r-x------   1 dclong     hdmi-mptna    21247 Feb 27 01:25 ./__spark_libs__/metrics-graphite-3.1.5.jar
+4298866174   16 -r-x------   1 dclong     hdmi-mptna    15824 Feb 27 01:25 ./__spark_libs__/metrics-json-3.1.5.jar
+4298866176   96 -r-x------   1 dclong     hdmi-mptna    94796 Feb 27 01:25 ./__spark_libs__/pyrolite-4.13.jar
+4298866179  100 -r-x------   1 dclong     hdmi-mptna   100636 Feb 27 01:25 ./__spark_libs__/jsp-api-2.1.jar
+4298866180   32 -r-x------   1 dclong     hdmi-mptna    30076 Feb 27 01:25 ./__spark_libs__/spark-sketch_2.11-2.3.1.1.1.2.jar
+4298866181  280 -r-x------   1 dclong     hdmi-mptna   286071 Feb 27 01:25 ./__spark_libs__/parquet-encoding-1.8.3.jar
+4298866182   40 -r-x------   1 dclong     hdmi-mptna    39283 Feb 27 01:25 ./__spark_libs__/metrics-jvm-3.1.5.jar
+4298866186   96 -r-x------   1 dclong     hdmi-mptna    95806 Feb 27 01:25 ./__spark_libs__/javax.servlet-api-3.1.0.jar
+4298866187 1768 -r-x------   1 dclong     hdmi-mptna  1809447 Feb 27 01:25 ./__spark_libs__/datanucleus-rdbms-3.2.9.jar
+4298866191   40 -r-x------   1 dclong     hdmi-mptna    40509 Feb 27 01:25 ./__spark_libs__/slf4j-api-1.7.16.jar
+4298866192  352 -r-x------   1 dclong     hdmi-mptna   358390 Feb 27 01:25 ./__spark_libs__/kryo-shaded-3.0.3.jar
+4298866194  384 -r-x------   1 dclong     hdmi-mptna   390733 Feb 27 01:25 ./__spark_libs__/parquet-format-2.3.1.jar
+4298866196   80 -r-x------   1 dclong     hdmi-mptna    79912 Feb 27 01:25 ./__spark_libs__/api-util-1.0.0-M20.jar
+4298866197  120 -r-x------   1 dclong     hdmi-mptna   120465 Feb 27 01:25 ./__spark_libs__/metrics-core-3.1.5.jar
+4298866200  188 -r-x------   1 dclong     hdmi-mptna   188671 Feb 27 01:25 ./__spark_libs__/commons-beanutils-1.7.0.jar
+4298866203   28 -r-x------   1 dclong     hdmi-mptna    27084 Feb 27 01:25 ./__spark_libs__/jackson-xc-1.9.13.jar
+4298866204   96 -r-x------   1 dclong     hdmi-mptna    94672 Feb 27 01:25 ./__spark_libs__/xz-1.0.jar
+4298866205   20 -r-x------   1 dclong     hdmi-mptna    18336 Feb 27 01:25 ./__spark_libs__/jackson-jaxrs-1.9.13.jar
+4298866206  256 -r-x------   1 dclong     hdmi-mptna   258919 Feb 27 01:25 ./__spark_libs__/jackson-core-2.6.7.jar
+4298866207  676 -r-x------   1 dclong     hdmi-mptna   691479 Feb 27 01:25 ./__spark_libs__/apacheds-kerberos-codec-2.0.0-M15.jar
+4298866433  236 -r-x------   1 dclong     hdmi-mptna   241367 Feb 27 01:25 ./__spark_libs__/commons-compress-1.4.1.jar
+4298866436   20 -r-x------   1 dclong     hdmi-mptna    18098 Feb 27 01:25 ./__spark_libs__/jersey-container-servlet-2.22.2.jar
+4298866441  320 -r-x------   1 dclong     hdmi-mptna   324565 Feb 27 01:25 ./__spark_libs__/httpcore-4.4.8.jar
+4298866479  576 -r-x------   1 dclong     hdmi-mptna   589462 Feb 27 01:25 ./__spark_libs__/json4s-core_2.11-3.2.11.jar
+4298866491   20 -r-x------   1 dclong     hdmi-mptna    17316 Feb 27 01:25 ./__spark_libs__/java-xmlbuilder-1.1.jar
+4298866495 1032 -r-x------   1 dclong     hdmi-mptna  1056168 Feb 27 01:25 ./__spark_libs__/snappy-java-1.1.2.6.jar
+4298866855   68 -r-x------   1 dclong     hdmi-mptna    69409 Feb 27 01:25 ./__spark_libs__/activation-1.1.1.jar
+4298866877   44 -r-x------   1 dclong     hdmi-mptna    42064 Feb 27 01:25 ./__spark_libs__/parquet-common-1.8.3.jar
+4298866893  212 -r-x------   1 dclong     hdmi-mptna   213911 Feb 27 01:25 ./__spark_libs__/jline-2.12.1.jar
+4298866896  528 -r-x------   1 dclong     hdmi-mptna   539912 Feb 27 01:25 ./__spark_libs__/jetty-6.1.26.jar
+4298866903 3152 -r-x------   1 dclong     hdmi-mptna  3224708 Feb 27 01:25 ./__spark_libs__/derby-10.12.1.1.jar
+4298867352  504 -r-x------   1 dclong     hdmi-mptna   515645 Feb 27 01:25 ./__spark_libs__/jackson-module-scala_2.11-2.6.7.1.jar
+4298867389 1632 -r-x------   1 dclong     hdmi-mptna  1671083 Feb 27 01:25 ./__spark_libs__/hppc-0.7.2.jar
+4298867889   52 -r-x------   1 dclong     hdmi-mptna    53027 Feb 27 01:25 ./__spark_libs__/spark-kvstore_2.11-2.3.1.1.1.2.jar
+4298867938  180 -r-x------   1 dclong     hdmi-mptna   180736 Feb 27 01:25 ./__spark_libs__/avro-mapred-1.7.7-hadoop2.jar
+4298867959  256 -r-x------   1 dclong     hdmi-mptna   258370 Feb 27 01:25 ./__spark_libs__/calcite-avatica-1.2.0-incubating.jar
+4298867960  192 -r-x------   1 dclong     hdmi-mptna   192993 Feb 27 01:25 ./__spark_libs__/avro-ipc-1.7.7.jar
+4298867982   36 -r-x------   1 dclong     hdmi-mptna    33015 Feb 27 01:25 ./__spark_libs__/jsr305-1.3.9.jar
+4298867985 2140 -r-x------   1 dclong     hdmi-mptna  2189117 Feb 27 01:25 ./__spark_libs__/guava-14.0.1.jar
+4298867986 1444 -r-x------   1 dclong     hdmi-mptna  1475955 Feb 27 01:25 ./__spark_libs__/htrace-core-3.1.0-incubating.jar
+4298867991  292 -r-x------   1 dclong     hdmi-mptna   298829 Feb 27 01:25 ./__spark_libs__/commons-configuration-1.6.jar
+4298868575  120 -r-x------   1 dclong     hdmi-mptna   120369 Feb 27 01:25 ./__spark_libs__/spark-repl_2.11-2.3.1.1.1.2.jar
+4298868580   68 -r-x------   1 dclong     hdmi-mptna    66270 Feb 27 01:25 ./__spark_libs__/jersey-container-servlet-core-2.22.2.jar
+4298868598  696 -r-x------   1 dclong     hdmi-mptna   710492 Feb 27 01:25 ./__spark_libs__/guice-3.0.jar
+4298868605   40 -r-x------   1 dclong     hdmi-mptna    37887 Feb 27 01:25 ./__spark_libs__/commons-compiler-3.0.8.jar
+4298870718  932 -r-x------   1 dclong     hdmi-mptna   951701 Feb 27 01:25 ./__spark_libs__/jersey-server-2.22.2.jar
+4298870815  208 -r-x------   1 dclong     hdmi-mptna   212453 Feb 27 01:25 ./__spark_libs__/commons-net-2.2.jar
+4298871782  104 -r-x------   1 dclong     hdmi-mptna   105134 Feb 27 01:25 ./__spark_libs__/jaxb-api-2.2.2.jar
+4298871817  180 -r-x------   1 dclong     hdmi-mptna   181271 Feb 27 01:25 ./__spark_libs__/hk2-locator-2.4.0-b34.jar
+4298871828   48 -r-x------   1 dclong     hdmi-mptna    48720 Feb 27 01:25 ./__spark_libs__/snappy-0.2.jar
+4298872160   84 -r-x------   1 dclong     hdmi-mptna    82421 Feb 27 01:25 ./__spark_libs__/json4s-ast_2.11-3.2.11.jar
+4298872162  616 -r-x------   1 dclong     hdmi-mptna   627814 Feb 27 01:25 ./__spark_libs__/joda-time-2.9.3.jar
+4298872167  172 -r-x------   1 dclong     hdmi-mptna   174351 Feb 27 01:25 ./__spark_libs__/stream-2.7.0.jar
+4298872169  440 -r-x------   1 dclong     hdmi-mptna   448794 Feb 27 01:25 ./__spark_libs__/apache-log4j-extras-1.2.17.jar
+4298872170  436 -r-x------   1 dclong     hdmi-mptna   442406 Feb 27 01:25 ./__spark_libs__/calcite-linq4j-1.2.0-incubating.jar
+4298872171  268 -r-x------   1 dclong     hdmi-mptna   270342 Feb 27 01:25 ./__spark_libs__/curator-recipes-2.7.1.jar
+4298872218   64 -r-x------   1 dclong     hdmi-mptna    65261 Feb 27 01:25 ./__spark_libs__/oro-2.0.8.jar
+4298872655 1168 -r-x------   1 dclong     hdmi-mptna  1194003 Feb 27 01:25 ./__spark_libs__/arpack_combined_all-0.1.jar
+4298872656   68 -r-x------   1 dclong     hdmi-mptna    69500 Feb 27 01:25 ./__spark_libs__/curator-client-2.7.1.jar
+4298872660   92 -r-x------   1 dclong     hdmi-mptna    93210 Feb 27 01:25 ./__spark_libs__/super-csv-2.2.0.jar
+4298873688   12 -r-x------   1 dclong     hdmi-mptna    12131 Feb 27 01:25 ./__spark_libs__/jpam-1.1.jar
+4298872663    8 -r-x------   1 dclong     hdmi-mptna     4596 Feb 27 01:25 ./__spark_libs__/jul-to-slf4j-1.7.16.jar
+4298872665  184 -r-x------   1 dclong     hdmi-mptna   186273 Feb 27 01:25 ./__spark_libs__/curator-framework-2.7.1.jar
+4298872668 1324 -r-x------   1 dclong     hdmi-mptna  1352514 Feb 27 01:25 ./__spark_libs__/spark-hive_2.11-2.3.1.1.1.2.jar
+4298872670  740 -r-x------   1 dclong     hdmi-mptna   757253 Feb 27 01:25 ./__spark_libs__/orc-mapreduce-1.4.4-nohive.jar
+4298872672 1024 -r-x------   1 dclong     hdmi-mptna  1045744 Feb 27 01:25 ./__spark_libs__/leveldbjni-all-1.8.jar
+4298872673   64 -r-x------   1 dclong     hdmi-mptna    62050 Feb 27 01:25 ./__spark_libs__/commons-logging-1.1.3.jar
+4298872674 3864 -r-x------   1 dclong     hdmi-mptna  3955990 Feb 27 01:25 ./__spark_libs__/bcprov-jdk15on-1.58.jar
+4298872705   36 -r-x------   1 dclong     hdmi-mptna    34603 Feb 27 01:25 ./__spark_libs__/machinist_2.11-0.6.1.jar
+4298872707 9888 -r-x------   1 dclong     hdmi-mptna 10121868 Feb 27 01:25 ./__spark_libs__/spire_2.11-0.13.0.jar
+4298872736  308 -r-x------   1 dclong     hdmi-mptna   313702 Feb 27 01:25 ./__spark_libs__/libfb303-0.9.3.jar
+4298873102  300 -r-x------   1 dclong     hdmi-mptna   305001 Feb 27 01:25 ./__spark_libs__/commons-httpclient-3.1.jar
+4298873130 1244 -r-x------   1 dclong     hdmi-mptna  1270377 Feb 27 01:25 ./__spark_libs__/arrow-vector-0.8.0.jar
+4298873132  940 -r-x------   1 dclong     hdmi-mptna   961731 Feb 27 01:25 ./__spark_libs__/parquet-column-1.8.3.jar
+4298873147 3692 -r-x------   1 dclong     hdmi-mptna  3780056 Feb 27 01:25 ./__spark_libs__/netty-all-4.1.17.Final.jar
+4298873477   12 -r-x------   1 dclong     hdmi-mptna    10166 Feb 27 01:25 ./__spark_libs__/flatbuffers-1.2.0-3f79e055.jar
+4298873514 4468 -r-x------   1 dclong     hdmi-mptna  4573750 Feb 27 01:25 ./__spark_libs__/scala-reflect-2.11.8.jar
+4298873533  952 -r-x------   1 dclong     hdmi-mptna   971310 Feb 27 01:25 ./__spark_libs__/jersey-guava-2.22.2.jar
+4298873633    4 -r-x------   1 dclong     hdmi-mptna     4028 Feb 27 01:25 ./__spark_libs__/shims-0.7.45.jar
+4298873634  780 -r-x------   1 dclong     hdmi-mptna   796326 Feb 27 01:25 ./__spark_libs__/janino-3.0.8.jar
+4298873639  388 -r-x------   1 dclong     hdmi-mptna   395195 Feb 27 01:25 ./__spark_libs__/javolution-5.5.1.jar
+4298873645  416 -r-x------   1 dclong     hdmi-mptna   423753 Feb 27 01:25 ./__spark_libs__/scala-parser-combinators_2.11-1.0.4.jar
+4298873651 9208 -r-x------   1 dclong     hdmi-mptna  9427569 Feb 27 01:25 ./__spark_libs__/spark-catalyst_2.11-2.3.1.1.1.2.jar
+4298873658   60 -r-x------   1 dclong     hdmi-mptna    60483 Feb 27 01:25 ./__spark_libs__/chill-java-0.8.4.jar
+4298873661  524 -r-x------   1 dclong     hdmi-mptna   533455 Feb 27 01:25 ./__spark_libs__/protobuf-java-2.5.0.jar
+4298873663  776 -r-x------   1 dclong     hdmi-mptna   792964 Feb 27 01:25 ./__spark_libs__/zookeeper-3.4.6.jar
+4298873665   12 -r-x------   1 dclong     hdmi-mptna     9939 Feb 27 01:25 ./__spark_libs__/slf4j-log4j12-1.7.16.jar
+4298873668   44 -r-x------   1 dclong     hdmi-mptna    41123 Feb 27 01:25 ./__spark_libs__/commons-cli-1.2.jar
+4298873678   64 -r-x------   1 dclong     hdmi-mptna    63777 Feb 27 01:25 ./__spark_libs__/validation-api-1.1.0.Final.jar
+4298873684   20 -r-x------   1 dclong     hdmi-mptna    16560 Feb 27 01:25 ./__spark_libs__/api-asn1-api-1.0.0-M20.jar
+4298876672  684 -r-x------   1 dclong     hdmi-mptna   698375 Feb 27 01:25 ./__spark_libs__/jersey-common-2.22.2.jar
+4298876673   64 -r-x------   1 dclong     hdmi-mptna    64921 Feb 27 01:25 ./__spark_libs__/spark-network-shuffle_2.11-2.3.1.1.1.2.jar
+4298876675 2000 -r-x------   1 dclong     hdmi-mptna  2046361 Feb 27 01:25 ./__spark_libs__/jets3t-0.9.4.jar
+4298876681   16 -r-x------   1 dclong     hdmi-mptna    15071 Feb 27 01:25 ./__spark_libs__/jta-1.1.jar
+4298876682 15128 -r-x------   1 dclong     hdmi-mptna 15487351 Feb 27 01:25 ./__spark_libs__/scala-compiler-2.11.8.jar
+4298876687  184 -r-x------   1 dclong     hdmi-mptna   187882 Feb 27 01:25 ./__spark_libs__/breeze-macros_2.11-0.13.2.jar
+4298876692    8 -r-x------   1 dclong     hdmi-mptna     5711 Feb 27 01:25 ./__spark_libs__/minlog-1.3.0.jar
+4298876714    8 -r-x------   1 dclong     hdmi-mptna     5950 Feb 27 01:25 ./__spark_libs__/javax.inject-2.4.0-b34.jar
+4298876719   28 -r-x------   1 dclong     hdmi-mptna    26514 Feb 27 01:25 ./__spark_libs__/stax-api-1.0.1.jar
+4298876720   44 -r-x------   1 dclong     hdmi-mptna    42858 Feb 27 01:25 ./__spark_libs__/jackson-module-paranamer-2.7.9.jar
+4298876730  656 -r-x------   1 dclong     hdmi-mptna   671138 Feb 27 01:25 ./__spark_libs__/scala-xml_2.11-1.0.5.jar
+4298876735  480 -r-x------   1 dclong     hdmi-mptna   489884 Feb 27 01:25 ./__spark_libs__/log4j-1.2.17.jar
+4298879750  148 -r-x------   1 dclong     hdmi-mptna   148627 Feb 27 01:25 ./__spark_libs__/stringtemplate-3.2.1.jar
+4298879768   48 -r-x------   1 dclong     hdmi-mptna    48984 Feb 27 01:25 ./__spark_libs__/spark-unsafe_2.11-2.3.1.1.1.2.jar
+4298879772  160 -r-x------   1 dclong     hdmi-mptna   160519 Feb 27 01:25 ./__spark_libs__/commons-dbcp-1.4.jar
+4298879777  176 -r-x------   1 dclong     hdmi-mptna   178947 Feb 27 01:25 ./__spark_libs__/hk2-api-2.4.0-b34.jar
+4298880775  748 -r-x------   1 dclong     hdmi-mptna   764569 Feb 27 01:25 ./__spark_libs__/jtransforms-2.4.0.jar
+4298880788  112 -r-x------   1 dclong     hdmi-mptna   110600 Feb 27 01:25 ./__spark_libs__/bonecp-0.8.0.RELEASE.jar
+4298880791 2328 -r-x------   1 dclong     hdmi-mptna  2383277 Feb 27 01:25 ./__spark_libs__/spark-network-common_2.11-2.3.1.1.1.2.jar
+4298880793 8968 -r-x------   1 dclong     hdmi-mptna  9179761 Feb 27 01:25 ./__spark_libs__/spark-sql_2.11-2.3.1.1.1.2.jar
+4298880802    4 -r-x------   1 dclong     hdmi-mptna     2497 Feb 27 01:25 ./__spark_libs__/javax.inject-1.jar
+4298880815   40 -r-x------   1 dclong     hdmi-mptna    40341 Feb 27 01:25 ./__spark_libs__/json4s-jackson_2.11-3.2.11.jar
+4298880822  144 -r-x------   1 dclong     hdmi-mptna   144660 Feb 27 01:25 ./__spark_libs__/xbean-asm5-shaded-4.4.jar
+4298880826 1256 -r-x------   1 dclong     hdmi-mptna  1282424 Feb 27 01:25 ./__spark_libs__/ivy-2.4.0.jar
+4298880828 3440 -r-x------   1 dclong     hdmi-mptna  3519262 Feb 27 01:25 ./__spark_libs__/calcite-core-1.2.0-incubating.jar
+4298880830   64 -r-x------   1 dclong     hdmi-mptna    65012 Feb 27 01:25 ./__spark_libs__/guice-servlet-3.0.jar
+4298882171  280 -r-x------   1 dclong     hdmi-mptna   284220 Feb 27 01:25 ./__spark_libs__/commons-lang-2.6.jar
+4298882189  364 -r-x------   1 dclong     hdmi-mptna   370119 Feb 27 01:25 ./__spark_libs__/lz4-java-1.4.0.jar
+4298882192   28 -r-x------   1 dclong     hdmi-mptna    26366 Feb 27 01:25 ./__spark_libs__/javax.annotation-api-1.2.jar
+4298883209  120 -r-x------   1 dclong     hdmi-mptna   118973 Feb 27 01:25 ./__spark_libs__/hk2-utils-2.4.0-b34.jar
+4298883226   80 -r-x------   1 dclong     hdmi-mptna    79150 Feb 27 01:25 ./__spark_libs__/arrow-memory-0.8.0.jar
+4298883227  116 -r-x------   1 dclong     hdmi-mptna   115534 Feb 27 01:25 ./__spark_libs__/javax.ws.rs-api-2.0.1.jar
+4298883912   20 -r-x------   1 dclong     hdmi-mptna    18482 Feb 27 01:25 ./__spark_libs__/eigenbase-properties-1.1.5.jar
+4298883917  220 -r-x------   1 dclong     hdmi-mptna   224167 Feb 27 01:25 ./__spark_libs__/chill_2.11-0.8.4.jar
+4298883921   44 -r-x------   1 dclong     hdmi-mptna    41755 Feb 27 01:25 ./__spark_libs__/objenesis-2.1.jar
+4298883925 1412 -r-x------   1 dclong     hdmi-mptna  1442702 Feb 27 01:25 ./__spark_libs__/orc-core-1.4.4-nohive.jar
+4298883954  144 -r-x------   1 dclong     hdmi-mptna   143602 Feb 27 01:25 ./__spark_libs__/commons-digester-1.8.jar
+4298885322    8 -r-x------   1 dclong     hdmi-mptna     4467 Feb 27 01:25 ./__spark_libs__/aopalliance-1.0.jar
+4298885330  120 -r-x------   1 dclong     hdmi-mptna   122774 Feb 27 01:25 ./__spark_libs__/py4j-0.10.7.jar
+4298885334  204 -r-x------   1 dclong     hdmi-mptna   206035 Feb 27 01:25 ./__spark_libs__/commons-beanutils-core-1.8.0.jar
+4298885340 2732 -r-x------   1 dclong     hdmi-mptna  2796935 Feb 27 01:25 ./__spark_libs__/parquet-hadoop-bundle-1.6.0.jar
+4298885345  164 -r-x------   1 dclong     hdmi-mptna   164368 Feb 27 01:25 ./__spark_libs__/antlr-runtime-3.4.jar
+4298885351 3444 -r-x------   1 dclong     hdmi-mptna  3522616 Feb 27 01:25 ./__spark_libs__/shapeless_2.11-2.3.2.jar
+4298885357  764 -r-x------   1 dclong     hdmi-mptna   781831 Feb 27 01:25 ./__spark_libs__/httpclient-4.5.4.jar
+4298885360  376 -r-x------   1 dclong     hdmi-mptna   384150 Feb 27 01:25 ./__spark_libs__/univocity-parsers-2.5.9.jar
+4298885370   80 -r-x------   1 dclong     hdmi-mptna    79845 Feb 27 01:25 ./__spark_libs__/compress-lzf-1.0.3.jar
+4298886578  436 -r-x------   1 dclong     hdmi-mptna   445288 Feb 27 01:25 ./__spark_libs__/antlr-2.7.7.jar
+4298886610 1300 -r-x------   1 dclong     hdmi-mptna  1330219 Feb 27 01:25 ./__spark_libs__/netty-3.9.9.Final.jar
+4298887012 1024 -r-x------   1 dclong     hdmi-mptna  1048115 Feb 27 01:25 ./__spark_libs__/parquet-jackson-1.8.3.jar
+4298887038  764 -r-x------   1 dclong     hdmi-mptna   780664 Feb 27 01:25 ./__spark_libs__/jackson-mapper-asl-1.9.13.jar
+4298887039    4 -r-x------   1 dclong     hdmi-mptna     3142 Feb 27 01:25 ./__spark_libs__/macro-compat_2.11-1.1.1.jar
+4298887062  788 -r-x------   1 dclong     hdmi-mptna   802818 Feb 27 01:25 ./__spark_libs__/scalap-2.11.8.jar
+4298887065   88 -r-x------   1 dclong     hdmi-mptna    87192 Feb 27 01:25 ./__spark_libs__/spire-macros_2.11-0.13.0.jar
+4298887071   44 -r-x------   1 dclong     hdmi-mptna    44925 Feb 27 01:25 ./__spark_libs__/apacheds-i18n-2.0.0-M15.jar
+4298887341 1988 -r-x------   1 dclong     hdmi-mptna  2035066 Feb 27 01:25 ./__spark_libs__/commons-math3-3.4.1.jar
+4298887342 5612 -r-x------   1 dclong     hdmi-mptna  5744974 Feb 27 01:25 ./__spark_libs__/scala-library-2.11.8.jar
+4298887343   20 -r-x------   1 dclong     hdmi-mptna    16993 Feb 27 01:25 ./__spark_libs__/JavaEWAH-0.3.2.jar
+4298887357   52 -r-x------   1 dclong     hdmi-mptna    52076 Feb 27 01:25 ./__spark_libs__/arrow-format-0.8.0.jar
+4298887359  576 -r-x------   1 dclong     hdmi-mptna   588337 Feb 27 01:25 ./__spark_libs__/commons-collections-3.2.2.jar
+4298887362   36 -r-x------   1 dclong     hdmi-mptna    34654 Feb 27 01:25 ./__spark_libs__/paranamer-2.8.jar
+4298887369   20 -r-x------   1 dclong     hdmi-mptna    20235 Feb 27 01:25 ./__spark_libs__/osgi-resource-locator-1.0.1.jar
+4298887379   20 -r-x------   1 dclong     hdmi-mptna    19827 Feb 27 01:25 ./__spark_libs__/opencsv-2.3.jar
+4298887381   20 -r-x------   1 dclong     hdmi-mptna    17008 Feb 27 01:25 ./__spark_libs__/base64-2.3.8.jar
+4298887408   96 -r-x------   1 dclong     hdmi-mptna    96221 Feb 27 01:25 ./__spark_libs__/commons-pool-1.5.4.jar
+4298887416  200 -r-x------   1 dclong     hdmi-mptna   201124 Feb 27 01:25 ./__spark_libs__/jdo-api-3.0.1.jar
+4298887419  428 -r-x------   1 dclong     hdmi-mptna   436303 Feb 27 01:25 ./__spark_libs__/avro-1.7.7.jar
+4298887452  232 -r-x------   1 dclong     hdmi-mptna   236660 Feb 27 01:25 ./__spark_libs__/ST4-4.0.4.jar
+6442572089    0 drwx------   3 dclong     hdmi-mptna      139 Feb 27 01:25 ./__spark_conf__
+6442575637    4 -r-x------   1 dclong     hdmi-mptna     2025 Feb 27 01:25 ./__spark_conf__/log4j.properties
+224732    4 drwx------   2 dclong     hdmi-mptna     4096 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__
+227368   12 -r-x------   1 dclong     hdmi-mptna    11575 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/log4j.properties
+227379    8 -r-x------   1 dclong     hdmi-mptna     4913 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hadoop-env.sh
+232727    8 -r-x------   1 dclong     hdmi-mptna     6924 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/mapred-site.xml
+234889    4 -r-x------   1 dclong     hdmi-mptna     1657 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/httpfs-log4j.properties
+235980    4 -r-x------   1 dclong     hdmi-mptna     2598 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hadoop-metrics2.properties
+236010    4 -r-x------   1 dclong     hdmi-mptna      243 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/yarn_jaas.conf.j2
+241064    4 -r-x------   1 dclong     hdmi-mptna      397 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hdfs-variable_D12.xml
+241078   52 -r-x------   1 dclong     hdmi-mptna    49678 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hosts
+241113   16 -r-x------   1 dclong     hdmi-mptna    14770 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/yarn-site.xml
+242981    4 -r-x------   1 dclong     hdmi-mptna     3589 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hadoop-env.cmd
+247294    0 -r-x------   1 dclong     hdmi-mptna        0 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/yarn.exclude
+249347   20 -r-x------   1 dclong     hdmi-mptna    19417 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/core-site.xml
+250805   16 -r-x------   1 dclong     hdmi-mptna    15885 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hdfs-site-before-fedration.xml
+250822    4 -r-x------   1 dclong     hdmi-mptna     1631 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/kms-log4j.properties
+250874    4 -r-x------   1 dclong     hdmi-mptna       54 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/empty-config.xml
+252303    4 -r-x------   1 dclong     hdmi-mptna     2191 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/yarn-env.cmd
+252315    4 -r-x------   1 dclong     hdmi-mptna     2393 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/ssl-client.xml
+254410   52 -r-x------   1 dclong     hdmi-mptna    51338 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/capacity-scheduler.xml
+268734    4 -r-x------   1 dclong     hdmi-mptna       54 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hdfs-variable.xml
+268746    4 -r-x------   1 dclong     hdmi-mptna     3518 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/kms-acls.xml
+274016    0 -r-x------   1 dclong     hdmi-mptna        0 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/yarn-include
+274043    4 -r-x------   1 dclong     hdmi-mptna     1335 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/configuration.xsl
+274319   12 -r-x------   1 dclong     hdmi-mptna    11534 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hdfs-site.xml-ORG
+274330    4 -r-x------   1 dclong     hdmi-mptna       54 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/yarn-variable.xml
+274333    8 -r-x------   1 dclong     hdmi-mptna     5495 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/yarn-env.sh
+274818   24 -r-x------   1 dclong     hdmi-mptna    24100 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hdfs-site.xml
+274833    4 -r-x------   1 dclong     hdmi-mptna     1021 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/commons-logging.properties
+274838    8 -r-x------   1 dclong     hdmi-mptna     5083 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/health_check.sh
+274844    8 -r-x------   1 dclong     hdmi-mptna     4121 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/task-log4j.properties
+276018    4 -r-x------   1 dclong     hdmi-mptna     2490 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hadoop-metrics.properties
+279042    0 -r-x------   1 dclong     hdmi-mptna        0 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hdfs-exclude
+279593    4 -r-x------   1 dclong     hdmi-mptna     1502 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/mapred-env.sh
+280650    0 -r-x------   1 dclong     hdmi-mptna        0 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hdfs-include
+280669   16 -r-x------   1 dclong     hdmi-mptna    14656 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hdfs-site.xml-fed-nn1
+282514    4 -r-x------   1 dclong     hdmi-mptna     1603 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/health_check
+282532    4 -r-x------   1 dclong     hdmi-mptna      951 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/mountTable.xml
+282550   12 -r-x------   1 dclong     hdmi-mptna    11136 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/core-site.xml-fed-nn
+283288    4 -r-x------   1 dclong     hdmi-mptna      310 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/pingfederate-agent-config.txt
+284588   12 -r-x------   1 dclong     hdmi-mptna    10949 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/core-site-before-fedration.xml
+284608    4 -r-x------   1 dclong     hdmi-mptna     2316 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/ssl-client.xml.example
+285977    4 -r-x------   1 dclong     hdmi-mptna     1527 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/kms-env.sh
+285996    4 -r-x------   1 dclong     hdmi-mptna      816 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/yarn-variable_D8.xml
+287283    4 -r-x------   1 dclong     hdmi-mptna      314 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hdfs-variable_D8.xml
+288029   12 -r-x------   1 dclong     hdmi-mptna     9866 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hadoop-policy.xml
+288054    8 -r-x------   1 dclong     hdmi-mptna     4974 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/federation-mapping.xml
+288055   12 -r-x------   1 dclong     hdmi-mptna    11924 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/core-site.xml-fed-nn1
+289127    4 -r-x------   1 dclong     hdmi-mptna       10 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/slaves
+292820    4 -r-x------   1 dclong     hdmi-mptna     1449 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/httpfs-env.sh
+296703    4 -r-x------   1 dclong     hdmi-mptna       21 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/httpfs-signature.secret
+297708    4 -r-x------   1 dclong     hdmi-mptna      321 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/hdfs-variable_jn.xml.j2
+299060    8 -r-x------   1 dclong     hdmi-mptna     6782 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/mapred-site.xml.12126.2019-03-06@23:38:45~
+299064    4 -r-x------   1 dclong     hdmi-mptna      620 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/httpfs-site.xml
+299070    8 -r-x------   1 dclong     hdmi-mptna     6694 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/mapred-site.xml.15085.2019-03-06@23:38:45~
+299081    4 -r-x------   1 dclong     hdmi-mptna      538 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/topology.py
+299570    4 -r-x------   1 dclong     hdmi-mptna     2345 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/ssl-server.xml
+299572    4 -r-x------   1 dclong     hdmi-mptna      931 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/mapred-env.cmd
+301013    4 -r-x------   1 dclong     hdmi-mptna      816 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/yarn-variable_D12.xml
+301233    4 -r-x------   1 dclong     hdmi-mptna     2268 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/ssl-server.xml.example
+301975    4 -r-x------   1 dclong     hdmi-mptna       55 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/core-variable.xml
+305764    4 -r-x------   1 dclong     hdmi-mptna      935 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/yarn-variable_D12M192.xml
+306532    4 -r-x------   1 dclong     hdmi-mptna      946 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/taskcontroller.cfg
+308638    8 -r-x------   1 dclong     hdmi-mptna     4113 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/mapred-queues.xml.template
+312081    8 -r-x------   1 dclong     hdmi-mptna     5511 Feb 27 01:25 ./__spark_conf__/__hadoop_conf__/kms-site.xml
+6442669457  148 -r-x------   1 dclong     hdmi-mptna   148458 Feb 27 01:25 ./__spark_conf__/__spark_hadoop_conf__.xml
+6442669462    8 -r-x------   1 dclong     hdmi-mptna     6284 Feb 27 01:25 ./__spark_conf__/__spark_conf__.properties
+222362  604 -r-x------   1 dclong     hdmi-mptna   615211 Feb 27 01:25 ./data-lineage-spark-0.1.0-SNAPSHOT.jar
+broken symlinks(find -L . -maxdepth 5 -type l -ls):
+
+End of LogType:directory.info
+*******************************************************************************
+
+LogAggregationType: AGGREGATED
+==============================================================================================================================
+LogType:launch_container.sh
+LogLastModifiedTime:Sat Feb 27 08:25:21 +0000 2021
+LogLength:8976
+LogContents:
+#!/bin/bash
+
+set -o pipefail -e
+export PRELAUNCH_OUT="/hadoop/3/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/prelaunch.out"
+exec >"${PRELAUNCH_OUT}"
+export PRELAUNCH_ERR="/hadoop/3/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/prelaunch.err"
+exec 2>"${PRELAUNCH_ERR}"
+echo "Setting up env variables"
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-"/apache/confs/hadoop/conf"}
+export MAX_APP_ATTEMPTS="1"
+export JAVA_HOME=${JAVA_HOME:-"/apache/java"}
+export LANG="en_US.UTF-8"
+export APP_SUBMIT_TIME_ENV="1614414302896"
+export HADOOP_HDFS_HOME=${HADOOP_HDFS_HOME:-"/apache/releases/hadoop-2.7.3.2.6.4.1.0.39"}
+export LOGNAME="dclong"
+export JVM_PID="$$"
+export PWD="/hadoop/11/yarn/local/usercache/dclong/appcache/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002"
+export HADOOP_COMMON_HOME=${HADOOP_COMMON_HOME:-"/apache/releases/hadoop-2.7.3.2.6.4.1.0.39"}
+export PYTHONHASHSEED="0"
+export LOCAL_DIRS="/hadoop/3/yarn/local/usercache/dclong/appcache/application_1611634725250_1347938,/hadoop/6/yarn/local/usercache/dclong/appcache/application_1611634725250_1347938,/hadoop/8/yarn/local/usercache/dclong/appcache/application_1611634725250_1347938,/hadoop/9/yarn/local/usercache/dclong/appcache/application_1611634725250_1347938,/hadoop/11/yarn/local/usercache/dclong/appcache/application_1611634725250_1347938,/hadoop/12/yarn/local/usercache/dclong/appcache/application_1611634725250_1347938"
+export PYTHONPATH=":/usr/local/lib/py_dpe_libs/liblinear-1.93/python/:/usr/local/lib/py_dpe_libs/libsvm-3.16/python/:$PWD/pyspark.zip:$PWD/py4j-0.10.7-src.zip:$PWD/packages_incremental_bbowac_etl_2.zip"
+export APPLICATION_WEB_PROXY_BASE="/proxy/application_1611634725250_1347938"
+export NM_HTTP_PORT="50060"
+export SPARK_DIST_CLASSPATH="/apache/confs/hadoop/conf:/tep/exports/apache/hadoop/share/hadoop/common/lib/*:/tep/exports/apache/hadoop/share/hadoop/common/*:/tep/exports/apache/hadoop/share/hadoop/hdfs:/tep/exports/apache/hadoop/share/hadoop/hdfs/lib/*:/tep/exports/apache/hadoop/share/hadoop/hdfs/*:/tep/exports/apache/hadoop/share/hadoop/yarn/lib/*:/tep/exports/apache/hadoop/share/hadoop/yarn/*:/tep/exports/apache/hadoop/share/hadoop/mapreduce/lib/*:/tep/exports/apache/hadoop/share/hadoop/mapreduce/*:/apache/hadoop//contrib/capacity-scheduler/*.jar:/apache/confs/hive/conf"
+export LOG_DIRS="/hadoop/3/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002,/hadoop/6/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002,/hadoop/8/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002,/hadoop/9/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002,/hadoop/11/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002,/hadoop/12/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002"
+export NM_AUX_SERVICE_mapreduce_shuffle="AAA0+gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+"
+export NM_PORT="45454"
+export USER="dclong"
+export HADOOP_YARN_HOME=${HADOOP_YARN_HOME:-"/apache/hadoop"}
+export HADOOP_TOKEN_FILE_LOCATION="/hadoop/11/yarn/local/usercache/dclong/appcache/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/container_tokens"
+export NM_AUX_SERVICE_spark_shuffle=""
+export SPARK_USER="dclong"
+export LOCAL_USER_DIRS="/hadoop/3/yarn/local/usercache/dclong/,/hadoop/6/yarn/local/usercache/dclong/,/hadoop/8/yarn/local/usercache/dclong/,/hadoop/9/yarn/local/usercache/dclong/,/hadoop/11/yarn/local/usercache/dclong/,/hadoop/12/yarn/local/usercache/dclong/"
+export HADOOP_HOME="/apache/releases/hadoop-2.7.3.2.6.4.1.0.39"
+export HOME="/home/"
+export CONTAINER_ID="container_e3731_1611634725250_1347938_01_000002"
+export MALLOC_ARENA_MAX="4"
+echo "Setting up job resources"
+ln -sf "/hadoop/11/yarn/local/usercache/dclong/filecache/137/features.txt" "features.txt"
+ln -sf "/hadoop/3/yarn/local/usercache/dclong/filecache/139/02c81b44-0774-44d9-a836-6f2ff5fcb441_data2.py" "02c81b44-0774-44d9-a836-6f2ff5fcb441_data2.py"
+ln -sf "/hadoop/9/yarn/local/usercache/dclong/filecache/136/pyspark.zip" "pyspark.zip"
+ln -sf "/hadoop/6/yarn/local/usercache/dclong/filecache/134/packages_incremental_bbowac_etl_2.zip" "packages_incremental_bbowac_etl_2.zip"
+ln -sf "/hadoop/9/yarn/local/usercache/dclong/filecache/142/py4j-0.10.7-src.zip" "py4j-0.10.7-src.zip"
+ln -sf "/hadoop/11/yarn/local/usercache/dclong/filecache/143/hive-site.xml" "hive-site.xml"
+ln -sf "/hadoop/12/yarn/local/usercache/dclong/filecache/138/ssl-client.xml" "ssl-client.xml"
+ln -sf "/hadoop/6/yarn/local/usercache/dclong/filecache/140/__spark_libs__2914772172935991564.zip" "__spark_libs__"
+ln -sf "/hadoop/8/yarn/local/usercache/dclong/filecache/141/__spark_conf__.zip" "__spark_conf__"
+ln -sf "/hadoop/8/yarn/local/usercache/dclong/filecache/135/data-lineage-spark-0.1.0-SNAPSHOT.jar" "data-lineage-spark-0.1.0-SNAPSHOT.jar"
+echo "Copying debugging information"
+# Creating copy of launch script
+cp "launch_container.sh" "/hadoop/3/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/launch_container.sh"
+chmod 640 "/hadoop/3/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/launch_container.sh"
+# Determining directory contents
+echo "ls -l:" 1>"/hadoop/3/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/directory.info"
+ls -l 1>>"/hadoop/3/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/directory.info"
+echo "find -L . -maxdepth 5 -ls:" 1>>"/hadoop/3/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/directory.info"
+find -L . -maxdepth 5 -ls 1>>"/hadoop/3/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/directory.info"
+echo "broken symlinks(find -L . -maxdepth 5 -type l -ls):" 1>>"/hadoop/3/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/directory.info"
+find -L . -maxdepth 5 -type l -ls 1>>"/hadoop/3/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/directory.info"
+echo "Launching container"
+exec /bin/bash -c "LD_LIBRARY_PATH="/apache/hadoop/lib/native/Linux-amd64-64/lib:/apache/hadoop/lib/native:$LD_LIBRARY_PATH" $JAVA_HOME/bin/java -server -Xmx30720m -Djava.io.tmpdir=$PWD/tmp '-XX:MaxMetaspaceSize=512m' '-XX:ParallelGCThreads=3' -Dspark.yarn.app.container.log.dir=/hadoop/11/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002 org.apache.spark.deploy.yarn.ApplicationMaster --class 'org.apache.spark.deploy.PythonRunner' --primary-py-file 02c81b44-0774-44d9-a836-6f2ff5fcb441_data2.py --arg '--cntry_id' --arg '0,1,225,679,1000,-999,-1' --arg '--user_sample_ratio' --arg '2' --arg '--total_days' --arg '728' --arg '--output' --arg '/apps/dclong/model_engine/models/chdu/bbowac_value//output/features/inference/2021-02-27' --arg '--impute_file' --arg 'impute.yaml' --arg '--feature_file' --arg 'features2.txt' --properties-file $PWD/__spark_conf__/__spark_conf__.properties 1> /hadoop/11/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/stdout 2> /hadoop/11/yarn/logs/application_1611634725250_1347938/container_e3731_1611634725250_1347938_01_000002/stderr"
+
+End of LogType:launch_container.sh
+************************************************************************************
+
+
+End of LogType:prelaunch.err
+******************************************************************************
+
+LogAggregationType: AGGREGATED
+==============================================================================================================================
+LogType:prelaunch.out
+LogLastModifiedTime:Sat Feb 27 08:25:21 +0000 2021
+LogLength:100
+LogContents:
+Setting up env variables
+Setting up job resources
+Copying debugging information
+Launching container
+
+End of LogType:prelaunch.out
+******************************************************************************
