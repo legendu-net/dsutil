@@ -175,7 +175,7 @@ class LogFilter:
     def _dedup_dump_log(self, lines):
         print("Deduplicating logs ...")
         deduper = LogDeduper()
-        for line, idx in tqdm(self._lookup):
+        for line, idx in tqdm(self._lookup.items()):
             deduper.add(line, idx)
         deduper.write(sys.stdout)
         with open(self._output_file, "w") as fout:
