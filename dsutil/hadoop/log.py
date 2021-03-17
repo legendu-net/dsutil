@@ -148,6 +148,7 @@ class LogFilter:
         """Filter informative liens from a Spark application log.
         """
         self._count_rows()
+        print("Scanning for error lines in the log ...")
         lines = [DASH_50 + "START" + DASH_50 + "\n"]
         with open(self._log_file, "r") as fin:
             dump_flag = -1
