@@ -19,6 +19,7 @@ def filter_(args):
         context_size=args.context_size,
         keywords=args.keywords,
         patterns=args.patterns,
+        threshold=args.threshold
     )
     logf.filter()
 
@@ -66,45 +67,8 @@ def parse_args(args=None, namespace=None) -> Namespace:
     return parser.parse_args(args=args, namespace=namespace)
 
 
-def _subparser_fetch(subparsers):
-    parser_fetch = subparsers.add_parser(
-        'fetch', help='fetch the log of a Spark/Hive application.'
-    )
-    parser_fetch.add_argument(
-        'app_id', help='the ID of the Spark/Hive application whose log is to fetch.'
-    )
-    parser_fetch.add_argument(
-        '-o',
-        '--output',
-        dest='output',
-        help='the ID of the Spark/Hive application whose log is to fetch.'
-    )
-    parser_fetch.add_argument(
-        '-u',
-        '--user',
-        dest='user',
-        default=None,
-        help='the name of the Spark/Hive application owner.'
-    )
-    parser_fetch.add_argument(
-        '-m',
-        '--b-marketing-ep-infr',
-        dest='user',
-        action='store_const',
-        const='b_marketing_ep_infr',
-        help='Fetch log using the acount b_marketing_ep_infr.'
-    )
-    parser_fetch.set_defaults(func=fetch)
-
-
-def _subparser_filter(subparsers):
-    parser_filter = subparsers.add_parser(
-        'filter', help='filter key information from a Spark/Hive application log.'
-    )
-    parser_filter.add_argument(
-        'log_file', type=str, help='path of the log file to process'
-    )
-    parser_filter.add_argument(
+def _option_filter(subparser) -> None:
+    subparser.add_argument(
         '-k',
         '--keywords',
         nargs='+',
@@ -112,7 +76,7 @@ def _subparser_filter(subparsers):
         default=LogFilter.KEYWORDS,
         help='user-defined keywords to search for in the log file'
     )
-    parser_filter.add_argument(
+    subparser.add_argument(
         '-i',
         '--ignore-patterns',
         nargs='+',
@@ -121,7 +85,7 @@ def _subparser_filter(subparsers):
         help=
         'regular expression patterns (date/time and ip by default) to ignore in dedup of filtered lines.'
     )
-    parser_filter.add_argument(
+    subparser.add_argument(
         '-c',
         '--context-size',
         type=int,
@@ -130,20 +94,57 @@ def _subparser_filter(subparsers):
         help=
         'number of lines (3 by default) to print before and after the suspicious line.'
     )
-    parser_filter.add_argument(
+    subparser.add_argument(
         '-o',
-        '--output-file',
-        dest='output_file',
+        '--output',
+        dest='output',
         help='path of the output file (containing filtered lines).'
     )
-    parser_filter.add_argument(
-        '-C',
-        '--case-sensitive',
-        dest='case_sensitive',
-        action="store_true",
+    subparser.add_argument(
+        '-t',
+        '--threshold',
+        dest='threshold',
+        type=float,
+        default=0.5,
         help='make pattern matching case-sensitive.'
     )
-    parser_filter.set_defaults(func=filter_)
+
+
+def _subparser_fetch(subparsers):
+    subparser_fetch = subparsers.add_parser(
+        'fetch', help='fetch the log of a Spark/Hive application.'
+    )
+    subparser_fetch.add_argument(
+        'app_id', help='the ID of the Spark/Hive application whose log is to fetch.'
+    )
+    subparser_fetch.add_argument(
+        '-u',
+        '--user',
+        dest='user',
+        default=None,
+        help='the name of the Spark/Hive application owner.'
+    )
+    subparser_fetch.add_argument(
+        '-m',
+        '--b-marketing-ep-infr',
+        dest='user',
+        action='store_const',
+        const='b_marketing_ep_infr',
+        help='Fetch log using the acount b_marketing_ep_infr.'
+    )
+    _option_filter(subparser_fetch)
+    subparser_fetch.set_defaults(func=fetch)
+
+
+def _subparser_filter(subparsers):
+    subparser_filter = subparsers.add_parser(
+        'filter', help='filter key information from a Spark/Hive application log.'
+    )
+    subparser_filter.add_argument(
+        'log_file', type=str, help='path of the log file to process'
+    )
+    _option_filter(subparser_filter)
+    subparser_filter.set_defaults(func=filter_)
 
 
 def main(args: Optional[Namespace] = None):

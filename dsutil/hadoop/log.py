@@ -81,6 +81,7 @@ class LogFilter:
         keywords: Sequence[str] = KEYWORDS,
         patterns: Sequence[str] = PATTERNS,
         output_file: str = "",
+        threshold: float = 0.5,
     ):
         self._log_file = log_file
         self._context_size = context_size
@@ -90,6 +91,7 @@ class LogFilter:
         self._lookup = {}
         self._queue = deque()
         self._output_file = self._get_output_file(output_file)
+        self._threshold = threshold
 
     def _get_output_file(self, output_file):
         """Get a valid output file.
@@ -175,7 +177,7 @@ class LogFilter:
 
     def _dedup_dump_log(self, lines):
         print("Deduplicating logs ...")
-        deduper = LogDeduper()
+        deduper = LogDeduper(self._threshold)
         for line, idx in tqdm(self._lookup.items()):
             deduper.add(line, idx)
         deduper.write(sys.stdout)
