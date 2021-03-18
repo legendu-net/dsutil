@@ -8,6 +8,7 @@ import re
 from collections import deque
 from difflib import SequenceMatcher
 from tqdm import tqdm
+from loguru import logger
 
 DASH_50 = "-" * 50
 DASH_100 = "-" * 100
@@ -82,16 +83,16 @@ class LogFilter:
         threshold: float = 0.5,
     ):
         self._log_file = log_file
-        self._context_size = context_size
-        self._keywords = keywords
-        self._patterns = patterns
-        self._num_rows = None
-        self._lookup = {}
-        self._queue = deque()
-        self._output = self._get_output(output)
-        self._threshold = threshold
+        self._context_size: int = context_size
+        self._keywords: Sequence[str] = keywords
+        self._patterns: Sequence[str] = patterns
+        self._num_rows: int = 0
+        self._lookup: dict = {}
+        self._queue: deque = deque()
+        self._output: str = self._get_output(output)
+        self._threshold: float = threshold
 
-    def _get_output(self, output):
+    def _get_output(self, output: str) -> str:
         """Get a valid output file.
 
         :param output: The path to the output file.
@@ -141,19 +142,16 @@ class LogFilter:
     def _count_rows(self):
         """Count the total number of rows.
         """
-        if self._num_rows is not None:
+        if self._num_rows:
             return
-        print("Counting total number of rows ...")
+        logger.info("Counting total number of rows ...")
         with open(self._log_file, "r") as fin:
             self._num_rows = sum(1 for line in fin)
-        print(f"Total number of rows: {self._num_rows:,}")
+        logger.info(f"Total number of rows: {self._num_rows:,}")
 
-    def filter(self):
-        """Filter informative liens from a Spark application log.
-        """
-        self._count_rows()
-        print("Scanning for error lines in the log ...")
-        lines = [DASH_50 + "START" + DASH_50 + "\n"]
+    def _scan_error_lines(self) -> None:
+        logger.info("Scanning for error lines in the log ...")
+        lines = [DASH_50 + " Possible Error Lines " + DASH_50 + "\n"]
         with open(self._log_file, "r") as fin:
             dump_flag = -1
             for idx, line in tqdm(enumerate(fin), total=self._num_rows):
@@ -173,17 +171,25 @@ class LogFilter:
                         dump_flag = -1
                 else:
                     dump_flag = 0
-            lines.append(DASH_50 + "EOF" + DASH_50 + "\n")
-            self._dump_queue(lines)
-        self._dedup_dump_log(lines)
+            if dump_flag >= 0:
+                self._dump_queue(lines)
+        with open(self._output, "w") as fout:
+            fout.writelines(lines)
+        logger.info("Possible Error Lines have been dumped into {}", self._output)
 
-    def _dedup_dump_log(self, lines):
-        print("Deduplicating logs ...")
+    def filter(self):
+        """Filter informative liens from a Spark application log.
+        """
+        self._count_rows()
+        self._scan_error_lines()
+        self._dedup_log()
+
+    def _dedup_log(self):
+        logger.info("Deduplicating logs ...")
         deduper = LogDeduper(self._threshold)
         for line, idx in tqdm(self._lookup.items()):
             deduper.add(line, idx)
         deduper.write(sys.stdout)
         with open(self._output, "w") as fout:
             deduper.write(fout)
-            fout.writelines(lines)
-        print(f"\nFile saved in {self._output}\n")
+        logger.info(f"\nUnique error lines have been appended into {}", self._output)
