@@ -71,7 +71,6 @@ class LogFilter:
         r"\d\d[\/](0?[1-9]|1[0-2])[\/](0?[1-9]|[12][0-9]|3[01])\s\d+[:]\d+:\d+",
         r"((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}",
     )
-    MSG = "\rProcessing line {line_num} ({progress}%); Time Used: {time_used}s; Time Left: {time_left}s"
 
     def __init__(
         self,
