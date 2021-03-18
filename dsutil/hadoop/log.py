@@ -127,7 +127,9 @@ class LogFilter:
         :param line: A line of logging message.
         :return: True if the line is to be kept and False otherwise.
         """
-        if re.search(r"/lib/python[0-9.]*/", line):
+        if re.search(r"/(lib|include)/python[0-9.]*/", line):
+            return False
+        if "-XX:OnOutOfMemoryError=" in line:
             return False
         if any(kw in line for kw in self._keywords):
             line = self._regularize(line)
