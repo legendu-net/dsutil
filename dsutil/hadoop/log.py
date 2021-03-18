@@ -127,7 +127,7 @@ class LogFilter:
         :param line: A line of logging message.
         :return: True if the line is to be kept and False otherwise.
         """
-        if re.search(line, "/lib/python[0-9.]*/"):
+        if re.search(r"/lib/python[0-9.]*/", line):
             return False
         if any(kw in line for kw in self._keywords):
             line = self._regularize(line)
