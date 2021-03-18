@@ -61,7 +61,6 @@ class LogFilter:
         "InvalidResourceRequestException",
         "has no attribute",
         "not found",
-        "exec /bin/bash ",
         "OOM",
         "Error",
         "error",
@@ -129,6 +128,8 @@ class LogFilter:
         :param line: A line of logging message.
         :return: True if the line is to be kept and False otherwise.
         """
+        if re.search(line, "/lib/python[0-9.]*/"):
+            return False
         if any(kw in line for kw in self._keywords):
             line = self._regularize(line)
             if line not in self._lookup:
