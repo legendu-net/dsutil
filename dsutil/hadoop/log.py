@@ -8,6 +8,7 @@ import re
 from collections import deque
 from difflib import SequenceMatcher
 from tqdm import tqdm
+from loguru import logger
 
 DASH_50 = "-" * 50
 DASH_100 = "-" * 100
@@ -46,7 +47,6 @@ class LogDeduper:
 
         :param fout: A file handler for outputing log.
         """
-        fout.write(DASH_50 + "SUMMARY" + DASH_50 + "\n")
         for line in self._lines:
             fout.write(line)
 
@@ -61,7 +61,6 @@ class LogFilter:
         "InvalidResourceRequestException",
         "has no attribute",
         "not found",
-        "exec /bin/bash ",
         "OOM",
         "Error",
         "error",
@@ -72,7 +71,6 @@ class LogFilter:
         r"\d\d[\/](0?[1-9]|1[0-2])[\/](0?[1-9]|[12][0-9]|3[01])\s\d+[:]\d+:\d+",
         r"((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}",
     )
-    MSG = "\rProcessing line {line_num} ({progress}%); Time Used: {time_used}s; Time Left: {time_left}s"
 
     def __init__(
         self,
@@ -84,16 +82,16 @@ class LogFilter:
         threshold: float = 0.5,
     ):
         self._log_file = log_file
-        self._context_size = context_size
-        self._keywords = keywords
-        self._patterns = patterns
-        self._num_rows = None
-        self._lookup = {}
-        self._queue = deque()
-        self._output = self._get_output(output)
-        self._threshold = threshold
+        self._context_size: int = context_size
+        self._keywords: Sequence[str] = keywords
+        self._patterns: Sequence[str] = patterns
+        self._num_rows: int = 0
+        self._lookup: dict[str, dict[str, int]] = {kwd: {} for kwd in self._keywords}
+        self._queue: deque = deque()
+        self._output: str = self._get_output(output)
+        self._threshold: float = threshold
 
-    def _get_output(self, output):
+    def _get_output(self, output: str) -> str:
         """Get a valid output file.
 
         :param output: The path to the output file.
@@ -129,29 +127,32 @@ class LogFilter:
         :param line: A line of logging message.
         :return: True if the line is to be kept and False otherwise.
         """
-        if any(kw in line for kw in self._keywords):
-            line = self._regularize(line)
-            if line not in self._lookup:
-                self._lookup[line] = idx
+        if re.search(r"/(lib|include)/python[0-9.]*/", line):
+            return False
+        if "-XX:OnOutOfMemoryError=" in line:
+            return False
+        for kwd in self._keywords:
+            if kwd in line:
+                line = self._regularize(line)
+                if line not in self._lookup[kwd]:
+                    self._lookup[kwd][line] = idx
                 return True
         return False
 
     def _count_rows(self):
         """Count the total number of rows.
         """
-        if self._num_rows is not None:
+        if self._num_rows:
             return
-        print("Counting total number of rows ...")
+        logger.info("Counting total number of rows ...")
         with open(self._log_file, "r") as fin:
             self._num_rows = sum(1 for line in fin)
-        print(f"Total number of rows: {self._num_rows:,}")
+        logger.info("Total number of rows: {:,}", self._num_rows)
 
-    def filter(self):
-        """Filter informative liens from a Spark application log.
-        """
-        self._count_rows()
-        print("Scanning for error lines in the log ...")
-        lines = [DASH_50 + "START" + DASH_50 + "\n"]
+    def _scan_error_lines(self) -> None:
+        print()
+        logger.info("Scanning for error lines in the log ...")
+        lines = [DASH_50 + " Possible Error Lines " + DASH_50 + "\n"]
         with open(self._log_file, "r") as fin:
             dump_flag = -1
             for idx, line in tqdm(enumerate(fin), total=self._num_rows):
@@ -171,17 +172,33 @@ class LogFilter:
                         dump_flag = -1
                 else:
                     dump_flag = 0
-            lines.append(DASH_50 + "EOF" + DASH_50 + "\n")
-            self._dump_queue(lines)
-        self._dedup_dump_log(lines)
+            if dump_flag >= 0:
+                self._dump_queue(lines)
+        with open(self._output, "w") as fout:
+            fout.writelines(lines)
+        logger.info("Possible Error Lines have been dumped into {}", self._output)
 
-    def _dedup_dump_log(self, lines):
-        print("Deduplicating logs ...")
+    def filter(self):
+        """Filter informative liens from a Spark application log.
+        """
+        self._count_rows()
+        self._scan_error_lines()
+        self._dedup_log()
+
+    def _dedup_log(self):
+        print()
+        fout = open(self._output, "w")
+        fout.write(DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
+        for kwd, lines in self._lookup.items():
+            if not lines:
+                continue
+            logger.info('Deduplicating error lines corresponding to "{}" ...', kwd)
+            self._dedup_log_1(lines, fout)
+        fout.close()
+
+    def _dedup_log_1(self, lines: dict[str, int], fout: TextIO):
         deduper = LogDeduper(self._threshold)
-        for line, idx in tqdm(self._lookup.items()):
+        for line, idx in tqdm(lines.items()):
             deduper.add(line, idx)
         deduper.write(sys.stdout)
-        with open(self._output, "w") as fout:
-            deduper.write(fout)
-            fout.writelines(lines)
-        print(f"\nFile saved in {self._output}\n")
+        deduper.write(fout)
