@@ -147,7 +147,7 @@ class LogFilter:
         logger.info("Counting total number of rows ...")
         with open(self._log_file, "r") as fin:
             self._num_rows = sum(1 for line in fin)
-        logger.info(f"Total number of rows: {self._num_rows:,}")
+        logger.info("Total number of rows: {:,}", self._num_rows)
 
     def _scan_error_lines(self) -> None:
         logger.info("Scanning for error lines in the log ...")
@@ -192,4 +192,4 @@ class LogFilter:
         deduper.write(sys.stdout)
         with open(self._output, "w") as fout:
             deduper.write(fout)
-        logger.info(f"\nUnique error lines have been appended into {}", self._output)
+        logger.info("\nUnique error lines have been appended into {}", self._output)
