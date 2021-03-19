@@ -47,7 +47,6 @@ class LogDeduper:
 
         :param fout: A file handler for outputing log.
         """
-        fout.write(DASH_50 + "SUMMARY" + DASH_50 + "\n")
         for line in self._lines:
             fout.write(line)
 
@@ -87,7 +86,7 @@ class LogFilter:
         self._keywords: Sequence[str] = keywords
         self._patterns: Sequence[str] = patterns
         self._num_rows: int = 0
-        self._lookup: dict = {}
+        self._lookup: dict[str, dict[str, int]] = {kwd: {} for kwd in self._keywords}
         self._queue: deque = deque()
         self._output: str = self._get_output(output)
         self._threshold: float = threshold
@@ -132,10 +131,11 @@ class LogFilter:
             return False
         if "-XX:OnOutOfMemoryError=" in line:
             return False
-        if any(kw in line for kw in self._keywords):
-            line = self._regularize(line)
-            if line not in self._lookup:
-                self._lookup[line] = idx
+        for kwd in self._keywords:
+            if kwd in line:
+                line = self._regularize(line)
+                if line not in self._lookup[kwd]:
+                    self._lookup[kwd][line] = idx
                 return True
         return False
 
@@ -150,6 +150,7 @@ class LogFilter:
         logger.info("Total number of rows: {:,}", self._num_rows)
 
     def _scan_error_lines(self) -> None:
+        print()
         logger.info("Scanning for error lines in the log ...")
         lines = [DASH_50 + " Possible Error Lines " + DASH_50 + "\n"]
         with open(self._log_file, "r") as fin:
@@ -185,11 +186,19 @@ class LogFilter:
         self._dedup_log()
 
     def _dedup_log(self):
-        logger.info("Deduplicating logs ...")
+        print()
+        fout = open(self._output, "w")
+        fout.write(DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
+        for kwd, lines in self._lookup.items():
+            if not lines:
+                continue
+            logger.info('Deduplicating error lines corresponding to "{}" ...', kwd)
+            self._dedup_log_1(lines, fout)
+        fout.close()
+
+    def _dedup_log_1(self, lines: dict[str, int], fout: TextIO):
         deduper = LogDeduper(self._threshold)
-        for line, idx in tqdm(self._lookup.items()):
+        for line, idx in tqdm(lines.items()):
             deduper.add(line, idx)
         deduper.write(sys.stdout)
-        with open(self._output, "w") as fout:
-            deduper.write(fout)
-        logger.info("\nUnique error lines have been appended into {}", self._output)
+        deduper.write(fout)
