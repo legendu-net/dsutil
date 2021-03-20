@@ -107,7 +107,7 @@ def _option_filter(subparser) -> None:
         "--threshold",
         dest="threshold",
         type=float,
-        default=0.5,
+        default=0.6,
         help="make pattern matching case-sensitive."
     )
     subparser.add_argument(
