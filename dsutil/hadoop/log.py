@@ -226,6 +226,6 @@ class LogFilter:
         deduper.write(fout)
         if not self._dump_by_keyword:
             return
-        with (dir_ / kwd).open("w") as fout:
+        with (dir_ / kwd).open("w") as fout_kwd:
             for line, idx in lines:
-                fout.write(f"L{idx}: {line}\n")
+                fout_kwd.write(f"L{idx}: {line}\n")
