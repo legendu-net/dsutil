@@ -1,10 +1,9 @@
 """Module for log filtering.
 """
 from __future__ import annotations
-from typing import Union, Sequence, TextIO
+from typing import Union, Optional, Sequence, TextIO
 from pathlib import Path
 import sys
-import os
 import re
 from collections import deque
 from difflib import SequenceMatcher
@@ -204,6 +203,8 @@ class LogFilter:
             logger.info(
                 "Error lines will be dumped by keyword into the directory {}.", dir_
             )
+        else:
+            dir_ = None
         # dedup error lines
         fout = open(self._output, "a")
         fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
@@ -211,11 +212,11 @@ class LogFilter:
             if not lines:
                 continue
             logger.info('Deduplicating error lines corresponding to "{}" ...', kwd)
-            self._dedup_log_1(lines, fout)
+            self._dedup_log_1(kwd, lines, fout, dir_)
         fout.close()
 
     def _dedup_log_1(
-        self, kwd: str, lines: dict[str, int], fout: TextIO, dir_: Path
+        self, kwd: str, lines: dict[str, int], fout: TextIO, dir_: Optional[Path]
     ) -> None:
         deduper = LogDeduper(self._threshold)
         lines = sorted(lines.items())
