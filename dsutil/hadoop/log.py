@@ -102,7 +102,7 @@ class LogFilter:
         :param output: The path to the output file.
         """
         if output == "" or Path(output).resolve() == self._lookup:
-            return self._log_file.with_name(self._log_file.stem _ "_s" + self._log_file.suffix)
+            return self._log_file.with_name(self._log_file.stem + "_s" + self._log_file.suffix)
         if isinstance(output, str):
             output = Path(output)
         return output.resolve()
