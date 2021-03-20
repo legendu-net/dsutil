@@ -136,9 +136,7 @@ class LogFilter:
         :param line: A line of logging message.
         :return: True if the line is to be kept and False otherwise.
         """
-        if re.search(r"\s+\./.*(lib|include)/", line):
-            return False
-        if "-XX:OnOutOfMemoryError=" in line:
+        if " ./" in line or "-XX:OnOutOfMemoryError=" in line:
             return False
         for kwd in self._keywords:
             if kwd in line:
