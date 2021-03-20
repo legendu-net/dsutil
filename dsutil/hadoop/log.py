@@ -164,22 +164,19 @@ class LogFilter:
         with open(self._log_file, "r") as fin:
             dump_flag = -1
             for idx, line in tqdm(enumerate(fin), total=self._num_rows):
-                line_with_num = f"L{idx}: {line}"
-                self._queue.append(line_with_num)
+                self._queue.append(f"L{idx}: {line}")
                 keep = self._keep(idx, line)
-                # fill up context_head with anything only if found
-                if len(self._queue) < self._context_size and not keep:
-                    self._queue.append(line_with_num)
-                    continue
-                if not keep and dump_flag == -1:
-                    self._queue.popleft()
-                elif not keep and dump_flag >= 0:
-                    dump_flag += 1
-                    if dump_flag == self._context_size:
-                        self._dump_queue(lines)
-                        dump_flag = -1
-                else:
+                if keep:
                     dump_flag = 0
+                    continue
+                if dump_flag == -1: 
+                    if len(self._queue) > self._context_size:
+                        self._queue.popleft()
+                    continue
+                dump_flag += 1
+                if dump_flag >= self._context_size:
+                    self._dump_queue(lines)
+                    dump_flag = -1
             if dump_flag >= 0:
                 self._dump_queue(lines)
         with open(self._output, "w") as fout:
