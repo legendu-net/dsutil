@@ -1,7 +1,7 @@
 """Module for log filtering.
 """
 from __future__ import annotations
-from typing import Sequence, TextIO
+from typing import Union, Sequence, TextIO
 import sys
 import os
 import re
