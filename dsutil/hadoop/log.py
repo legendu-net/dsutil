@@ -2,6 +2,7 @@
 """
 from __future__ import annotations
 from typing import Union, Sequence, TextIO
+from pathlib import Path
 import sys
 import os
 import re
