@@ -58,11 +58,7 @@ class LogFilter:
     """A class for log filtering.
     """
     KEYWORDS = (
-        "User class threw exception",
         "spark.yarn.executor.memoryOverhead",
-        "FileAlreadyExists",
-        "InvalidResourceRequestException",
-        "has no attribute",
         "not found",
         "OOM",
         "Error",
@@ -71,8 +67,8 @@ class LogFilter:
         "exception",
     )
     PATTERNS = (
-        r"\d\d[\/](0?[1-9]|1[0-2])[\/](0?[1-9]|[12][0-9]|3[01])\s\d+[:]\d+:\d+",
-        r"((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}",
+        r"\d\d[\/](0?[1-9]|1[0-2])[\/](0?[1-9]|[12][0-9]|3[01])\s\d+[:]\d+:\d+",  # time
+        r"((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}",  # IP
     )
 
     def __init__(
@@ -136,15 +132,14 @@ class LogFilter:
         :param line: A line of logging message.
         :return: True if the line is to be kept and False otherwise.
         """
-        if re.search(r"\s+\./.*(lib|include)/", line):
-            return False
-        if "-XX:OnOutOfMemoryError=" in line:
+        if " ./" in line or "-XX:OnOutOfMemoryError=" in line:
             return False
         for kwd in self._keywords:
             if kwd in line:
                 line = self._regularize(line)
-                if line not in self._lookup[kwd]:
-                    self._lookup[kwd][line] = idx
+                if line in self._lookup[kwd]:
+                    return False
+                self._lookup[kwd][line] = idx
                 return True
         return False
 
@@ -165,22 +160,19 @@ class LogFilter:
         with open(self._log_file, "r") as fin:
             dump_flag = -1
             for idx, line in tqdm(enumerate(fin), total=self._num_rows):
-                line_with_num = f"L{idx}: {line}"
-                self._queue.append(line_with_num)
+                self._queue.append(f"L{idx}: {line}")
                 keep = self._keep(idx, line)
-                # fill up context_head with anything only if found
-                if len(self._queue) < self._context_size and not keep:
-                    self._queue.append(line_with_num)
-                    continue
-                if not keep and dump_flag == -1:
-                    self._queue.popleft()
-                elif not keep and dump_flag >= 0:
-                    dump_flag += 1
-                    if dump_flag == self._context_size:
-                        self._dump_queue(lines)
-                        dump_flag = -1
-                else:
+                if keep:
                     dump_flag = 0
+                    continue
+                if dump_flag == -1:
+                    if len(self._queue) > self._context_size:
+                        self._queue.popleft()
+                    continue
+                dump_flag += 1
+                if dump_flag >= self._context_size:
+                    self._dump_queue(lines)
+                    dump_flag = -1
             if dump_flag >= 0:
                 self._dump_queue(lines)
         with open(self._output, "w") as fout:
