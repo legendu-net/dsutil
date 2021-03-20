@@ -12,8 +12,7 @@ def test_main():
         [
             "filter",
             str(BASE_DIR / "application_1611634725250_1347938"), "-o",
-            str(output),
-            "-d"
+            str(output), "-d"
         ]
     )
     dsutil.hadoop.logf.main(args)

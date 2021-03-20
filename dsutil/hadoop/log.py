@@ -85,7 +85,8 @@ class LogFilter:
         threshold: float = 0.5,
         dump_by_keyword: bool = False,
     ):
-        self._log_file = (log_file if isinstance(log_file, Path) else Path(log_file)).resolve()
+        self._log_file = (log_file
+                          if isinstance(log_file, Path) else Path(log_file)).resolve()
         self._context_size: int = context_size
         self._keywords: Sequence[str] = keywords
         self._patterns: Sequence[str] = patterns
@@ -102,7 +103,9 @@ class LogFilter:
         :param output: The path to the output file.
         """
         if output == "" or Path(output).resolve() == self._lookup:
-            return self._log_file.with_name(self._log_file.stem + "_s" + self._log_file.suffix)
+            return self._log_file.with_name(
+                self._log_file.stem + "_s" + self._log_file.suffix
+            )
         if isinstance(output, str):
             output = Path(output)
         return output.resolve()
@@ -197,7 +200,9 @@ class LogFilter:
         if self._dump_by_keyword:
             dir_ = self._output.parent / (self._log_file.stem + "_k")
             dir_.mkdir(parents=True, exist_ok=True)
-            logger.info("Error lines will be dumped by keyword into the directory {}.", dir_)
+            logger.info(
+                "Error lines will be dumped by keyword into the directory {}.", dir_
+            )
         # dedup error lines
         fout = open(self._output, "a")
         fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
@@ -208,7 +213,9 @@ class LogFilter:
             self._dedup_log_1(lines, fout)
         fout.close()
 
-    def _dedup_log_1(self, kwd: str, lines: dict[str, int], fout: TextIO, dir_: Path) -> None:
+    def _dedup_log_1(
+        self, kwd: str, lines: dict[str, int], fout: TextIO, dir_: Path
+    ) -> None:
         deduper = LogDeduper(self._threshold)
         lines = sorted(lines.items())
         for line, idx in tqdm(lines):
