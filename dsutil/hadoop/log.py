@@ -144,6 +144,7 @@ class LogFilter:
                 if line not in self._lookup[kwd]:
                     self._lookup[kwd][line] = idx
                     return True
+                return False
         return False
 
     def _count_rows(self):
