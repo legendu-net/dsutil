@@ -45,7 +45,7 @@ def fetch(args):
     """
     app_id = _format_app_id(args.app_id)
     output = args.output if args.output else app_id
-    cmd = [YARN, "logs", "-applicationId", app_id]
+    cmd = [YARN, "logs", "-size_limit_mb", "-1", "-applicationId", app_id]
     if args.user:
         cmd = cmd + ["-appOwner", args.user]
     with open(output, "w", encoding="utf-8") as fout:
