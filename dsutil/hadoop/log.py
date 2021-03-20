@@ -141,10 +141,10 @@ class LogFilter:
         for kwd in self._keywords:
             if kwd in line:
                 line = self._regularize(line)
-                if line not in self._lookup[kwd]:
-                    self._lookup[kwd][line] = idx
-                    return True
-                return False
+                if line in self._lookup[kwd]:
+                    return False
+                self._lookup[kwd][line] = idx
+                return True
         return False
 
     def _count_rows(self):
