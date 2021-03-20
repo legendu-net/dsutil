@@ -17,3 +17,6 @@ def test_main():
     )
     dsutil.hadoop.logf.main(args)
     assert output.is_file()
+    text = output.read_text()
+    assert "- Possible Error Lines -" in text
+    assert "- Deduped Error Lines -" in text

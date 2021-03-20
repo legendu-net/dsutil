@@ -188,7 +188,7 @@ class LogFilter:
     def _dedup_log(self):
         print()
         fout = open(self._output, "a")
-        fout.write(DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
+        fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
         for kwd, lines in self._lookup.items():
             if not lines:
                 continue
