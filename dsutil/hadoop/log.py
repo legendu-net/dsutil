@@ -169,7 +169,7 @@ class LogFilter:
                 if keep:
                     dump_flag = 0
                     continue
-                if dump_flag == -1: 
+                if dump_flag == -1:
                     if len(self._queue) > self._context_size:
                         self._queue.popleft()
                     continue
