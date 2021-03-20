@@ -20,7 +20,8 @@ def filter_(args):
         keywords=args.keywords,
         patterns=args.patterns,
         output=args.output,
-        threshold=args.threshold
+        threshold=args.threshold,
+        dump_by_keyword=args.dump_by_keyword,
     )
     logf.filter()
 
@@ -108,6 +109,13 @@ def _option_filter(subparser) -> None:
         type=float,
         default=0.5,
         help="make pattern matching case-sensitive."
+    )
+    subparser.add_argument(
+        "-d",
+        "--dump-by-keyword",
+        dest="dump_by_keyword",
+        action="store_true",
+        help="dump error lines by keywords."
     )
 
 
