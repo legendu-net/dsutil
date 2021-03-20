@@ -67,8 +67,11 @@ class LogFilter:
         "exception",
     )
     PATTERNS = (
-        r"\d\d[\/](0?[1-9]|1[0-2])[\/](0?[1-9]|[12][0-9]|3[01])\s\d+[:]\d+:\d+",  # time
-        r"((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}",  # IP
+        (r"\d{2,}[-/]\d{2,}[-/]\d{2,}\s\d+:\d+:\d+", "YYYY/MM/DD HH:MM:SS"),
+        (r"\d{,3}.\d{,3}.\d{,3}.\d{,3}(:\d+)?", "0.0.0.0:0"),
+        (r"streamId=\d+", "streamId=*"),
+        (r"chunkIndex=\d+", "chunkIndex=*"),
+        (r"send RPC \d+", "send RPC *"),
     )
 
     def __init__(
@@ -112,8 +115,8 @@ class LogFilter:
         :param line: A line of logging message.
         :return: The regularized the line message.
         """
-        for pattern in self._patterns:
-            line = re.sub(pattern, "", line)
+        for pattern, replace in self._patterns:
+            line = re.sub(pattern, replace, line)
         return line
 
     def _dump_queue(self, lines) -> None:
