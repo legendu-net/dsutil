@@ -29,7 +29,10 @@ class LogDeduper:
         :return: A similarity score (between 0 and 1) between the 2 lines.
         """
         return max(
-            (SequenceMatcher(None, line, target).ratio() for target in self._lines),
+            (
+                SequenceMatcher(None, line, target).ratio()
+                for target in reversed(self._lines)
+            ),
             default=0
         )
 
@@ -188,7 +191,7 @@ class LogFilter:
     def _dedup_log(self):
         print()
         fout = open(self._output, "a")
-        fout.write(DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
+        fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
         for kwd, lines in self._lookup.items():
             if not lines:
                 continue
@@ -198,7 +201,7 @@ class LogFilter:
 
     def _dedup_log_1(self, lines: dict[str, int], fout: TextIO):
         deduper = LogDeduper(self._threshold)
-        for line, idx in tqdm(lines.items()):
+        for line, idx in tqdm(sorted(lines.items())):
             deduper.add(line, idx)
         deduper.write(sys.stdout)
         deduper.write(fout)
