@@ -29,7 +29,10 @@ class LogDeduper:
         :return: A similarity score (between 0 and 1) between the 2 lines.
         """
         return max(
-            (SequenceMatcher(None, line, target).ratio() for target in reversed(self._lines)),
+            (
+                SequenceMatcher(None, line, target).ratio()
+                for target in reversed(self._lines)
+            ),
             default=0
         )
 
