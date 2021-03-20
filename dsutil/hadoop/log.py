@@ -77,14 +77,15 @@ class LogFilter:
 
     def __init__(
         self,
-        log_file,
-        context_size=5,
+        log_file: Union[str, Path],
+        context_size: int = 5,
         keywords: Sequence[str] = KEYWORDS,
         patterns: Sequence[str] = PATTERNS,
-        output: str = "",
+        output: Union[str, Path] = "",
         threshold: float = 0.5,
+        dump_by_keyword: bool = False,
     ):
-        self._log_file = log_file
+        self._log_file = (log_file if isinstance(log_file, Path) else Path(log_file)).resolve()
         self._context_size: int = context_size
         self._keywords: Sequence[str] = keywords
         self._patterns: Sequence[str] = patterns
@@ -93,16 +94,18 @@ class LogFilter:
         self._queue: deque = deque()
         self._output: str = self._get_output(output)
         self._threshold: float = threshold
+        self._dump_by_keyword: bool = dump_by_keyword
 
-    def _get_output(self, output: str) -> str:
+    def _get_output(self, output: Union[str, Path]) -> Path:
         """Get a valid output file.
 
         :param output: The path to the output file.
         """
-        if output and output != self._log_file:
-            return output
-        title, ext = os.path.splitext(self._log_file)
-        return title + "_s" + ext
+        if output == "" or Path(output).resolve() == self._lookup:
+            return self._log_file.with_name(self._log_file.stem _ "_s" + self._log_file.suffix)
+        if isinstance(output, str):
+            output = Path(output)
+        return output.resolve()
 
     def _regularize(self, line) -> str:
         """Get rid of substrings with patterns specified by the regular expressions.
@@ -181,7 +184,7 @@ class LogFilter:
             fout.writelines(lines)
         logger.info("Possible Error Lines have been dumped into {}", self._output)
 
-    def filter(self):
+    def filter(self) -> None:
         """Filter informative liens from a Spark application log.
         """
         self._count_rows()
@@ -190,6 +193,12 @@ class LogFilter:
 
     def _dedup_log(self):
         print()
+        # create dir for dumping errors by keyword
+        if self._dump_by_keyword:
+            dir_ = self._output.parent / (self._log_file.stem + "_k")
+            dir_.mkdir(parents=True, exist_ok=True)
+            logger.info("Error lines will be dumped by keyword into the directory {}.", dir_)
+        # dedup error lines
         fout = open(self._output, "a")
         fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
         for kwd, lines in self._lookup.items():
@@ -199,9 +208,15 @@ class LogFilter:
             self._dedup_log_1(lines, fout)
         fout.close()
 
-    def _dedup_log_1(self, lines: dict[str, int], fout: TextIO):
+    def _dedup_log_1(self, kwd: str, lines: dict[str, int], fout: TextIO, dir_: Path) -> None:
         deduper = LogDeduper(self._threshold)
-        for line, idx in tqdm(sorted(lines.items())):
+        lines = sorted(lines.items())
+        for line, idx in tqdm(lines):
             deduper.add(line, idx)
         deduper.write(sys.stdout)
         deduper.write(fout)
+        if not self._dump_by_keyword:
+            return
+        with (dir_ / kwd).open("w") as fout:
+            for line, idx in lines:
+                fout.write(f"L{idx}: {line}\n")
