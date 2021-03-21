@@ -17,7 +17,7 @@ DASH_100 = "-" * 100
 class LogDeduper:
     """Dedup similar log lines.
     """
-    def __init__(self, threshold: float = 0.6):
+    def __init__(self, threshold: float = 0.7):
         self._lines = []
         self._threshold = threshold
 
@@ -81,7 +81,7 @@ class LogFilter:
         keywords: Sequence[str] = KEYWORDS,
         patterns: Sequence[str] = PATTERNS,
         output: Union[str, Path] = "",
-        threshold: float = 0.6,
+        threshold: float = 0.7,
         dump_by_keyword: bool = False,
     ):
         self._log_file = (log_file
