@@ -6,17 +6,12 @@ python-local:
   - python
 spark-submit: /apache/spark2.3/bin/spark-submit
 files:
-  hive-site.xml: 
-    - file:///apache/hive/conf/hive-site.xml
-  ssl-client.xml: 
-    - file:///apache/hadoop/etc/hadoop/ssl-client.xml
-  hdfs-site.xml: 
-    - file:///apache/hadoop/etc/hadoop/hdfs-site.xml
-  core-site.xml: 
-    - file:///apache/hadoop/etc/hadoop/core-site.xml
-  federation-mapping.xml:
-    - file:///apache/hadoop/etc/hadoop/federation-mapping.xml
-    - file:///apache/fed-test-confs/conf/federation-mapping.xml
+  - file:///apache/hive/conf/hive-site.xml
+  - file:///apache/hadoop/etc/hadoop/ssl-client.xml
+  - file:///apache/hadoop/etc/hadoop/hdfs-site.xml
+  - file:///apache/hadoop/etc/hadoop/core-site.xml
+  - file:///apache/hadoop/etc/hadoop/federation-mapping.xml
+  - file:///apache/fed-test-confs/conf/federation-mapping.xml
 master: yarn
 deploy-mode: cluster
 queue: your-queue
