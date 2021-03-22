@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import Union, Optional, Sequence, TextIO
 from pathlib import Path
+import sys
 import re
 from collections import deque
 from difflib import SequenceMatcher
@@ -209,19 +210,24 @@ class LogFilter:
         lines_unique = [self._error_priority(line) for line in lines_unique]
         lines_unique.sort()
         with self._output.open("a") as fout:
-            fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
-            fout.write(
-                "http://www.legendu.net/misc/blog/A-comprehensive-list-of-issues-in-spark-applications\n\n"
-            )
-            for _, line, reason, solution in lines_unique:
-                fout.write(line)
-                if reason:
-                    fout.write("Possible Reason(s): ")
-                    fout.write(reason + "\n")
-                if solution:
-                    fout.write("Possible Solution(s): ")
-                    fout.write(solution + "\n")
-                fout.write("\n")
+            self._write_lines_unique(lines_unique, fout)
+        self._write_lines_unique(lines_unique, sys.stdout)
+
+    @staticmethod
+    def _write_lines_unique(lines_unique: list[tuple[int, str, str, str]], fout: TextIO):
+        fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
+        fout.write(
+            "http://www.legendu.net/misc/blog/A-comprehensive-list-of-issues-in-spark-applications\n\n"
+        )
+        for _, line, reason, solution in lines_unique:
+            fout.write(line)
+            if reason:
+                fout.write("Possible Reason(s): ")
+                fout.write(reason + "\n")
+            if solution:
+                fout.write("Possible Solution(s): ")
+                fout.write(solution + "\n")
+            fout.write("\n")
 
     @staticmethod
     def _error_priority(line: str) -> tuple[int, str, str, str]:
