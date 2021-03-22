@@ -210,7 +210,9 @@ class LogFilter:
         lines_unique.sort()
         with self._output.open("a") as fout:
             fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
-            fout.write("http://www.legendu.net/misc/blog/A-comprehensive-list-of-issues-in-spark-applications\n\n")
+            fout.write(
+                "http://www.legendu.net/misc/blog/A-comprehensive-list-of-issues-in-spark-applications\n\n"
+            )
             for _, line, reason, solution in lines_unique:
                 fout.write(line)
                 if reason:
@@ -229,34 +231,55 @@ class LogFilter:
         :return: The priority of the error line.
         """
         patterns = [
-            ("object has no attribute", 1, "As explained by the error message.", "Correct the attribute name in your Python code."),
-            ("No such file or directory:", 1, "As explained by the error message.", "Upload the file using the option --files of the spark-submit command."),
-            ("error: the following arguments are required:", 1, "As explained by the error message", "Specify the required argument to your Python script."),
+            (
+                "object has no attribute", 1, "As explained by the error message.",
+                "Correct the attribute name in your Python code."
+            ),
+            (
+                "No such file or directory:", 1, "As explained by the error message.",
+                "Upload the file using the option --files of the spark-submit command."
+            ),
+            (
+                "error: the following arguments are required:", 1,
+                "As explained by the error message",
+                "Specify the required argument to your Python script."
+            ),
             (r"org\.apache\.spark\.sql\.AnalysisException: cannot resolve", 1, "", ""),
             ("SyntaxError: invalid syntax", 1, "", ""),
-            ("NameError: name .* is not defined", 1,"", ""),
-            (r"org\.apache\.spark\.sql\.AnalysisException: Path does not exist:", 1, "", ""),
+            ("NameError: name .* is not defined", 1, "", ""),
+            (
+                r"org\.apache\.spark\.sql\.AnalysisException: Path does not exist:", 1,
+                "", ""
+            ),
             ("ModuleNotFoundError: No module named", 1, "", ""),
             ("error: unrecognized arguments:", 1, "", ""),
             ("error: argument", 1, "", ""),
-            (r"org\.apache\.hadoop\.security\.AccessControlException: Permission denied: user=", 1,"", ""),
-            (r"org\.apache\.spark\.InsertOperationConflictException: Failed to hold insert operation lock", 1,"", ""),
-            ("Block rdd_.* could not be removed as it was not found on disk or in memory", 2,"", ""),
-            (r"java\.io\.FileNotFoundException", 2,"", ""),
-            ("Container killed by YARN for exceeding memory limits", 2,"", ""),
-            (r"org\.apache\.spark\.memory\.SparkOutOfMemoryError", 3,"", ""),
-            ("Container from a bad node", 3,"", ""),
-            ("No live nodes contain block BP", 3,"", ""),
-            ("ReplicaNotFoundException: Replica not found for", 3,"", ""),
+            (
+                r"org\.apache\.hadoop\.security\.AccessControlException: Permission denied: user=",
+                1, "", ""
+            ),
+            (
+                r"org\.apache\.spark\.InsertOperationConflictException: Failed to hold insert operation lock",
+                1, "", ""
+            ),
+            (
+                "Block rdd_.* could not be removed as it was not found on disk or in memory",
+                2, "", ""
+            ),
+            (r"java\.io\.FileNotFoundException", 2, "", ""),
+            ("Container killed by YARN for exceeding memory limits", 2, "", ""),
+            (r"org\.apache\.spark\.memory\.SparkOutOfMemoryError", 3, "", ""),
+            ("Container from a bad node", 3, "", ""),
+            ("No live nodes contain block BP", 3, "", ""),
+            ("ReplicaNotFoundException: Replica not found for", 3, "", ""),
         ]
         for pattern, priority, reason, solution in patterns:
             if re.search(pattern, line):
                 return priority, line, reason, solution
         return 10, line, "", ""
 
-    def _dedup_log_1(
-        self, kwd: str, lines: dict[str, int], dir_: Optional[Path]
-    ) -> list[str]:
+    def _dedup_log_1(self, kwd: str, lines: dict[str, int],
+                     dir_: Optional[Path]) -> list[str]:
         deduper = LogDeduper(self._threshold)
         lines = sorted(lines.items())
         for line, idx in tqdm(lines):
