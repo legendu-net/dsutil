@@ -100,6 +100,7 @@ def _option_filter(subparser) -> None:
         "-o",
         "--output",
         dest="output",
+        default="",
         help="path of the output file (containing filtered lines)."
     )
     subparser.add_argument(

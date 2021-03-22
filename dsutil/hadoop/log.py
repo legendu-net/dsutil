@@ -214,20 +214,16 @@ class LogFilter:
         self._write_lines_unique(lines_unique, sys.stdout)
 
     @staticmethod
-    def _write_lines_unique(lines_unique: list[tuple[int, str, str, str]], fout: TextIO):
+    def _write_lines_unique(
+        lines_unique: list[tuple[int, str, str, str]], fout: TextIO
+    ):
         fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
         fout.write(
             "http://www.legendu.net/misc/blog/A-comprehensive-list-of-issues-in-spark-applications\n\n"
         )
-        for _, line, reason, solution in lines_unique:
+        for _, line, url in lines_unique:
             fout.write(line)
-            if reason:
-                fout.write("Possible Reason(s): ")
-                fout.write(reason + "\n")
-            if solution:
-                fout.write("Possible Solution(s): ")
-                fout.write(solution + "\n")
-            fout.write("\n")
+            fout.write(f"Possible causes and solutions: {url}\n")
 
     @staticmethod
     def _error_priority(line: str) -> tuple[int, str, str, str]:
@@ -238,51 +234,102 @@ class LogFilter:
         """
         patterns = [
             (
-                "object has no attribute", 1, "As explained by the error message.",
-                "Correct the attribute name in your Python code."
+                "(?i)object has no attribute", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
-                "No such file or directory:", 1, "As explained by the error message.",
-                "Upload the file using the option --files of the spark-submit command."
+                "(?i)No such file or directory:", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
-                "error: the following arguments are required:", 1,
-                "As explained by the error message",
-                "Specify the required argument to your Python script."
-            ),
-            ("error: unrecognized arguments:", 1, "As explained by the error message.", "Remove the unrecognizedd argument(s) from the command line."),
-            ("error: argument", 1, "", ""),
-            (r"org\.apache\.spark\.sql\.AnalysisException: cannot resolve", 1, "", ""),
-            ("SyntaxError: invalid syntax", 1, "", ""),
-            ("NameError: name .* is not defined", 1, "", ""),
-            (
-                r"org\.apache\.spark\.sql\.AnalysisException: Path does not exist:", 1,
-                "", ""
-            ),
-            ("ModuleNotFoundError: No module named", 1, "", ""),
-            (
-                r"org\.apache\.hadoop\.security\.AccessControlException: Permission denied: user=",
-                1, "", ""
+                "(?i)error: the following arguments are required:", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
-                r"org\.apache\.spark\.InsertOperationConflictException: Failed to hold insert operation lock",
-                1, "", ""
+                "(?i)error: unrecognized arguments:", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
-                "Block rdd_.* could not be removed as it was not found on disk or in memory",
-                2, "", ""
+                "(?i)error: argument", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
-            (r"java\.io\.FileNotFoundException", 2, "", ""),
-            ("Container killed by YARN for exceeding memory limits", 2, "", ""),
-            (r"org\.apache\.spark\.memory\.SparkOutOfMemoryError", 3, "", ""),
-            ("Container from a bad node", 3, "", ""),
-            ("No live nodes contain block BP", 3, "", ""),
-            ("ReplicaNotFoundException: Replica not found for", 3, "", ""),
+            (
+                "(?i)ModuleNotFoundError: No module named", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+            ),
+            (
+                "(?i)SyntaxError: invalid syntax", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+            ),
+            (
+                "(?i)NameError: name .* is not defined", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+            ),
+            (
+                "(?i)table not found", 1,
+                "http://www.legendu.net/misc/blog/spark-issue-table-not-found/"
+            ),
+            (
+                "(?i)SparkContext: A master URL must be set", 1,
+                "http://www.legendu.net/misc/blog/spark-issue-a-master-url-must-be-set-in-your-configuration/"
+            ),
+            (
+                r"(?i)org\.apache\.spark\.sql\.AnalysisException: cannot resolve", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-org.apache.spark.sql.AnalysisException:-cannot-resolve"
+            ),
+            (
+                r"(?i)org\.apache\.spark\.sql\.AnalysisException: Path does not exist:",
+                1,
+                "http://www.legendu.net/misc/blog/spark-issue:-org.apache.spark.sql.AnalysisException:-Path-does-not-exist"
+            ),
+            (
+                r"(?i)org\.apache\.hadoop\.security\.AccessControlException: Permission denied: user=",
+                1,
+                "http://www.legendu.net/misc/blog/org.apache.hadoop.security.AccessControlException:-Permission-denied"
+            ),
+            (
+                r"(?i)org\.apache\.spark\.InsertOperationConflictException: Failed to hold insert operation lock",
+                1,
+                "http://www.legendu.net/misc/blog/org.apache.spark.InsertOperationConflictException:-Failed-to-hold-insert-operation-lock"
+            ),
+            (
+                "(?i)serialized results is bigger than spark.driver.maxResultSize", 2,
+                "http://www.legendu.net/misc/blog/spark-issues-total-size-bigger-than-maxresultsize/"
+            ),
+            (
+                "(?i)Block rdd_.* could not be removed as it was not found on disk or in memory",
+                2,
+                "http://www.legendu.net/misc/blog/spark-issue:-block-could-not-be-removed-as-it-was-not-found-on-disk-or-in-memory"
+            ),
+            (
+                r"(?i)java\.io\.FileNotFoundException", 2,
+                "http://www.legendu.net/misc/blog/spark-issue-file-not-found-exception/"
+            ),
+            (
+                "(?i)Container killed by YARN for exceeding memory limits", 2,
+                "http://www.legendu.net/misc/blog/spark-issue-Container-killed-by-YARN-for-exceeding-memory-limits/"
+            ),
+            (
+                r"(?i)org\.apache\.spark\.memory\.SparkOutOfMemoryError", 3,
+                "http://www.legendu.net/misc/tag/spark-issue.html"
+            ),
+            (
+                "(?i)Container from a bad node", 3,
+                "http://www.legendu.net/misc/tag/spark-issue.html"
+            ),
+            (
+                "(?i)No live nodes contain block BP", 3,
+                "http://www.legendu.net/misc/tag/spark-issue.html"
+            ),
+            (
+                "(?i)ReplicaNotFoundException: Replica not found for", 3,
+                "http://www.legendu.net/misc/tag/spark-issue.html"
+            ),
         ]
-        for pattern, priority, reason, solution in patterns:
+        for pattern, priority, url in patterns:
             if re.search(pattern, line):
-                return priority, line, reason, solution
-        return 10, line, "", ""
+                return priority, line, url
+        return 10, line, "http://www.legendu.net/misc/tag/spark-issue.html"
 
     def _dedup_log_1(self, kwd: str, lines: dict[str, int],
                      dir_: Optional[Path]) -> list[str]:
