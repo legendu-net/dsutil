@@ -250,6 +250,8 @@ class LogFilter:
                 "As explained by the error message",
                 "Specify the required argument to your Python script."
             ),
+            ("error: unrecognized arguments:", 1, "As explained by the error message.", "Remove the unrecognizedd argument(s) from the command line."),
+            ("error: argument", 1, "", ""),
             (r"org\.apache\.spark\.sql\.AnalysisException: cannot resolve", 1, "", ""),
             ("SyntaxError: invalid syntax", 1, "", ""),
             ("NameError: name .* is not defined", 1, "", ""),
@@ -258,8 +260,6 @@ class LogFilter:
                 "", ""
             ),
             ("ModuleNotFoundError: No module named", 1, "", ""),
-            ("error: unrecognized arguments:", 1, "", ""),
-            ("error: argument", 1, "", ""),
             (
                 r"org\.apache\.hadoop\.security\.AccessControlException: Permission denied: user=",
                 1, "", ""
