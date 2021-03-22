@@ -221,7 +221,7 @@ class LogFilter:
         )
         for _, line, url in lines_unique:
             fout.write(line)
-            fout.write(f"Possible causes and solutions: {url}\n")
+            fout.write(f"Possible causes and solutions: {url}\n\n")
 
     @staticmethod
     def _error_priority(line: str) -> tuple[int, str, str]:
