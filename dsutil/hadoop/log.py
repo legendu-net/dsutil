@@ -215,7 +215,7 @@ class LogFilter:
 
     @staticmethod
     def _write_lines_unique(
-        lines_unique: list[tuple[int, str, str, str]], fout: TextIO
+        lines_unique: list[tuple[int, str, str]], fout: TextIO
     ):
         fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
         fout.write(
