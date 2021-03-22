@@ -18,7 +18,7 @@ class LogDeduper:
     """Dedup similar log lines.
     """
     def __init__(self, threshold: float = 0.7):
-        self._lines = []
+        self.lines = []
         self._threshold = threshold
 
     def similarity(self, line):
@@ -31,7 +31,7 @@ class LogDeduper:
         return max(
             (
                 SequenceMatcher(None, line, target).ratio()
-                for target in reversed(self._lines)
+                for target in reversed(self.lines)
             ),
             default=0
         )
@@ -43,14 +43,14 @@ class LogDeduper:
         :param line_num: The row number (0-based) of the line.
         """
         if self.similarity(line) < self._threshold:
-            self._lines.append(f"L{line_num}: {line}\n")
+            self.lines.append(f"L{line_num}: {line}")
 
     def write(self, fout: TextIO):
         """Write deduplicated log into a file.
 
         :param fout: A file handler for outputing log.
         """
-        for line in self._lines:
+        for line in self.lines:
             fout.write(line)
 
 
@@ -201,26 +201,99 @@ class LogFilter:
         else:
             dir_ = None
         # dedup error lines
-        fout = open(self._output, "a")
-        fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
+        lines_unique = []
         for kwd, lines in self._lookup.items():
             if not lines:
                 continue
             logger.info('Deduplicating error lines corresponding to "{}" ...', kwd)
-            self._dedup_log_1(kwd, lines, fout, dir_)
-        fout.close()
+            lines_unique.extend(self._dedup_log_1(kwd, lines, dir_))
+        lines_unique = [self._error_priority(line) for line in lines_unique]
+        lines_unique.sort()
+        with self._output.open("a") as fout:
+            self._write_lines_unique(lines_unique, fout)
+        self._write_lines_unique(lines_unique, sys.stdout)
 
-    def _dedup_log_1(
-        self, kwd: str, lines: dict[str, int], fout: TextIO, dir_: Optional[Path]
-    ) -> None:
+    @staticmethod
+    def _write_lines_unique(lines_unique: list[tuple[int, str, str, str]], fout: TextIO):
+        fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
+        fout.write(
+            "http://www.legendu.net/misc/blog/A-comprehensive-list-of-issues-in-spark-applications\n\n"
+        )
+        for _, line, reason, solution in lines_unique:
+            fout.write(line)
+            if reason:
+                fout.write("Possible Reason(s): ")
+                fout.write(reason + "\n")
+            if solution:
+                fout.write("Possible Solution(s): ")
+                fout.write(solution + "\n")
+            fout.write("\n")
+
+    @staticmethod
+    def _error_priority(line: str) -> tuple[int, str, str, str]:
+        """Return priority (with a smaller value means higher priority) of an error line.
+
+        :param line: An error line.
+        :return: The priority of the error line.
+        """
+        patterns = [
+            (
+                "object has no attribute", 1, "As explained by the error message.",
+                "Correct the attribute name in your Python code."
+            ),
+            (
+                "No such file or directory:", 1, "As explained by the error message.",
+                "Upload the file using the option --files of the spark-submit command."
+            ),
+            (
+                "error: the following arguments are required:", 1,
+                "As explained by the error message",
+                "Specify the required argument to your Python script."
+            ),
+            ("error: unrecognized arguments:", 1, "As explained by the error message.", "Remove the unrecognizedd argument(s) from the command line."),
+            ("error: argument", 1, "", ""),
+            (r"org\.apache\.spark\.sql\.AnalysisException: cannot resolve", 1, "", ""),
+            ("SyntaxError: invalid syntax", 1, "", ""),
+            ("NameError: name .* is not defined", 1, "", ""),
+            (
+                r"org\.apache\.spark\.sql\.AnalysisException: Path does not exist:", 1,
+                "", ""
+            ),
+            ("ModuleNotFoundError: No module named", 1, "", ""),
+            (
+                r"org\.apache\.hadoop\.security\.AccessControlException: Permission denied: user=",
+                1, "", ""
+            ),
+            (
+                r"org\.apache\.spark\.InsertOperationConflictException: Failed to hold insert operation lock",
+                1, "", ""
+            ),
+            (
+                "Block rdd_.* could not be removed as it was not found on disk or in memory",
+                2, "", ""
+            ),
+            (r"java\.io\.FileNotFoundException", 2, "", ""),
+            ("Container killed by YARN for exceeding memory limits", 2, "", ""),
+            (r"org\.apache\.spark\.memory\.SparkOutOfMemoryError", 3, "", ""),
+            ("Container from a bad node", 3, "", ""),
+            ("No live nodes contain block BP", 3, "", ""),
+            ("ReplicaNotFoundException: Replica not found for", 3, "", ""),
+        ]
+        for pattern, priority, reason, solution in patterns:
+            if re.search(pattern, line):
+                return priority, line, reason, solution
+        return 10, line, "", ""
+
+    def _dedup_log_1(self, kwd: str, lines: dict[str, int],
+                     dir_: Optional[Path]) -> list[str]:
         deduper = LogDeduper(self._threshold)
         lines = sorted(lines.items())
         for line, idx in tqdm(lines):
             deduper.add(line, idx)
-        deduper.write(sys.stdout)
-        deduper.write(fout)
-        if not self._dump_by_keyword:
-            return
-        with (dir_ / kwd).open("w") as fout_kwd:
-            for line, idx in lines:
-                fout_kwd.write(f"L{idx}: {line}\n")
+        #deduper.write(sys.stdout)
+        #deduper.write(fout)
+        if self._dump_by_keyword:
+            with (dir_ / kwd).open("w") as fout_kwd:
+                for line, idx in lines:
+                    fout_kwd.write(f"L{idx}: {line}\n")
+        return deduper.lines
