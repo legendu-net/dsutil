@@ -214,9 +214,7 @@ class LogFilter:
         self._write_lines_unique(lines_unique, sys.stdout)
 
     @staticmethod
-    def _write_lines_unique(
-        lines_unique: list[tuple[int, str, str]], fout: TextIO
-    ):
+    def _write_lines_unique(lines_unique: list[tuple[int, str, str]], fout: TextIO):
         fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
         fout.write(
             "http://www.legendu.net/misc/blog/A-comprehensive-list-of-issues-in-spark-applications\n\n"
@@ -226,7 +224,7 @@ class LogFilter:
             fout.write(f"Possible causes and solutions: {url}\n")
 
     @staticmethod
-    def _error_priority(line: str) -> tuple[int, str, str, str]:
+    def _error_priority(line: str) -> tuple[int, str, str]:
         """Return priority (with a smaller value means higher priority) of an error line.
 
         :param line: An error line.
