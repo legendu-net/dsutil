@@ -3,7 +3,6 @@
 from __future__ import annotations
 from typing import Union, Optional, Sequence, TextIO
 from pathlib import Path
-import sys
 import re
 from collections import deque
 from difflib import SequenceMatcher
