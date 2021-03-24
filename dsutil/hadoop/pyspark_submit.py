@@ -410,7 +410,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
         help="Specify a path for generating a configration example."
     )
     parser.add_argument(
-        dest="cmd", nargs="+", help="The command to submit to Spark to run."
+        dest="cmd", nargs="+", help="The command (of PySpark script) to submit to Spark to run."
     )
     args = parser.parse_args(args=args, namespace=namespace)
     return args
