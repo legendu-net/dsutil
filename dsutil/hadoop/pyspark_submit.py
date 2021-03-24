@@ -401,7 +401,8 @@ def parse_args(args=None, namespace=None) -> Namespace:
         default="",
         help="The local path to Python."
     )
-    parser.add_argument(
+    mutex_group = parser.add_mutually_exclusive_group(required=True)
+    mutex_group.add_argument(
         "-g",
         "--gen-config",
         "--generate-config",
@@ -409,7 +410,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
         required=False,
         help="Specify a path for generating a configration example."
     )
-    parser.add_argument(
+    mutex_group.add_argument(
         dest="cmd", nargs="+", help="The command (of PySpark script) to submit to Spark to run."
     )
     args = parser.parse_args(args=args, namespace=namespace)
