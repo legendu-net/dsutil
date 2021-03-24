@@ -272,21 +272,21 @@ class LogFilter:
                 "http://www.legendu.net/misc/blog/spark-issue-a-master-url-must-be-set-in-your-configuration/"
             ),
             (
-                r"(?i)org\.apache\.spark\.sql\.AnalysisException: cannot resolve", 1,
+                r"(?i)org\.apache\.spark\.sql\.AnalysisException.*cannot resolve", 1,
                 "http://www.legendu.net/misc/blog/spark-issue:-org.apache.spark.sql.AnalysisException:-cannot-resolve"
             ),
             (
-                r"(?i)org\.apache\.spark\.sql\.AnalysisException: Path does not exist:",
+                r"(?i)org\.apache\.spark\.sql\.AnalysisException.*Path does not exist",
                 1,
                 "http://www.legendu.net/misc/blog/spark-issue:-org.apache.spark.sql.AnalysisException:-Path-does-not-exist"
             ),
             (
-                r"(?i)org\.apache\.hadoop\.security\.AccessControlException: Permission denied: user=",
+                r"(?i)org\.apache\.hadoop\.security\.AccessControlException.*Permission denied",
                 1,
                 "http://www.legendu.net/misc/blog/org.apache.hadoop.security.AccessControlException:-Permission-denied"
             ),
             (
-                r"(?i)org\.apache\.spark\.InsertOperationConflictException: Failed to hold insert operation lock",
+                r"(?i)org\.apache\.spark\.InsertOperationConflictException.*Failed to hold insert operation lock",
                 1,
                 "http://www.legendu.net/misc/blog/org.apache.spark.InsertOperationConflictException:-Failed-to-hold-insert-operation-lock"
             ),
