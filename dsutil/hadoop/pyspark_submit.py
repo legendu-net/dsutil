@@ -413,7 +413,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "--files",
         dest="files",
         nargs="+",
-        default=()
+        default=(),
         help="Additional files to upload."
     )
     args = parser.parse_args(args=args, namespace=namespace)
