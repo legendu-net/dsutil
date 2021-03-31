@@ -279,16 +279,20 @@ class DockerImage:
         logger.info("Building the Docker image {}:{} ...", self._name, tag_build)
         self._update_base_tag(tag_build)
         client = docker.APIClient(base_url="unix://var/run/docker.sock")
-        for msg in client.build(
-            path=str(self._path),
-            tag=f"{self._name}:{tag_build}",
-            rm=True,
-            pull=self.is_root(),
-            cache_from=None,
-            decode=True
-        ):
-            if "stream" in msg:
-                print(msg["stream"], end="")
+        try:
+            for msg in client.build(
+                path=str(self._path),
+                tag=f"{self._name}:{tag_build}",
+                rm=True,
+                pull=self.is_root(),
+                cache_from=None,
+                decode=True
+            ):
+                if "stream" in msg:
+                    print(msg["stream"], end="")
+        except docker.errors.BuildError as err:
+            for line in err.build_log:
+                print(line.get("stream", line.get("error")))
         self._tag_build = tag_build
         self._remove_ssh(copy_ssh_to)
         end = time.perf_counter_ns()
