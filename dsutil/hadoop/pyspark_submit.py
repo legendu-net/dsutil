@@ -407,7 +407,9 @@ def parse_args(args=None, namespace=None) -> Namespace:
         help="Specify a path for generating a configration example."
     )
     mutex_group.add_argument(
-        dest="cmd", nargs="+", help="The command (of PySpark script) to submit to Spark to run."
+        dest="cmd",
+        nargs="+",
+        help="The command (of PySpark script) to submit to Spark to run."
     )
     parser.add_argument(
         "--files",
