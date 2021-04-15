@@ -18,6 +18,7 @@ import pandas as pd
 import docker
 import networkx as nx
 import git
+from ..utils import retry
 
 
 def tag_date(tag: str) -> str:
@@ -30,8 +31,9 @@ def tag_date(tag: str) -> str:
     return mmddhh if tag in ("", "latest") else f"{tag}_{mmddhh}"
 
 
-def _push_image_timing(repo: str, tag: str) -> tuple[str, str, float, str]:
+def _push_image_timing(repo: str, tag: str) -> tuple[str, str, str, float]:
     """Push a Docker image to Docker Hub and time the pushing.
+
     :param repo: The local repository of the Docker image.
     :param tag: The tag of the Docker image to push.
     :return: The time (in seconds) used to push the Docker image.
@@ -53,8 +55,10 @@ def _push_image_timing(repo: str, tag: str) -> tuple[str, str, float, str]:
                 print()
         print()
 
-    seconds = timeit.timeit(_push, timer=time.perf_counter_ns, number=1) / 1E9
-    return repo, tag, seconds, "push"
+    time_begin = time.perf_counter_ns()
+    retry(_push, times=3)
+    time_end = time.perf_counter_ns()
+    return repo, tag, "push", (time_end - time_begin) / 1E9
 
 
 def _is_image_pushed(msg: dict[str, Any]):
@@ -69,32 +73,13 @@ def _is_image_pushed(msg: dict[str, Any]):
         "total"]
 
 
-def _retry_docker(task: Callable,
-                  retry: int = 3,
-                  seconds: float = 60) -> tuple[str, str, float, str]:
-    """Retry a Docker API on failure (for a few times).
-    :param task: The task to run.
-    :param retry: The total number of times to retry.
-    :param seconds: The number of seconds to wait before retrying.
-    :return: The time (in seconds) used to run the task.
-    """
-    if retry <= 1:
-        return task()
-    for _ in range(retry):
-        try:
-            return task()
-        except (docker.errors.APIError, urllib3.exceptions.ReadTimeoutError):
-            time.sleep(seconds)
-    return task()
-
-
-def _pull_image_timing(repo: str, tag: str) -> tuple[str, str, float, str]:
+def _pull_image_timing(repo: str, tag: str) -> tuple[str, str, str, float]:
     client = docker.from_env()
     logger.info("Pulling the Docker image {}:{} ...", repo, tag)
     seconds = timeit.timeit(
         lambda: client.images.pull(repo, tag), timer=time.perf_counter_ns, number=1
     ) / 1E9
-    return repo, tag, seconds, "pull"
+    return repo, tag, "pull", seconds
 
 
 def _ignore_socket(dir_, files):
@@ -590,7 +575,7 @@ class DockerImageBuilder:
         image, name: str, tag_new: str, action_time: list[tuple[str, float, str]]
     ) -> None:
         image.tag(name, tag_new, force=True)
-        action_time.append((tag_new, 0, "tag"))
+        action_time.append((tag_new, "tag", 0))
 
     def _build_image_node(
         self,
@@ -614,13 +599,14 @@ class DockerImageBuilder:
             return
         self._tag_image(name, tag, attr)
         if push:
-            self._push_image(name, attr["action_time"])
+            self._push_images(name, attr["action_time"])
 
     @staticmethod
-    def _push_image(name, action_time):
+    def _push_images(name, action_time):
         for idx in range(len(action_time)):
             tag, *_ = action_time[idx]
-            action_time.append(_retry_docker(lambda: _push_image_timing(name, tag)))  # pylint: disable=W0640
+            _, *tas = _push_image_timing(name, tag)
+            action_time.append(tas)
 
     def _tag_image(self, name, tag, attr):
         image = docker.from_env().images.get(f"{name}:{tag}")
