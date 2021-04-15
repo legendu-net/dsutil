@@ -25,9 +25,7 @@ def to_bool(value: Any) -> bool:
     return False
 
 
-def retry(task: Callable,
-                  times: int = 3,
-                  wait_seconds: float = 60):
+def retry(task: Callable, times: int = 3, wait_seconds: float = 60):
     """Retry a Docker API on failure (for a few times).
     :param task: The task to run.
     :param times: The total number of times to retry.
