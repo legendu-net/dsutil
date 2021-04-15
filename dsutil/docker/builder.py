@@ -8,7 +8,7 @@ from pathlib import Path
 import time
 import timeit
 import datetime
-from collections import deque
+from collections import deque, namedtuple
 import shutil
 import subprocess as sp
 import urllib3
@@ -130,6 +130,11 @@ class Node:
             # SSH urls, e.g., git@github.com:dclong/docker-jupyterhub-ds.git
             index = self.git_url.rindex(":", 0, rindex)
         return self.git_url[(index + 1):-4] + f"<{self.branch}>"
+
+
+DockerAction = namedtuple(
+    "DockerAction", ["succeed", "err_msg", "image", "tag", "seconds", "action"]
+)
 
 
 class DockerImage:
@@ -254,9 +259,7 @@ class DockerImage:
             shutil.copytree(ssh_src, ssh_dst, ignore=_ignore_socket)
             logger.info("~/.ssh has been copied to {}", ssh_dst)
 
-    def build(self,
-              tag_build: str = None,
-              copy_ssh_to: str = "") -> tuple[str, str, float, str]:
+    def build(self, tag_build: str = None, copy_ssh_to: str = "") -> DockerAction:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
@@ -269,7 +272,7 @@ class DockerImage:
             under the current local Git repository. 
         :return: A tuple of the format (image_name_built, tag_built, time_taken, "build").
         """
-        start = time.perf_counter_ns()
+        time_begin = time.perf_counter_ns()
         self.clone_repo()
         self._copy_ssh(copy_ssh_to)
         if tag_build is None:
@@ -291,12 +294,27 @@ class DockerImage:
                 if "stream" in msg:
                     print(msg["stream"], end="")
         except docker.errors.BuildError as err:
-            for line in err.build_log:
-                print(line.get("stream", line.get("error")))
+            return DockerAction(
+                succeed=False,
+                err_msg="\n".join(
+                    line.get("stream", line.get("error")) for line in err.build_log
+                ),
+                image=self._name,
+                tag="",
+                seconds=(time.perf_counter_ns() - time_begin) / 1E9,
+                action="build"
+            )
+        finally:
+            self._remove_ssh(copy_ssh_to)
         self._tag_build = tag_build
-        self._remove_ssh(copy_ssh_to)
-        end = time.perf_counter_ns()
-        return self._name, tag_build, (end - start) / 1E9, "build"
+        return DockerAction(
+            succeed=True,
+            err_msg="",
+            image=self._name,
+            tag=tag_build,
+            seconds=(time.perf_counter_ns() - time_begin) / 1E9,
+            action="build"
+        )
 
     def _remove_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
@@ -344,6 +362,18 @@ class DockerImage:
         return servers
 
 
+class DockerImageBuilderError(Exception):
+    """Exception due to Docker image building."""
+    def __init__(self, graph):
+        super().__init__(
+            "Failed to build Docker images corresponding to the following nodes:\n"
+            "\n".join(
+                f"{node}:\n{graph.nodes[node]['build_err_msg']}"
+                for node in graph.failures
+            )
+        )
+
+
 class DockerImageBuilder:
     """A class for build many Docker images at once.
     """
@@ -361,6 +391,7 @@ class DockerImageBuilder:
         self._repo_nodes: dict[str, list[Node]] = {}
         self._repo_path = {}
         self._roots = set()
+        self.failures = []
         self._servers = set()
 
     def _record_docker_servers(self, deps: deque[DockerImage]):
@@ -507,7 +538,6 @@ class DockerImageBuilder:
         """
         self._build_graph()
         self._login_servers()
-        data = []
         for node in self._roots:
             self._build_images_graph(
                 node=node,
@@ -515,22 +545,27 @@ class DockerImageBuilder:
                 copy_ssh_to=copy_ssh_to,
                 push=push,
                 remove=remove,
-                data=data
             )
-        frame = pd.DataFrame(data, columns=["repo", "tag", "seconds", "type"])
-        return frame
+        if self.failures:
+            raise DockerImageBuilderError(self._graph)
 
     def _build_images_graph(
-        self, node, tag_build: str, copy_ssh_to: str, push: bool, remove: bool,
-        data: list
+        self,
+        node,
+        tag_build: str,
+        copy_ssh_to: str,
+        push: bool,
+        remove: bool,
     ) -> None:
-        res = self._build_image_node(
+        self._build_image_node(
             node=node,
             tag_build=tag_build,
             copy_ssh_to=copy_ssh_to,
             push=push,
-            data=data
         )
+        attr = self._graph.nodes[node]
+        if not attr["build_succeed"]:
+            return
         children = self._graph.successors(node)
         for child in children:
             self._build_images_graph(
@@ -539,45 +574,61 @@ class DockerImageBuilder:
                 copy_ssh_to=copy_ssh_to,
                 push=push,
                 remove=remove,
-                data=data
             )
         if not remove:
             return
         # remove images associate with node
         images = docker.from_env().images
-        for image_name, tag, _, type_ in res:
-            if type_ == "build":
+        image_name = attr["image_name"]
+        for tag, action, _ in attr["action_time"]:
+            if action in ("build", "tag"):
                 logger.info("Removing Docker image {}:{} ...", image_name, tag)
                 images.remove(f"{image_name}:{tag}")
 
     @staticmethod
-    def _tag_image(image, name: str, tag_new: str, res: list) -> None:
+    def _tag_image_1(
+        image, name: str, tag_new: str, action_time: list[tuple[str, float, str]]
+    ) -> None:
         image.tag(name, tag_new, force=True)
-        res.append((name, tag_new, 0, "build"))
+        action_time.append((tag_new, 0, "tag"))
 
     def _build_image_node(
-        self, node, tag_build: str, copy_ssh_to: str, push: bool,
-        data: list[tuple[str, str, float, str]]
-    ) -> list[tuple[str, str, float, str]]:
-        res = []
-        res_build = DockerImage(
+        self,
+        node,
+        tag_build: str,
+        copy_ssh_to: str,
+        push: bool,
+    ) -> None:
+        succeed, err_msg, name, tag, seconds, action = DockerImage(
             git_url=node.git_url,
             branch=node.branch,
             branch_fallback=self._branch_fallback,
             repo_path=self._repo_path
         ).build(tag_build=tag_build, copy_ssh_to=copy_ssh_to)
-        res.append(res_build)
-        name, tag, _, _ = res_build
-        # create a historical tag
-        image = docker.from_env().images.get(f"{name}:{tag}")
-        self._tag_image(image, name, tag_date(tag), res)
-        # create new tags on the built images corresponding to other branches
-        for br in self._graph.nodes[node].get("identical_branches", set()):
-            tag_new = branch_to_tag(br)
-            self._tag_image(image, name, tag_new, res)
-            self._tag_image(image, name, tag_date(tag_new), res)
+        attr = self._graph.nodes[node]
+        attr["build_succeed"] = succeed
+        attr["build_err_msg"] = err_msg
+        attr["image_name"] = name
+        attr["action_time"] = [(tag, action, seconds)]
+        if not succeed:
+            return
+        self._tag_image(name, tag, attr)
         if push:
-            for name, tag, *_ in res.copy():
-                res.append(_retry_docker(lambda: _push_image_timing(name, tag)))  # pylint: disable=W0640
-        data.extend(res)
-        return res
+            self._push_image(name, attr["action_time"])
+
+    @staticmethod
+    def _push_image(name, action_time):
+        for idx in range(len(action_time)):
+            tag, *_ = action_time[idx]
+            action_time.append(_retry_docker(lambda: _push_image_timing(name, tag)))  # pylint: disable=W0640
+
+    def _tag_image(self, name, tag, attr):
+        image = docker.from_env().images.get(f"{name}:{tag}")
+        action_time = attr["action_time"]
+        # create a historical tag
+        self._tag_image_1(image, name, tag_date(tag), action_time)
+        # create new tags on the built images corresponding to other branches
+        for br in attr.get("identical_branches", set()):
+            tag_new = branch_to_tag(br)
+            self._tag_image_1(image, name, tag_new, action_time)
+            self._tag_image_1(image, name, tag_date(tag_new), action_time)
