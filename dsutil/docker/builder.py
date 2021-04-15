@@ -1,7 +1,7 @@
 """Docker related utils.
 """
 from __future__ import annotations
-from typing import Union, Callable, Any
+from typing import Union, Any
 from dataclasses import dataclass
 import tempfile
 from pathlib import Path
@@ -11,7 +11,6 @@ import datetime
 from collections import deque, namedtuple
 import shutil
 import subprocess as sp
-import urllib3
 import yaml
 from loguru import logger
 import pandas as pd
