@@ -278,11 +278,8 @@ class DockerImage:
                 if "stream" in msg:
                     print(msg["stream"], end="")
                 image_built = f"{self._name}:{tag_build}"
-                try:
-                    docker.from_env().images.get(image_built)
-                except:
-                    raise docker.errors.BuildError(f"Failed to build {image_built}", "")
-        except docker.errors.BuildError as err:
+                docker.from_env().images.get(image_built)
+        except (docker.errors.BuildError, docker.errors.ImageNotFound) as err:
             return DockerAction(
                 succeed=False,
                 err_msg="\n".join(
