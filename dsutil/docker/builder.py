@@ -117,7 +117,7 @@ class Node:
 
 
 DockerAction = namedtuple(
-    "DockerAction", ["succeed", "err_msg", "image", "tag", "seconds", "action"]
+    "DockerAction", ["succeed", "err_msg", "image", "tag", "action", "seconds"]
 )
 
 
@@ -277,6 +277,11 @@ class DockerImage:
             ):
                 if "stream" in msg:
                     print(msg["stream"], end="")
+                image_built = f"{self._name}:{tag_build}"
+                try:
+                    docker.from_env().images.get(image_built)
+                except:
+                    raise docker.errors.BuildError(f"Failed to build {image_built}", "")
         except docker.errors.BuildError as err:
             return DockerAction(
                 succeed=False,
@@ -285,8 +290,8 @@ class DockerImage:
                 ),
                 image=self._name,
                 tag="",
+                action="build",
                 seconds=(time.perf_counter_ns() - time_begin) / 1E9,
-                action="build"
             )
         finally:
             self._remove_ssh(copy_ssh_to)
@@ -296,8 +301,8 @@ class DockerImage:
             err_msg="",
             image=self._name,
             tag=tag_build,
+            action="build",
             seconds=(time.perf_counter_ns() - time_begin) / 1E9,
-            action="build"
         )
 
     def _remove_ssh(self, copy_ssh_to: str):
@@ -583,7 +588,7 @@ class DockerImageBuilder:
         copy_ssh_to: str,
         push: bool,
     ) -> None:
-        succeed, err_msg, name, tag, seconds, action = DockerImage(
+        succeed, err_msg, name, tag, action, seconds = DockerImage(
             git_url=node.git_url,
             branch=node.branch,
             branch_fallback=self._branch_fallback,
