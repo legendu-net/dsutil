@@ -358,14 +358,8 @@ class DockerImage:
 
 class DockerImageBuilderError(Exception):
     """Exception due to Docker image building."""
-    def __init__(self, graph):
-        super().__init__(
-            "Failed to build Docker images corresponding to the following nodes:\n"
-            "\n".join(
-                f"{node}:\n{graph.nodes[node]['build_err_msg']}"
-                for node in graph.failures
-            )
-        )
+    def __init__(self, msg):
+        super().__init__(msg)
 
 
 class DockerImageBuilder:
@@ -541,7 +535,13 @@ class DockerImageBuilder:
                 remove=remove,
             )
         if self.failures:
-            raise DockerImageBuilderError(self._graph)
+            raise DockerImageBuilderError(self._build_error_msg())
+
+    def _build_error_msg(self):
+        return "Failed to build Docker images corresponding to the following nodes:\n" + "\n".join(
+            f"{node}:\n{self._graph.nodes[node]['build_err_msg']}"
+            for node in self.failures
+        )
 
     def _build_images_graph(
         self,
