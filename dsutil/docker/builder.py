@@ -559,6 +559,7 @@ class DockerImageBuilder:
         )
         attr = self._graph.nodes[node]
         if not attr["build_succeed"]:
+            self.failures.append(node)
             return
         children = self._graph.successors(node)
         for child in children:
