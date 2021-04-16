@@ -358,8 +358,7 @@ class DockerImage:
 
 class DockerImageBuilderError(Exception):
     """Exception due to Docker image building."""
-    def __init__(self, msg):
-        super().__init__(msg)
+    pass
 
 
 class DockerImageBuilder:
