@@ -358,7 +358,6 @@ class DockerImage:
 
 class DockerImageBuilderError(Exception):
     """Exception due to Docker image building."""
-    pass
 
 
 class DockerImageBuilder:
