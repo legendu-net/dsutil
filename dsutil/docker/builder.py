@@ -278,12 +278,21 @@ class DockerImage:
                 if "stream" in msg:
                     print(msg["stream"], end="")
                 docker.from_env().images.get(f"{self._name}:{tag_build}")
-        except (docker.errors.BuildError, docker.errors.ImageNotFound) as err:
+        except docker.errors.BuildError as err:
             return DockerAction(
                 succeed=False,
                 err_msg="\n".join(
                     line.get("stream", line.get("error")) for line in err.build_log
                 ),
+                image=self._name,
+                tag="",
+                action="build",
+                seconds=(time.perf_counter_ns() - time_begin) / 1E9,
+            )
+        except docker.errors.ImageNotFound as err:
+            return DockerAction(
+                succeed=False,
+                err_msg="",
                 image=self._name,
                 tag="",
                 action="build",
