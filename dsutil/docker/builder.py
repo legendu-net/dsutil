@@ -470,9 +470,12 @@ class DockerImageBuilder:
     def _add_identical_branch(self, node: Node, branch: str) -> None:
         if node.branch == branch:
             return
+        self._get_identical_branches(node).add(branch)
+
+    def _get_identical_branches(self, node: Node):
         attr = self._graph.nodes[node]
         attr.setdefault("identical_branches", set())
-        attr["identical_branches"].add(branch)
+        return attr["identical_branches"]
 
     def _build_graph(self):
         if self._graph is not None:
@@ -488,10 +491,7 @@ class DockerImageBuilder:
             # nodes and attributes
             fout.write("nodes:\n")
             for node in self._graph.nodes:
-                identical_branches = self._graph.nodes[node].get(
-                    "identical_branches", set()
-                )
-                fout.write(f"  {node}: {list(identical_branches)}\n")
+                fout.write(f"  {node}: {list(self._get_identical_branches(node))}\n")
             # edges
             fout.write("edges:\n")
             for node1, node2 in self._graph.edges:
@@ -537,7 +537,7 @@ class DockerImageBuilder:
 
     def _build_error_msg(self):
         return "Failed to build Docker images corresponding to the following nodes:\n" + "\n".join(
-            f"{node}:\n{self._graph.nodes[node]['build_err_msg']}"
+            f"{node} {self._get_identical_branches(node)}:\n{self._graph.nodes[node]['build_err_msg']}"
             for node in self.failures
         )
 
