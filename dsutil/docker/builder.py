@@ -537,7 +537,7 @@ class DockerImageBuilder:
 
     def _build_error_msg(self):
         return "Failed to build Docker images corresponding to the following nodes:\n" + "\n".join(
-            f"{node} {self._get_identical_branches(node)}:\n{self._graph.nodes[node]['build_err_msg']}"
+            f"{node} {list(self._get_identical_branches(node))}:\n{self._graph.nodes[node]['build_err_msg']}"
             for node in self.failures
         )
 
