@@ -138,7 +138,7 @@ class DockerImage:
         :param git_url: URL of the remote Git repository.
         :param branch: The branch of the GitHub repository to use.
         """
-        self._git_url = git_url[:-4] if git_url.endswith(".git") else git_url 
+        self._git_url = git_url[:-4] if git_url.endswith(".git") else git_url
         self._branch = branch
         self._branch_fallback = branch_fallback
         self._repo_path = {} if repo_path is None else repo_path
