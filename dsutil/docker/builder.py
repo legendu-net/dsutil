@@ -108,12 +108,12 @@ class Node:
 
     def __str__(self):
         rindex = self.git_url.rindex("/")
-        # HTTP urls, e.g., https://github.com/dclong/docker-jupyterhub-ds.git
+        # HTTP urls, e.g., https://github.com/dclong/docker-jupyterhub-ds
         index = self.git_url.rfind("/", 0, rindex)
         if index < 0:
-            # SSH urls, e.g., git@github.com:dclong/docker-jupyterhub-ds.git
+            # SSH urls, e.g., git@github.com:dclong/docker-jupyterhub-ds
             index = self.git_url.rindex(":", 0, rindex)
-        return self.git_url[(index + 1):-4] + f"<{self.branch}>"
+        return self.git_url[(index + 1):] + f"<{self.branch}>"
 
 
 DockerAction = namedtuple(
@@ -138,7 +138,7 @@ class DockerImage:
         :param git_url: URL of the remote Git repository.
         :param branch: The branch of the GitHub repository to use.
         """
-        self._git_url = git_url.strip()
+        self._git_url = git_url[:-4] if git_url.endswith(".git") else git_url 
         self._branch = branch
         self._branch_fallback = branch_fallback
         self._repo_path = {} if repo_path is None else repo_path
