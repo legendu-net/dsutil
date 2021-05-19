@@ -17,6 +17,7 @@ import pandas as pd
 import docker
 import networkx as nx
 import git
+import pytest
 from ..utils import retry
 
 

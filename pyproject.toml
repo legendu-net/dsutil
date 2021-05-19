@@ -25,6 +25,7 @@ notifiers = ">=1.2.1"
 PyYAML = ">=5.3.1"
 python-magic = ">=0.4.0"
 tqdm = ">=4.59.0"
+pytest = ">=3.0"
 # admin
 psutil = { version = ">=5.7.3", optional = true}
 # cv
@@ -50,7 +51,6 @@ admin = ["psutil"]
 all = ["opencv-python", "pillow", "docker", "networkx", "requests", "PyPDF2", "nbformat", "nbconvert", "yapf", "psutil"]
 
 [tool.poetry.dev-dependencies]
-pytest = ">=3.0"
 pylint = ">=2.7.0"
 flake8 = ">=3.8.4"
 pytype = { version = ">=2020.08.10", python = "<3.9" }
