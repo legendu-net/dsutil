@@ -322,11 +322,7 @@ class DockerImage:
 
     def _test_built_image(self) -> bool:
         code = pytest.main([str(self._path)])
-        print(code)
-        if isinstance(code, pytest.ExitCode):
-            code = code.value
-        print(code)
-        return code == 0
+        return code in (pytest.ExitCode.OK, pytest.ExitCode.NO_TESTS_COLLECTED, 0)
 
     def _remove_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
