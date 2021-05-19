@@ -17,6 +17,7 @@ import pandas as pd
 import docker
 import networkx as nx
 import git
+import pytest
 from ..utils import retry
 
 
@@ -301,14 +302,27 @@ class DockerImage:
         finally:
             self._remove_ssh(copy_ssh_to)
         self._tag_build = tag_build
+        if self._test_built_image():
+            return DockerAction(
+                succeed=True,
+                err_msg="",
+                image=self._name,
+                tag=tag_build,
+                action="build",
+                seconds=(time.perf_counter_ns() - time_begin) / 1E9,
+            )
         return DockerAction(
-            succeed=True,
-            err_msg="",
+            succeed=False,
+            err_msg="Built image failed to pass tests.",
             image=self._name,
             tag=tag_build,
             action="build",
             seconds=(time.perf_counter_ns() - time_begin) / 1E9,
         )
+
+    def _test_built_image(self) -> bool:
+        code = pytest.main([str(self._path)])
+        return code in (pytest.ExitCode.OK, pytest.ExitCode.NO_TESTS_COLLECTED, 0)
 
     def _remove_ssh(self, copy_ssh_to: str):
         if copy_ssh_to:
