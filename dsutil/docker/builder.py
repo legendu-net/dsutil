@@ -590,7 +590,7 @@ class DockerImageBuilder:
         for tag, action, _ in attr["action_time"]:
             if action in ("build", "tag"):
                 logger.info("Removing Docker image {}:{} ...", image_name, tag)
-                images.remove(f"{image_name}:{tag}")
+                images.remove(f"{image_name}:{tag}", force=True)
 
     @staticmethod
     def _tag_image_1(
