@@ -1,12 +1,9 @@
-"""Update shebang of scripts.
+"""Update shebang of Python scripts in a directory.
 """
 from typing import Union
 from pathlib import Path
 from argparse import ArgumentParser, Namespace
 from magic import Magic
-
-FILE = Path(__file__).resolve()
-print(f"Location of the shebang.py: {FILE}")
 
 
 def _update_shebang(path: Path, shebang: str):
@@ -51,7 +48,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "--script-dir",
         dest="script_dir",
         required=True,
-        help="The new shebang to use."
+        help="The directory containing scripts whose shebang are to be updated."
     )
     parser.add_argument(
         "-s",
