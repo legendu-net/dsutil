@@ -491,7 +491,7 @@ class DockerImageBuilder:
         attr.setdefault("identical_branches", set())
         return attr["identical_branches"]
 
-    def _build_graph(self):
+    def build_graph(self):
         if self._graph is not None:
             return
         self._graph = nx.DiGraph()
@@ -536,7 +536,7 @@ class DockerImageBuilder:
         :param push: If True, push the built Docker images to DockerHub.
         :return: A pandas DataFrame summarizing building information.
         """
-        self._build_graph()
+        self.build_graph()
         self._login_servers()
         for node in self._roots:
             self._build_images_graph(
