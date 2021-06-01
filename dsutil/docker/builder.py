@@ -443,12 +443,11 @@ class DockerImageBuilder:
         :param b2: Another branches.
         :return: True if there are no differences between the 2 branches and false otherwise.
         """
-        repo = git.Repo(path)
         logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
-        cmd = f"git -C {path} diff {b1}..{b2} -- :(exclude)test :(exclude)tests"
-        diff = sp.run(cmd, shell=True, check=True, capture_output=True)
+        cmd = f"git -C {path} diff {b1}..{b2} -- ':(exclude)test' ':(exclude)tests'"
+        diff = sp.run(cmd, shell=True, check=True, capture_output=True).stdout
         return not diff
 
     def _add_root_node(self, node) -> Node:
