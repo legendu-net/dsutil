@@ -447,8 +447,9 @@ class DockerImageBuilder:
         logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
-        diffs: list = repo.commit(b1).diff(repo.commit(b2))
-        return not diffs
+        cmd = f"git -C {path} diff {b1}..{b2} -- :(exclude)test :(exclude)tests"
+        diff = sp.run(cmd, shell=True, check=True, capture_output=True)
+        return not diff
 
     def _add_root_node(self, node) -> Node:
         logger.debug("Adding root node {} into the graph ...", node)
