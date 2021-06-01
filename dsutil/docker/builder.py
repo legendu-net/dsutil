@@ -447,7 +447,7 @@ class DockerImageBuilder:
         logger.debug("Comparing branches {} and {} of the local repo {}", b1, b2, path)
         if b1 == b2:
             return True
-        cmd = f"git -C {path} diff {b1}..{b2} -- :(exclude)test :(exclude)tests"
+        cmd = f"git -C {path} diff {b1}..{b2} -- ':(exclude)test' ':(exclude)tests'"
         diff = sp.run(cmd, shell=True, check=True, capture_output=True)
         return not diff
 
