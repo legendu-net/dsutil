@@ -12,6 +12,7 @@ This is a Python pacakage that contains misc utils for Data Science.
       ```
       dsutil.git.check
       ```
+    - docker
     - text manipulation
     - html
     - misc
