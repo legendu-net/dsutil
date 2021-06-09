@@ -584,7 +584,7 @@ class DockerImageBuilder:
             )
         if not remove:
             return
-        # remove images associate with node
+        # remove images associated with the node
         images = docker.from_env().images
         image_name = attr["image_name"]
         for tag, action, _ in attr["action_time"]:
