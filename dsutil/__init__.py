@@ -3,4 +3,4 @@
 from . import git
 from . import poetry
 
-__version__ = "0.61.4"
+__version__ = "0.61.5"
