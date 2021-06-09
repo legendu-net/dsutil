@@ -65,6 +65,7 @@ class LogFilter:
         "error",
         "Exception",
         "exception",
+        "failures",
     )
     PATTERNS = (
         (r"\d{2,}[-/]\d{2,}[-/]\d{2,}\s\d+:\d+:\d+", "YYYY/MM/DD HH:MM:SS"),
@@ -290,6 +291,11 @@ class LogFilter:
                 1,
                 "http://www.legendu.net/misc/blog/spark-issue-InsertOperationConflictException-failed-to-hold-insert-operation-lock"
             ),
+            (
+                r"(?i)max number of executor failures",
+                1,
+                "http://www.legendu.net/misc/blog/spark-issue:-max-number-of-executor-failures-reached"
+            )
             (
                 "(?i)serialized results is bigger than spark.driver.maxResultSize", 2,
                 "http://www.legendu.net/misc/blog/spark-issues-total-size-bigger-than-maxresultsize/"
