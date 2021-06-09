@@ -128,7 +128,7 @@ def remove_images(
 
 def _remove_images_frame(imgs, choice: str = "") -> list[str]:
     if imgs.empty:
-        return
+        return []
     imgs = imgs.drop_duplicates().sort_values("created", ascending=False)
     print("\n", imgs, "\n")
     sys.stdout.flush()

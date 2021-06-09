@@ -492,6 +492,9 @@ class DockerImageBuilder:
         return attr["identical_branches"]
 
     def build_graph(self):
+        """Build a graph representing dependent relationships among Docker images.
+        This function is called by the method build_images.
+        """
         if self._graph is not None:
             return
         self._graph = nx.DiGraph()
