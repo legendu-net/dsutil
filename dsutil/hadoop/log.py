@@ -295,7 +295,7 @@ class LogFilter:
                 r"(?i)max number of executor failures",
                 1,
                 "http://www.legendu.net/misc/blog/spark-issue:-max-number-of-executor-failures-reached"
-            )
+            ),
             (
                 "(?i)serialized results is bigger than spark.driver.maxResultSize", 2,
                 "http://www.legendu.net/misc/blog/spark-issues-total-size-bigger-than-maxresultsize/"
