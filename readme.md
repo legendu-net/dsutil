@@ -25,7 +25,7 @@ Currently, Python 3.7 and 3.8 are supported.
 
 You can download a copy of the latest release and install it using pip.
 ```
-pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.61.4/dsutil-0.61.4-py3-none-any.whl
+pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.61.5/dsutil-0.61.5-py3-none-any.whl
 ```
 Or you can use the following command to install the latest master branch
 if you have pip 20.0+.

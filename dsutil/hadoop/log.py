@@ -292,8 +292,7 @@ class LogFilter:
                 "http://www.legendu.net/misc/blog/spark-issue-InsertOperationConflictException-failed-to-hold-insert-operation-lock"
             ),
             (
-                r"(?i)max number of executor failures",
-                1,
+                r"(?i)max number of executor failures", 1,
                 "http://www.legendu.net/misc/blog/spark-issue:-max-number-of-executor-failures-reached"
             ),
             (

@@ -1,5 +1,6 @@
 """Docker related utils.
 """
+from __future__ import annotations
 import sys
 from typing import Union
 import subprocess as sp
@@ -99,11 +100,12 @@ def remove_images(
     aggressive: bool = False,
     frame: Union[pd.DataFrame, None] = None,
     choice: str = ""
-) -> None:
+) -> list[str]:
     """Remove specified Docker images.
     :param id_: The id of the image to remove.
     :param name: A (regex) pattern of names of images to remove.
     :param tag: Remove images whose tags containing specified tag.
+    :return: A list of images failed to be removed.
     """
     frames = []
     if frame:
@@ -121,12 +123,12 @@ def remove_images(
             imgs[~imgs.tag.str.contains(r"\d{4,}")].groupby("image_id").apply(  # pylint: disable=E1101
             lambda frame: frame.query("tag == 'next'") if frame.shape[0] > 1 else None
         ))
-    _remove_images_frame(pd.concat(frames, ignore_index=True), choice=choice)
+    return _remove_images_frame(pd.concat(frames, ignore_index=True), choice=choice)
 
 
-def _remove_images_frame(imgs, choice: str = ""):
+def _remove_images_frame(imgs, choice: str = "") -> list[str]:
     if imgs.empty:
-        return
+        return []
     imgs = imgs.drop_duplicates().sort_values("created", ascending=False)
     print("\n", imgs, "\n")
     sys.stdout.flush()
@@ -137,17 +139,25 @@ def _remove_images_frame(imgs, choice: str = ""):
             "Do you want to remove the above images? (y - Yes, n - [No], i - interactive): "
         )
     client = docker.from_env()
+    failures = []
     for row in imgs.itertuples():
         image_name = row.repository + ":" + row.tag
         image = row.image_id if row.tag == "<none>" else image_name
         if choice == "y":
-            client.images.remove(image)
+            try:
+                client.images.remove(image)
+            except:
+                failures.append(image)
         elif choice == "i":
             choice_i = input(
                 f"Do you want to remove the image '{image_name}'? (y - Yes, n - [No]):"
             )
             if choice_i == "y":
-                client.images.remove(image)
+                try:
+                    client.images.remove(image)
+                except:
+                    failures.append(image)
+    return failures
 
 
 def stop(id_: str = "", name: str = "", status: str = "", choice: str = "") -> None:
