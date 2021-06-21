@@ -30,7 +30,7 @@ jobs:
       run: |
         pip3 install -U git+https://github.com/dclong/xinstall@main
         xinstall pt -ic --python python
-        $env:Path += ";$env:Userprofile\.poetry\bin"
+        $env:Path += ";$env:Userprofile\.local\bin"
         poetry env use python
         poetry install --no-dev -E all
         #poetry run pip3 install .
@@ -38,5 +38,5 @@ jobs:
         #poetry run pip3 install pytest
     - name: Test with pytest
       run: |
-        $env:Path += ";$env:Userprofile\.poetry\bin"
+        $env:Path += ";$env:Userprofile\.local\bin"
         poetry run pytest
