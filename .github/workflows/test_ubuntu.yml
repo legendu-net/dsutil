@@ -28,8 +28,8 @@ jobs:
       run: |
         pip3 install -U git+https://github.com/dclong/xinstall@main
         xinstall pt -ic
-        ~/.poetry/bin/poetry env use python3
-        ~/.poetry/bin/poetry install -E all
+        ~/.local/bin/poetry env use python3
+        ~/.local/bin/poetry install -E all
     - name: Test with pytest
       run: |
-        ~/.poetry/bin/poetry run pytest
+        ~/.local/bin/poetry run pytest

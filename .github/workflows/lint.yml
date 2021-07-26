@@ -28,15 +28,15 @@ jobs:
       run: |
         pip3 install -U git+https://github.com/dclong/xinstall@main
         xinstall --sudo pt -ic
-        ~/.poetry/bin/poetry env use python3
+        ~/.local/bin/poetry env use python3
         cat pyproject.toml
-        ~/.poetry/bin/poetry install -E all
+        ~/.local/bin/poetry install -E all
     - name: Lint with pylint
       run: |
-        ~/.poetry/bin/poetry run pylint -E dsutil/
+        ~/.local/bin/poetry run pylint -E dsutil/
     - name: Lint with pytype
       run: |
-        ~/.poetry/bin/poetry run pytype dsutil/ tests/
+        ~/.local/bin/poetry run pytype dsutil/ tests/
     - name: Check code format
       run: |
-        ~/.poetry/bin/poetry run yapf -dr dsutil/ tests/
+        ~/.local/bin/poetry run yapf -dr dsutil/ tests/
