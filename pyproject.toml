@@ -62,6 +62,11 @@ pyspark = ">=3.0.1"
 based_on_style = "facebook"
 column_limit = 88
 
+[tool.yapfignore]
+ignore_patterns = [
+    "*/.ipynb_checkpoints/",
+]
+
 [tool.pylint.master]
 ignore = ".venv,.ipynb_checkpoints"
 unsafe-load-any-extension = "no"
