@@ -27,7 +27,9 @@ def extract_pages(file: str, subfiles: dict[str, Union[int, Iterable[int]]]) -> 
             _extract_pages(reader, indexes, subfile)
 
 
-def _extract_pages(reader: PdfFileReader, indexes: Union[int, Iterable[int]], output: str) -> None:
+def _extract_pages(
+    reader: PdfFileReader, indexes: Union[int, Iterable[int]], output: str
+) -> None:
     """A helper function for extract_pages.
 
     :param reader: A PdfFileReader object.
