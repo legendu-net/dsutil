@@ -19,7 +19,7 @@ jobs:
           xinstall pt -ic
       - name: Build Package
         run: |
-          ~/.poetry/bin/poetry build
+          ~/.local/bin/poetry build
           ls -lha dist/
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
