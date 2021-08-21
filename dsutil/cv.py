@@ -249,3 +249,28 @@ def frame_image(
     img = img.copy()
     img.paste(frame, mask=mask)
     return img
+
+
+def add_frames(
+    arr: Union[np.ndarray, Image.Image],
+    bboxes: list[tuple[int, int, int, int]],
+    rgb: tuple[int, int, int] = (255, 0, 0)
+) -> np.ndarray:
+    """Add (highlighting) frames into an image.
+    :param arr: A PIL image or its numpy array representation.
+    :param bboxes: A list of bounding boxes.
+    :param rgb: The RGB color (defaults to (255, 0, 0)) of the (highlighting) frame.
+    :return: A numpy array representation of the altered image.
+    """
+    if isinstance(arr, Image.Image):
+        arr = np.array(arr)
+    for x1, y1, x2, y2 in bboxes:
+        if x2 is None:
+            x2 = x1
+        if y2 is None:
+            y2 = y1
+        arr[y1, x1:x2, :] = rgb
+        arr[y2, x1:x2, :] = rgb
+        arr[y1:y2, x1, :] = rgb
+        arr[y1:y2, x2, :] = rgb
+    return arr
