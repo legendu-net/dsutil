@@ -94,8 +94,7 @@ def authenticate(password: str, email: Dict[str, str], user: str = "") -> None:
             ["/usr/bin/kinit", user if user else USER],
             input=password.encode(),
             check=True,
-            stdout=sp.PIPE,
-            stderr=sp.PIPE
+            capture_output=True
         )
         subject = SUBJECT.format("succeeded")
         msg = MSG.format("succeeded")

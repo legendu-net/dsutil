@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dsutil"
-version = "0.61.5"
+version = "0.62.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
@@ -61,6 +61,11 @@ pyspark = ">=3.0.1"
 [tool.yapf]
 based_on_style = "facebook"
 column_limit = 88
+
+[tool.yapfignore]
+ignore_patterns = [
+    "*/.ipynb_checkpoints/",
+]
 
 [tool.pylint.master]
 ignore = ".venv,.ipynb_checkpoints"
