@@ -14,7 +14,7 @@ import tempfile
 from tqdm import tqdm
 import pandas as pd
 from loguru import logger
-import git
+import dulwich.porcelain
 
 HOME = Path.home()
 
@@ -184,7 +184,7 @@ def find_data_tables(
     if isinstance(root, str):
         if re.search(r"(git@|https://).*\.git", root):
             with tempfile.TemporaryDirectory() as tempdir:
-                git.Repo.clone_from(root, tempdir, branch="master")
+                dulwich.porcelain.clone(root, tempdir)
                 logger.info(
                     "The repo {} is cloned to the local directory {}.", root, tempdir
                 )
