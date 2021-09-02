@@ -257,6 +257,7 @@ def add_frames(
     rgb: tuple[int, int, int] = (255, 0, 0)
 ) -> np.ndarray:
     """Add (highlighting) frames into an image.
+
     :param arr: A PIL image or its numpy array representation.
     :param bboxes: A list of bounding boxes.
     :param rgb: The RGB color (defaults to (255, 0, 0)) of the (highlighting) frame.
