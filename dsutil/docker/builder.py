@@ -90,6 +90,16 @@ def branch_to_tag(branch: str) -> str:
     return branch
 
 
+def _get_docker_builder() -> str:
+    docker = "docker"
+    if shutil.which(docker):
+        return docker
+    kaniko = "/kaniko/executor"
+    if Path(kaniko).is_file():
+        return kaniko
+    return ""
+
+
 @dataclass(frozen=True)
 class Node:
     """A class similar to DockerImage for simplifying code.
@@ -238,7 +248,7 @@ class DockerImage:
         self,
         tag_build: str = None,
         copy_ssh_to: str = "",
-        builder: str = "Docker"
+        builder: str = _get_docker_builder(),
     ) -> DockerAction:
         """Build the Docker image.
 
@@ -262,7 +272,7 @@ class DockerImage:
         logger.info("Building the Docker image {}:{} ...", self._name, tag_build)
         self._update_base_tag(tag_build)
         try:
-            if builder == "Docker":
+            if builder == "docker":
                 for msg in docker.APIClient(base_url="unix://var/run/docker.sock"
                                            ).build(
                                                path=str(self._path),
@@ -275,9 +285,13 @@ class DockerImage:
                     if "stream" in msg:
                         print(msg["stream"], end="")
                 docker.from_env().images.get(f"{self._name}:{tag_build}")
-            elif builder == "Kaniko":
+            elif builder == "/kaniko/executor":
                 cmd = f"/kaniko/executor -c {self._path} -d {self._name}:{tag_build}"
                 sp.run(cmd, shell=True, check=True)
+            elif builder == "":
+                raise ValueError("Please provide a valid Docker builder!")
+            else:
+                raise NotImplementedError(f"The docker builder {builder} is not supported yet!")
         except docker.errors.BuildError as err:
             return DockerAction(
                 succeed=False,
