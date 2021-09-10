@@ -6,7 +6,6 @@ from dataclasses import dataclass
 import tempfile
 from pathlib import Path
 import time
-import timeit
 import datetime
 from collections import deque, namedtuple
 import shutil
@@ -235,7 +234,12 @@ class DockerImage:
             shutil.copytree(ssh_src, ssh_dst, ignore=_ignore_socket)
             logger.info("~/.ssh has been copied to {}", ssh_dst)
 
-    def build(self, tag_build: str = None, copy_ssh_to: str = "", builder: str = "Docker") -> DockerAction:
+    def build(
+        self,
+        tag_build: str = None,
+        copy_ssh_to: str = "",
+        builder: str = "Docker"
+    ) -> DockerAction:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
@@ -259,14 +263,15 @@ class DockerImage:
         self._update_base_tag(tag_build)
         try:
             if builder == "Docker":
-                for msg in docker.APIClient(base_url="unix://var/run/docker.sock").build(
-                    path=str(self._path),
-                    tag=f"{self._name}:{tag_build}",
-                    rm=True,
-                    pull=self.is_root(),
-                    cache_from=None,
-                    decode=True
-                ):
+                for msg in docker.APIClient(base_url="unix://var/run/docker.sock"
+                                           ).build(
+                                               path=str(self._path),
+                                               tag=f"{self._name}:{tag_build}",
+                                               rm=True,
+                                               pull=self.is_root(),
+                                               cache_from=None,
+                                               decode=True
+                                           ):
                     if "stream" in msg:
                         print(msg["stream"], end="")
                 docker.from_env().images.get(f"{self._name}:{tag_build}")
