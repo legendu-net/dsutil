@@ -6,7 +6,6 @@ from dataclasses import dataclass
 import tempfile
 from pathlib import Path
 import time
-import timeit
 import datetime
 from collections import deque, namedtuple
 import shutil
@@ -71,15 +70,6 @@ def _is_image_pushed(msg: dict[str, Any]):
     detail = msg["progressDetail"]
     return "current" in detail and "total" in detail and detail["current"] >= detail[
         "total"]
-
-
-def _pull_image_timing(repo: str, tag: str) -> tuple[str, str, str, float]:
-    client = docker.from_env()
-    logger.info("Pulling the Docker image {}:{} ...", repo, tag)
-    seconds = timeit.timeit(
-        lambda: client.images.pull(repo, tag), timer=time.perf_counter_ns, number=1
-    ) / 1E9
-    return repo, tag, "pull", seconds
 
 
 def _ignore_socket(dir_, files):
@@ -244,7 +234,12 @@ class DockerImage:
             shutil.copytree(ssh_src, ssh_dst, ignore=_ignore_socket)
             logger.info("~/.ssh has been copied to {}", ssh_dst)
 
-    def build(self, tag_build: str = None, copy_ssh_to: str = "") -> DockerAction:
+    def build(
+        self,
+        tag_build: str = None,
+        copy_ssh_to: str = "",
+        builder: str = "Docker"
+    ) -> DockerAction:
         """Build the Docker image.
 
         :param tag_build: The tag of the Docker image to build.
@@ -266,19 +261,23 @@ class DockerImage:
             tag_build = "latest"
         logger.info("Building the Docker image {}:{} ...", self._name, tag_build)
         self._update_base_tag(tag_build)
-        client = docker.APIClient(base_url="unix://var/run/docker.sock")
         try:
-            for msg in client.build(
-                path=str(self._path),
-                tag=f"{self._name}:{tag_build}",
-                rm=True,
-                pull=self.is_root(),
-                cache_from=None,
-                decode=True
-            ):
-                if "stream" in msg:
-                    print(msg["stream"], end="")
-            docker.from_env().images.get(f"{self._name}:{tag_build}")
+            if builder == "Docker":
+                for msg in docker.APIClient(base_url="unix://var/run/docker.sock"
+                                           ).build(
+                                               path=str(self._path),
+                                               tag=f"{self._name}:{tag_build}",
+                                               rm=True,
+                                               pull=self.is_root(),
+                                               cache_from=None,
+                                               decode=True
+                                           ):
+                    if "stream" in msg:
+                        print(msg["stream"], end="")
+                docker.from_env().images.get(f"{self._name}:{tag_build}")
+            elif builder == "Kaniko":
+                cmd = f"/kaniko/executor -c {self._path} -d {self._name}:{tag_build}"
+                sp.run(cmd, shell=True, check=True)
         except docker.errors.BuildError as err:
             return DockerAction(
                 succeed=False,
@@ -380,7 +379,8 @@ class DockerImageBuilder:
     def __init__(
         self,
         branch_urls: Union[dict[str, list[str]], str, Path],
-        branch_fallback: str = "dev"
+        branch_fallback: str = "dev",
+        builder: str = "Docker",
     ):
         if isinstance(branch_urls, (str, Path)):
             with open(branch_urls, "r") as fin:
@@ -393,6 +393,7 @@ class DockerImageBuilder:
         self._roots = set()
         self.failures = []
         self._servers = set()
+        self._builder = builder
 
     def _record_docker_servers(self, deps: deque[DockerImage]):
         for dep in deps:
@@ -614,7 +615,7 @@ class DockerImageBuilder:
             branch=node.branch,
             branch_fallback=self._branch_fallback,
             repo_path=self._repo_path
-        ).build(tag_build=tag_build, copy_ssh_to=copy_ssh_to)
+        ).build(tag_build=tag_build, copy_ssh_to=copy_ssh_to, builder=self._builder)
         attr = self._graph.nodes[node]
         attr["build_succeed"] = succeed
         attr["build_err_msg"] = err_msg
@@ -623,7 +624,7 @@ class DockerImageBuilder:
         if not succeed:
             return
         self._tag_image(name, tag, attr)
-        if push:
+        if self._builder == "Docker" and push:
             self._push_images(name, attr["action_time"])
 
     @staticmethod
