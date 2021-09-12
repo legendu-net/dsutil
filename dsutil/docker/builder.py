@@ -55,7 +55,7 @@ def _push_image_timing(repo: str, tag: str) -> tuple[str, str, str, float]:
     #            print()
     #    print()
     time_begin = time.perf_counter_ns()
-    retry(lambda: sp.run(f"docker push {repo}:{tag}", check=True), times=3)
+    retry(lambda: sp.run(f"docker push {repo}:{tag}", shell=True, check=True), times=3)
     time_end = time.perf_counter_ns()
     return repo, tag, "push", (time_end - time_begin) / 1E9
 
