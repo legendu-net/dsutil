@@ -88,6 +88,16 @@ def branch_to_tag(branch: str) -> str:
     return branch
 
 
+def _reg_tag(tag: Union[None, str, list[str]], branch: str):
+    if tag is None:
+        tag = branch_to_tag(branch)
+    elif tag == "":
+        tag = "latest"
+    if isinstance(tag, str):
+        tag = [tag]
+    return tag
+
+
 def _get_docker_builder() -> str:
     docker = "docker"
     if shutil.which(docker):
@@ -588,14 +598,14 @@ class DockerImageBuilder:
         push: bool,
         remove: bool,
     ) -> None:
-        attr = self._graph.nodes[node]
-        tags = self._gen_add_tags(tag_build, attr)
+        tags = self._gen_add_tags(tag_build, node)
         self._build_image_node(
             node=node,
             tags=tags,
             copy_ssh_to=copy_ssh_to,
             push=push,
         )
+        attr = self._graph.nodes[node]
         if not attr["build_succeed"]:
             self.failures.append(node)
             return
@@ -648,13 +658,13 @@ class DockerImageBuilder:
     #        _, *tas = _push_image_timing(name, tag)
     #        action_time.append(tas)
 
-    @staticmethod
-    def _gen_add_tags(tag_build, attr) -> list:
+    def _gen_add_tags(self, tag_build, node) -> list:
+        tag_build = _reg_tag(tag_build, node.branch)
         tags = {
             tag_build: None,
             tag_date(tag_build): None,
         }
-        branches = attr.get("identical_branches", set())
+        branches = self._graph.nodes[node].get("identical_branches", set())
         for br in branches:
             tag = branch_to_tag(br)
             tags[tag] = None
