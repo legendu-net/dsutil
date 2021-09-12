@@ -273,12 +273,7 @@ class DockerImage:
         time_begin = time.perf_counter_ns()
         self.clone_repo()
         self._copy_ssh(copy_ssh_to)
-        if tags is None:
-            tags = branch_to_tag(self._branch)
-        elif tags == "":
-            tags = "latest"
-        if isinstance(tags, str):
-            tags = [tags]
+        tags = _reg_tag(tags, self._branch)
         tag0 = tags[0]
         logger.info("Building the Docker image {}:{} ...", self._name, tag0)
         self._update_base_tag(tag0)
@@ -659,7 +654,7 @@ class DockerImageBuilder:
     #        action_time.append(tas)
 
     def _gen_add_tags(self, tag_build, node) -> list:
-        tag_build = _reg_tag(tag_build, node.branch)
+        tag_build = _reg_tag(tag_build, node.branch)[0]
         tags = {
             tag_build: None,
             tag_date(tag_build): None,
