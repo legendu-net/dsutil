@@ -1,7 +1,7 @@
 """Docker related utils.
 """
 from __future__ import annotations
-from typing import Union, Any
+from typing import Union
 from dataclasses import dataclass
 import tempfile
 from pathlib import Path
@@ -37,39 +37,37 @@ def _push_image_timing(repo: str, tag: str) -> tuple[str, str, str, float]:
     :param tag: The tag of the Docker image to push.
     :return: The time (in seconds) used to push the Docker image.
     """
-    client = docker.from_env()
+    #client = docker.from_env()
     logger.info("Pushing Docker image {}:{} ...", repo, tag)
-
-    def _push():
-        msg_all: dict[str, dict] = {}
-        for msg in client.images.push(repo, tag, stream=True, decode=True):
-            if "id" not in msg or "status" not in msg:
-                continue
-            msg_all[msg["id"]] = msg
-            id_ = next(iter(msg_all))
-            msg = msg_all[id_]
-            print(f"{id_}: {msg['status']}: {msg.get('progress', '')}", end="\r")
-            if _is_image_pushed(msg):
-                msg_all.pop(id_)
-                print()
-        print()
-
+    #def _push():
+    #    msg_all: dict[str, dict] = {}
+    #    for msg in client.images.push(repo, tag, stream=True, decode=True):
+    #        if "id" not in msg or "status" not in msg:
+    #            continue
+    #        msg_all[msg["id"]] = msg
+    #        id_ = next(iter(msg_all))
+    #        msg = msg_all[id_]
+    #        print(f"{id_}: {msg['status']}: {msg.get('progress', '')}", end="\r")
+    #        if _is_image_pushed(msg):
+    #            msg_all.pop(id_)
+    #            print()
+    #    print()
     time_begin = time.perf_counter_ns()
-    retry(_push, times=3)
+    retry(lambda: sp.run(f"docker push {repo}:{tag}", check=True), times=3)
     time_end = time.perf_counter_ns()
     return repo, tag, "push", (time_end - time_begin) / 1E9
 
 
-def _is_image_pushed(msg: dict[str, Any]):
-    phrases = ["Mounted from", "Pushed", "Layer already exists"]
-    status = msg["status"]
-    if any(status.startswith(phrase) for phrase in phrases):
-        return True
-    if not "progressDetail" in msg:
-        return False
-    detail = msg["progressDetail"]
-    return "current" in detail and "total" in detail and detail["current"] >= detail[
-        "total"]
+#def _is_image_pushed(msg: dict[str, Any]):
+#    phrases = ["Mounted from", "Pushed", "Layer already exists"]
+#    status = msg["status"]
+#    if any(status.startswith(phrase) for phrase in phrases):
+#        return True
+#    if not "progressDetail" in msg:
+#        return False
+#    detail = msg["progressDetail"]
+#    return "current" in detail and "total" in detail and detail["current"] >= detail[
+#        "total"]
 
 
 def _ignore_socket(dir_, files):
@@ -117,8 +115,8 @@ class Node:
         return self.git_url[(index + 1):] + f"<{self.branch}>"
 
 
-DockerAction = namedtuple(
-    "DockerAction", ["succeed", "err_msg", "image", "tag", "action", "seconds"]
+DockerActionResult = namedtuple(
+    "DockerActionResult", ["succeed", "err_msg", "image", "tag", "action", "seconds"]
 )
 
 
@@ -147,7 +145,6 @@ class DockerImage:
         self._name = ""
         self._base_image = ""
         self._git_url_base = ""
-        self._tag_build = None
 
     def is_root(self) -> bool:
         """Check whether this DockerImage is a root DockerImage.
@@ -246,37 +243,41 @@ class DockerImage:
 
     def build(
         self,
-        tag_build: str = None,
+        tags: Union[None, str, list[str]] = None,
         copy_ssh_to: str = "",
         builder: str = _get_docker_builder(),
-    ) -> DockerAction:
+    ) -> DockerActionResult:
         """Build the Docker image.
 
-        :param tag_build: The tag of the Docker image to build.
+        :param tags: The tags of the Docker image to build.
             If None (default), then it is determined by the branch name.
             When the branch is master the "latest" tag is used,
             otherwise the next tag is used.
-            If an empty string is specifed for tag_build,
+            If an empty string is specifed for tags,
             it is also treated as the latest tag.
         :param copy_ssh_to: If True, SSH keys are copied into a directory named ssh
             under the current local Git repository. 
+        :param builder: The tool to use to build Docker images.
         :return: A tuple of the format (image_name_built, tag_built, time_taken, "build").
         """
         time_begin = time.perf_counter_ns()
         self.clone_repo()
         self._copy_ssh(copy_ssh_to)
-        if tag_build is None:
-            tag_build = branch_to_tag(self._branch)
-        elif tag_build == "":
-            tag_build = "latest"
-        logger.info("Building the Docker image {}:{} ...", self._name, tag_build)
-        self._update_base_tag(tag_build)
+        if tags is None:
+            tags = branch_to_tag(self._branch)
+        elif tags == "":
+            tags = "latest"
+        if isinstance(tags, str):
+            tags = [tags]
+        tag0 = tags[0]
+        logger.info("Building the Docker image {}:{} ...", self._name, tag0)
+        self._update_base_tag(tag0)
         try:
             if builder == "docker":
                 for msg in docker.APIClient(base_url="unix://var/run/docker.sock"
                                            ).build(
                                                path=str(self._path),
-                                               tag=f"{self._name}:{tag_build}",
+                                               tag=f"{self._name}:{tag0}",
                                                rm=True,
                                                pull=self.is_root(),
                                                cache_from=None,
@@ -284,16 +285,22 @@ class DockerImage:
                                            ):
                     if "stream" in msg:
                         print(msg["stream"], end="")
-                docker.from_env().images.get(f"{self._name}:{tag_build}")
+                # add additional tags for the image
+                image = docker.from_env().images.get(f"{self._name}:{tag0}")
+                for tag in tags[1:]:
+                    image.tag(self._name, tag, force=True)
             elif builder == "/kaniko/executor":
-                cmd = f"/kaniko/executor -c {self._path} -d {self._name}:{tag_build}"
+                dests = " ".join(f"-d {self._name}:{tag}" for tag in tags)
+                cmd = f"/kaniko/executor -c {self._path} {dests}"
                 sp.run(cmd, shell=True, check=True)
             elif builder == "":
                 raise ValueError("Please provide a valid Docker builder!")
             else:
-                raise NotImplementedError(f"The docker builder {builder} is not supported yet!")
+                raise NotImplementedError(
+                    f"The docker builder {builder} is not supported yet!"
+                )
         except docker.errors.BuildError as err:
-            return DockerAction(
+            return DockerActionResult(
                 succeed=False,
                 err_msg="\n".join(
                     line.get("stream", line.get("error")) for line in err.build_log
@@ -304,7 +311,7 @@ class DockerImage:
                 seconds=(time.perf_counter_ns() - time_begin) / 1E9,
             )
         except docker.errors.ImageNotFound as err:
-            return DockerAction(
+            return DockerActionResult(
                 succeed=False,
                 err_msg="",
                 image=self._name,
@@ -314,21 +321,20 @@ class DockerImage:
             )
         finally:
             self._remove_ssh(copy_ssh_to)
-        self._tag_build = tag_build
         if self._test_built_image():
-            return DockerAction(
+            return DockerActionResult(
                 succeed=True,
                 err_msg="",
                 image=self._name,
-                tag=tag_build,
+                tag=tag0,
                 action="build",
                 seconds=(time.perf_counter_ns() - time_begin) / 1E9,
             )
-        return DockerAction(
+        return DockerActionResult(
             succeed=False,
             err_msg="Built image failed to pass tests.",
             image=self._name,
-            tag=tag_build,
+            tag=tag0,
             action="build",
             seconds=(time.perf_counter_ns() - time_begin) / 1E9,
         )
@@ -394,7 +400,7 @@ class DockerImageBuilder:
         self,
         branch_urls: Union[dict[str, list[str]], str, Path],
         branch_fallback: str = "dev",
-        builder: str = "Docker",
+        builder: str = _get_docker_builder(),
     ):
         if isinstance(branch_urls, (str, Path)):
             with open(branch_urls, "r") as fin:
@@ -501,7 +507,7 @@ class DockerImageBuilder:
             return
         self._get_identical_branches(node).add(branch)
 
-    def _get_identical_branches(self, node: Node):
+    def _get_identical_branches(self, node: Node) -> set:
         attr = self._graph.nodes[node]
         attr.setdefault("identical_branches", set())
         return attr["identical_branches"]
@@ -555,7 +561,8 @@ class DockerImageBuilder:
         :return: A pandas DataFrame summarizing building information.
         """
         self.build_graph()
-        self._login_servers()
+        if self._builder == "docker":
+            self._login_servers()
         for node in self._roots:
             self._build_images_graph(
                 node=node,
@@ -581,13 +588,14 @@ class DockerImageBuilder:
         push: bool,
         remove: bool,
     ) -> None:
+        attr = self._graph.nodes[node]
+        tags = self._gen_add_tags(tag_build, attr)
         self._build_image_node(
             node=node,
-            tag_build=tag_build,
+            tags=tags,
             copy_ssh_to=copy_ssh_to,
             push=push,
         )
-        attr = self._graph.nodes[node]
         if not attr["build_succeed"]:
             self.failures.append(node)
             return
@@ -602,59 +610,53 @@ class DockerImageBuilder:
             )
         if not remove:
             return
-        # remove images associated with the node
-        images = docker.from_env().images
-        image_name = attr["image_name"]
-        for tag, action, _ in attr["action_time"]:
-            if action in ("build", "tag"):
+        # remove images associated with node
+        if self._builder == "docker":
+            images = docker.from_env().images
+            image_name = attr["image_name"]
+            logger.info("Removing Docker image {}:{} ...", image_name, tag_build)
+            images.remove(f"{image_name}:{tag_build}", force=True)
+            for tag in tags:
                 logger.info("Removing Docker image {}:{} ...", image_name, tag)
                 images.remove(f"{image_name}:{tag}", force=True)
-
-    @staticmethod
-    def _tag_image_1(
-        image, name: str, tag_new: str, action_time: list[tuple[str, float, str]]
-    ) -> None:
-        image.tag(name, tag_new, force=True)
-        action_time.append((tag_new, "tag", 0))
 
     def _build_image_node(
         self,
         node,
-        tag_build: str,
+        tags: list[str],
         copy_ssh_to: str,
         push: bool,
     ) -> None:
-        succeed, err_msg, name, tag, action, seconds = DockerImage(
+        succeed, err_msg, name, tag, _, _ = DockerImage(
             git_url=node.git_url,
             branch=node.branch,
             branch_fallback=self._branch_fallback,
             repo_path=self._repo_path
-        ).build(tag_build=tag_build, copy_ssh_to=copy_ssh_to, builder=self._builder)
+        ).build(tags=tags, copy_ssh_to=copy_ssh_to, builder=self._builder)
         attr = self._graph.nodes[node]
         attr["build_succeed"] = succeed
         attr["build_err_msg"] = err_msg
         attr["image_name"] = name
-        attr["action_time"] = [(tag, action, seconds)]
-        if not succeed:
-            return
-        self._tag_image(name, tag, attr)
-        if self._builder == "Docker" and push:
-            self._push_images(name, attr["action_time"])
+        if succeed and push:
+            for tag in tags:
+                _push_image_timing(name, tag)
+
+    #@staticmethod
+    #def _push_images(name, action_time):
+    #    for idx in range(len(action_time)):
+    #        tag, *_ = action_time[idx]
+    #        _, *tas = _push_image_timing(name, tag)
+    #        action_time.append(tas)
 
     @staticmethod
-    def _push_images(name, action_time):
-        for idx in range(len(action_time)):
-            tag, *_ = action_time[idx]
-            _, *tas = _push_image_timing(name, tag)
-            action_time.append(tas)
-
-    def _tag_image(self, name, tag, attr):
-        image = docker.from_env().images.get(f"{name}:{tag}")
-        action_time = attr["action_time"]
-        # create a historical tag
-        self._tag_image_1(image, name, tag_date(tag), action_time)
-        # create new tags on the built images corresponding to other branches
-        for br in attr.get("identical_branches", set()):
-            tag_new = branch_to_tag(br)
-            self._tag_image_1(image, name, tag_new, action_time)
-            self._tag_image_1(image, name, tag_date(tag_new), action_time)
+    def _gen_add_tags(tag_build, attr) -> list:
+        tags = {
+            tag_build: None,
+            tag_date(tag_build): None,
+        }
+        branches = attr.get("identical_branches", set())
+        for br in branches:
+            tag = branch_to_tag(br)
+            tags[tag] = None
+            tags[tag_date(tag)] = None
+        return list(tags.keys())
