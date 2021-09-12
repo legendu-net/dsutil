@@ -30,6 +30,8 @@ def tag_date(tag: str) -> str:
     return mmddhh if tag in ("", "latest") else f"{tag}_{mmddhh}"
 
 
+#TODO: return result as DockerActionResult?
+# I think this is a good idea
 def _push_image_timing(repo: str, tag: str) -> tuple[str, str, str, float]:
     """Push a Docker image to Docker Hub and time the pushing.
 
@@ -619,8 +621,6 @@ class DockerImageBuilder:
         if self._builder == "docker":
             images = docker.from_env().images
             image_name = attr["image_name"]
-            logger.info("Removing Docker image {}:{} ...", image_name, tag_build)
-            images.remove(f"{image_name}:{tag_build}", force=True)
             for tag in tags:
                 logger.info("Removing Docker image {}:{} ...", image_name, tag)
                 images.remove(f"{image_name}:{tag}", force=True)
@@ -642,7 +642,7 @@ class DockerImageBuilder:
         attr["build_succeed"] = succeed
         attr["build_err_msg"] = err_msg
         attr["image_name"] = name
-        if succeed and push:
+        if self._builder == "docker" and succeed and push:
             for tag in tags:
                 _push_image_timing(name, tag)
 
