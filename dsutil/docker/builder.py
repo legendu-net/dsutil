@@ -298,7 +298,7 @@ class DockerImage:
                     image.tag(self._name, tag, force=True)
             elif builder == "/kaniko/executor":
                 dests = " ".join(f"-d {self._name}:{tag}" for tag in tags)
-                cmd = f"/kaniko/executor -c {self._path} {dests}"
+                cmd = f"/kaniko/executor --cleanup -c {self._path} {dests}"
                 sp.run(cmd, shell=True, check=True)
             elif builder == "":
                 raise ValueError("Please provide a valid Docker builder!")
