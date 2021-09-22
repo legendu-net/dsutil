@@ -39,4 +39,4 @@ def test_DockerImageBuilder():
         return
     branch_urls = {"dev": ["https://github.com/dclong/docker-python-portable.git", ]}
     builder = dsutil.docker.DockerImageBuilder(branch_urls)
-    builder.build_images(tag_build="unittest")
+    builder.build_images(tag_build="unittest", push=False)
