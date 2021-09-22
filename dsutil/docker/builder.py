@@ -30,9 +30,7 @@ def tag_date(tag: str) -> str:
     return mmddhh if tag in ("", "latest") else f"{tag}_{mmddhh}"
 
 
-#TODO: return result as DockerActionResult?
-# I think this is a good idea
-def _push_image_timing(repo: str, tag: str) -> tuple[str, str, str, float]:
+def _push_image_timing(repo: str, tag: str) -> DockerActionResult:
     """Push a Docker image to Docker Hub and time the pushing.
 
     :param repo: The local repository of the Docker image.
@@ -55,9 +53,11 @@ def _push_image_timing(repo: str, tag: str) -> tuple[str, str, str, float]:
     #            print()
     #    print()
     time_begin = time.perf_counter_ns()
-    retry(lambda: sp.run(f"docker push {repo}:{tag}", shell=True, check=True), times=3)
-    time_end = time.perf_counter_ns()
-    return repo, tag, "push", (time_end - time_begin) / 1E9
+    try:
+        retry(lambda: sp.run(f"docker push {repo}:{tag}", shell=True, check=True), times=3)
+        return DockerActionResult(True, "", repo, tag, "push", (time.perf_counter_ns() - time_begin) / 1E9)
+    except err:
+        return DockerActionResult(False, str(err), repo, tag, "push", (time.perf_counter_ns() - time_begin) / 1E9)
 
 
 #def _is_image_pushed(msg: dict[str, Any]):
