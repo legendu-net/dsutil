@@ -32,9 +32,7 @@ def retry(task: Callable, times: int = 3, wait_seconds: float = 60):
     :param wait_seconds: The number of seconds to wait before retrying.
     :return: The return result of the task.
     """
-    if times <= 1:
-        return task()
-    for _ in range(times):
+    for _ in range(1, times):
         try:
             return task()
         except:
