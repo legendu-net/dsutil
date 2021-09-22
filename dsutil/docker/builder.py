@@ -56,7 +56,7 @@ def _push_image_timing(repo: str, tag: str) -> DockerActionResult:
     try:
         retry(lambda: sp.run(f"docker push {repo}:{tag}", shell=True, check=True), times=3)
         return DockerActionResult(True, "", repo, tag, "push", (time.perf_counter_ns() - time_begin) / 1E9)
-    except err:
+    except Exception as err:
         return DockerActionResult(False, str(err), repo, tag, "push", (time.perf_counter_ns() - time_begin) / 1E9)
 
 
