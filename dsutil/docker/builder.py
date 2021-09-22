@@ -54,10 +54,18 @@ def _push_image_timing(repo: str, tag: str) -> DockerActionResult:
     #    print()
     time_begin = time.perf_counter_ns()
     try:
-        retry(lambda: sp.run(f"docker push {repo}:{tag}", shell=True, check=True), times=3)
-        return DockerActionResult(True, "", repo, tag, "push", (time.perf_counter_ns() - time_begin) / 1E9)
+        retry(
+            lambda: sp.run(f"docker push {repo}:{tag}", shell=True, check=True),
+            times=3
+        )
+        return DockerActionResult(
+            True, "", repo, tag, "push", (time.perf_counter_ns() - time_begin) / 1E9
+        )
     except Exception as err:
-        return DockerActionResult(False, str(err), repo, tag, "push", (time.perf_counter_ns() - time_begin) / 1E9)
+        return DockerActionResult(
+            False, str(err), repo, tag, "push",
+            (time.perf_counter_ns() - time_begin) / 1E9
+        )
 
 
 #def _is_image_pushed(msg: dict[str, Any]):
