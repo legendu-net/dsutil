@@ -51,7 +51,9 @@ def images() -> pd.DataFrame:
                     "size": size
                 }
             )
-    return pd.DataFrame(data)
+    frame = pd.DataFrame(data)
+    frame.created = pd.to_datetime(frame.created)
+    return frame
 
 
 def containers() -> pd.DataFrame:
