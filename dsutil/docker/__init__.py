@@ -82,7 +82,8 @@ def remove(aggressive: bool = False, choice: str = "") -> None:
     """Remove exited Docker containers and images without tags.
     """
     docker.from_env().containers.prune()
-    remove_images(tag="none", aggressive=aggressive, choice=choice)
+    failures = remove_images(tag="none", aggressive=aggressive, choice=choice)
+    logger.error("Failed to remove the following Docker images:\n{}", "\n".join(failures))
 
 
 def pull():
