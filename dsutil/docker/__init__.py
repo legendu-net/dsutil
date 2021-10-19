@@ -4,6 +4,7 @@ from __future__ import annotations
 import sys
 from typing import Union
 import subprocess as sp
+from loguru import logger
 import pandas as pd
 import docker
 from .builder import DockerImage, DockerImageBuilder
