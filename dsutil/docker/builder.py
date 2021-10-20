@@ -37,21 +37,7 @@ def _push_image_timing(repo: str, tag: str) -> DockerActionResult:
     :param tag: The tag of the Docker image to push.
     :return: The time (in seconds) used to push the Docker image.
     """
-    #client = docker.from_env()
     logger.info("Pushing Docker image {}:{} ...", repo, tag)
-    #def _push():
-    #    msg_all: dict[str, dict] = {}
-    #    for msg in client.images.push(repo, tag, stream=True, decode=True):
-    #        if "id" not in msg or "status" not in msg:
-    #            continue
-    #        msg_all[msg["id"]] = msg
-    #        id_ = next(iter(msg_all))
-    #        msg = msg_all[id_]
-    #        print(f"{id_}: {msg['status']}: {msg.get('progress', '')}", end="\r")
-    #        if _is_image_pushed(msg):
-    #            msg_all.pop(id_)
-    #            print()
-    #    print()
     time_begin = time.perf_counter_ns()
     try:
         retry(
@@ -66,18 +52,6 @@ def _push_image_timing(repo: str, tag: str) -> DockerActionResult:
             False, str(err), repo, tag, "push",
             (time.perf_counter_ns() - time_begin) / 1E9
         )
-
-
-#def _is_image_pushed(msg: dict[str, Any]):
-#    phrases = ["Mounted from", "Pushed", "Layer already exists"]
-#    status = msg["status"]
-#    if any(status.startswith(phrase) for phrase in phrases):
-#        return True
-#    if not "progressDetail" in msg:
-#        return False
-#    detail = msg["progressDetail"]
-#    return "current" in detail and "total" in detail and detail["current"] >= detail[
-#        "total"]
 
 
 def _ignore_socket(dir_, files):
