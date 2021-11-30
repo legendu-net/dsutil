@@ -269,6 +269,10 @@ class LogFilter:
                 "http://www.legendu.net/misc/blog/spark-issue-table-not-found/"
             ),
             (
+                "(?i)libc.*not found", 1,
+                "http://www.legendu.net/misc/blog/spark-issue-libc-not-found/"
+            ),
+            (
                 "(?i)SparkContext: A master URL must be set", 1,
                 "http://www.legendu.net/misc/blog/spark-issue-a-master-url-must-be-set-in-your-configuration/"
             ),
