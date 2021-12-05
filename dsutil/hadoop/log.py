@@ -312,7 +312,8 @@ class LogFilter:
                 "http://www.legendu.net/misc/blog/spark-issue:-error:-Found-argument-which-was-not-expected"
             ),
             (
-                r"(?i)RuntimeError: Result vector from pandas_udf was not the required length", 1,
+                r"(?i)RuntimeError: Result vector from pandas_udf was not the required length",
+                1,
                 "http://www.legendu.net/misc/blog/spark-issue:-RuntimeError:-Result-vector-of-pandas_udf-was-not-the-required-length"
             ),
             (

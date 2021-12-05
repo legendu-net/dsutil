@@ -19,7 +19,8 @@ import yaml
 from loguru import logger
 import notifiers
 
-PROFILE = Path.home() / ".kinit_profile"
+HOME = Path.home()
+PROFILE = HOME / ".pykinit_profile"
 HOST = socket.gethostname()
 HOST_IP = socket.gethostbyname(HOST)
 USER = getpass.getuser()
@@ -158,17 +159,17 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "--config",
         dest="config",
         type=Path,
-        default=None,
+        default=HOME / ".pykinit.yaml",
         help="The path to a configure file which contains email information."
     )
     return parser.parse_args(args, namespace)
 
 
-def _read_config(config: Union[Path, str, None]) -> Dict[str, Any]:
-    if not config:
-        return {}
+def _read_config(config: Union[Path, str]) -> Dict[str, Any]:
     if isinstance(config, str):
         config = Path(config)
+    if not config.is_file():
+        return {"email": {}}
     with config.open("r") as fin:
         return yaml.load(fin, Loader=yaml.FullLoader)
 
@@ -185,11 +186,12 @@ def main() -> None:
     if not password:
         raise ExceptionNoPassword()
     config = _read_config(args.config)
-    authenticate(password, config["email"], args.user)
     if args.minute:
         while True:
             authenticate(read_passwd(), config["email"])
             time.sleep(args.minute * 60)
+    else:
+        authenticate(password, config["email"], args.user)
 
 
 if __name__ == "__main__":
