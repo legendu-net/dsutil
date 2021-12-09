@@ -300,6 +300,23 @@ class LogFilter:
                 "http://www.legendu.net/misc/blog/spark-issue:-max-number-of-executor-failures-reached"
             ),
             (
+                r"(?i)IllegalArgumentException: System memory \d* must be at least", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-IllegalArgumentException:-System-memory-must-be-at-least"
+            ),
+            (
+                r"(?i)CalledProcessError: Command .* returned non-zero exit status", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-CalledProcessError:-Command-returned-non-zero-exit-status"
+            ),
+            (
+                r"(?i)error: Found argument .* which wasn't expected", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-error:-Found-argument-which-was-not-expected"
+            ),
+            (
+                r"(?i)RuntimeError: Result vector from pandas_udf was not the required length",
+                1,
+                "http://www.legendu.net/misc/blog/spark-issue:-RuntimeError:-Result-vector-of-pandas_udf-was-not-the-required-length"
+            ),
+            (
                 "(?i)serialized results is bigger than spark.driver.maxResultSize", 2,
                 "http://www.legendu.net/misc/blog/spark-issues-total-size-bigger-than-maxresultsize/"
             ),
