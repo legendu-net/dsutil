@@ -317,6 +317,10 @@ class LogFilter:
                 "http://www.legendu.net/misc/blog/spark-issue:-RuntimeError:-Result-vector-of-pandas_udf-was-not-the-required-length"
             ),
             (
+                r"(?i)InvalidResourceRequestException", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-InvalidResourceRequestException"
+            ),
+            (
                 "(?i)serialized results is bigger than spark.driver.maxResultSize", 2,
                 "http://www.legendu.net/misc/blog/spark-issues-total-size-bigger-than-maxresultsize/"
             ),
