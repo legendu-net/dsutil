@@ -83,7 +83,8 @@ class Hdfs():
     def _du_helper(self, path: str) -> pd.DataFrame:
         cmd = f"{self.bin} dfs -du {path}"
         logger.info("Running command: {}. Might take a while.", cmd)
-        frame = to_frame(cmd, split=r" +", header=["size", "path"])
+        frame = to_frame(cmd, split=r" +", header=["bytes", "path"])
+        frame.bytes = frame.bytes.astype(int)
         return frame
 
     def exists(self, path: str) -> bool:
