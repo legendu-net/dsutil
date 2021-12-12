@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Union
 import sys
 from pathlib import Path
+import re
 from loguru import logger
 
 
@@ -202,7 +203,7 @@ def _filter_num(path: Union[str, Path], pattern: str, num_lines: int):
             res.append(line)
             count = num_lines
     if res:
-        results.append(res) 
+        results.append(res)
     return results
 
 
@@ -225,11 +226,16 @@ def _filter_sp(path: Union[str, Path], pattern: str, sub_pattern: str):
             res.append(line)
             sub = True
     if res:
-        results.append(res) 
+        results.append(res)
     return results
 
 
-def filter(path: Union[str, Path], pattern: str, sub_pattern: str = "", num_lines: int = 0) -> list[list[str]]:
+def filter(
+    path: Union[str, Path],
+    pattern: str,
+    sub_pattern: str = "",
+    num_lines: int = 0
+) -> list[list[str]]:
     """Filter lines from a file. 
     A main regex pattern is used to identify main rows.
     For each matched main row, 
