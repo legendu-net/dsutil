@@ -1,6 +1,7 @@
 """Script for fetch and filtering Spark application logs.
 """
 from typing import Optional
+from pathlib import Path
 import re
 from argparse import ArgumentParser, Namespace
 import subprocess as sp
@@ -54,6 +55,58 @@ def fetch(args):
     filter_(args)
 
 
+def status(args):
+    """Get status of a Spark application.
+
+    :param args: A Namespace object containing command-line options.
+    """
+    if "app_id" in args:
+        cmd = ["yarn", "application", "-status", args.app_id]
+        sp.run(cmd, check=True)
+        return
+    report = """Application Report : 
+        Application-Id : {APP_ID}
+        Application-Name : {APP_NAME}
+        Application-Type : {APP_TYPE}
+        User : {USER}
+        Queue : {QUEUE}
+        Application Priority : {PRIORITY}
+        Start-Time : {START_TIME}
+        Finish-Time : {FINISH_TIME}
+        Progress : {PROGRESS}
+        State : {STATE}
+        Final-State : {STATUS}
+        Tracking-URL : {URL}
+        RPC Port : {PORT}
+        AM Host : {HOST}
+        Aggregate Resource Allocation : {RESOURCE}
+        Log Aggregation Status : {LOG_STATUS}
+        Diagnostics : 
+        Unmanaged Application : {UNMANAGED}
+        Application Node Label Expression : {APP_NODE_LABEL}
+        AM container Node Label Expression : {CON_NODE_LABEL}
+    """
+    with args.log_file.open() as fin:
+        for line in fin:
+            if "{APP_ID}" in report:
+                match = re.search(r"(application_\d+_\d+)", line)
+                if match:
+                    report = report.replace("{APP_ID}", match.group())
+            if "{APP_NAME}" in report:
+                match = re.search(r"--primary-py-file (.*) ", line)
+                if match:
+                    report = report.replace("{APP_NAME}", match.group())
+            if "{USER}" in report:
+                match = re.search(r"local/usercache/(.*)/", line)
+                if match:
+                    report = report.replace("{USER}", match.group())
+            if "{STATUS}" in report:
+                match = re.search(r"Final app status: (.*),", line)
+                if match:
+                    report = report.replace("{STATUS}", match.group())
+    print(report)
+
+
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
     
@@ -66,7 +119,22 @@ def parse_args(args=None, namespace=None) -> Namespace:
     subparsers = parser.add_subparsers(help="Sub commands.")
     _subparser_fetch(subparsers)
     _subparser_filter(subparsers)
+    _subparser_status(subparsers)
     return parser.parse_args(args=args, namespace=namespace)
+
+
+def _subparser_status(subparsers):
+    subparser_status = subparsers.add_parser(
+        "status", help="filter key information from a Spark/Hive application log."
+    )
+    mutex_group = subparser_status.add_mutually_exclusive_group(required=True)
+    mutex_group.add_argument(
+        "-i", "--id", "--app-id", dest="app_id", type=str, help="An application ID."
+    )
+    mutex_group.add_argument(
+        "-l", "-f", "--log-file", dest="log_file", type=Path, help="An application ID."
+    )
+    subparser_status.set_defaults(func=status)
 
 
 def _option_filter(subparser) -> None:

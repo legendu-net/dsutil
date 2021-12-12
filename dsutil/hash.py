@@ -35,10 +35,18 @@ def _rmd5(path: Path, res: list[tuple[str]]) -> None:
     :param res: A list to record the result.
     """
     if path.is_file():
-        md5sum = hashlib.md5(path.read_bytes()).hexdigest()
+        try:
+            md5sum = hashlib.md5(path.read_bytes()).hexdigest()
+        except:
+            md5sum = "FAILED!"
         line = f"{str(path)}: {md5sum}"
         res.append(line)
         logger.info(line)
         return
-    for p in path.iterdir():
-        _rmd5(p, res)
+    try:
+        for p in path.iterdir():
+            _rmd5(p, res)
+    except:
+        line = f"{str(path)}: FAILED!"
+        res.append(line)
+        logger.info(line)
