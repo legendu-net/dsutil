@@ -182,3 +182,69 @@ def prune_json(input: Union[str, Path], output: Union[str, Path] = ""):
             else:
                 fout.write(line)
     logger.info("The pruned JSON file is written to {}.", output)
+
+
+def _filter_num(path: Union[str, Path], pattern: str, num_lines: int):
+    if isinstance(path, str):
+        path = Path(path)
+    results = []
+    res = []
+    count = 0
+    for line in path.open():
+        if count > 0:
+            res.append(line)
+            count -= 1
+            continue
+        if re.search(pattern, line):
+            if res:
+                results.append(res)
+            res = []
+            res.append(line)
+            count = num_lines
+    if res:
+        results.append(res) 
+    return results
+
+
+def _filter_sp(path: Union[str, Path], pattern: str, sub_pattern: str):
+    if isinstance(path, str):
+        path = Path(path)
+    results = []
+    res = []
+    sub = False
+    for line in path.open():
+        if sub:
+            if re.search(sub_pattern, line):
+                res.append(line)
+            else:
+                sub = False
+        if re.search(pattern, line):
+            if res:
+                results.append(res)
+            res = []
+            res.append(line)
+            sub = True
+    if res:
+        results.append(res) 
+    return results
+
+
+def filter(path: Union[str, Path], pattern: str, sub_pattern: str = "", num_lines: int = 0) -> list[list[str]]:
+    """Filter lines from a file. 
+    A main regex pattern is used to identify main rows.
+    For each matched main row, 
+    a sub regex pattern or a fixed number of lines can be provided.
+    If a sub regex pattern is provided,
+    then lines matching the sub regex pattern following a main line are kept together with the main line.
+    If a fixed number of lines is provided, e.g., ``num_lines=k``,
+    then ``k`` additional lines after a main line are kept together with the main line.
+
+    :param path: Path to a text file from which to filter lines.
+    :param pattern: The main regex pattern.
+    :param sub_pattern: The sub regex pattern (defaults to "", i.e., no sub pattern by default).
+    :param num_lines: The num of additional lines (0 by default) to keep after a main line.
+    :return: A list of list of lines.
+    """
+    if sub_pattern:
+        return _filter_sp(path, pattern=pattern, sub_pattern=sub_pattern)
+    return _filter_num(path, pattern=pattern, num_lines=num_lines)
