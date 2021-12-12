@@ -233,6 +233,31 @@ class LogFilter:
         """
         patterns = [
             (
+                "(?i)libc.*not found", 1,
+                "http://www.legendu.net/misc/blog/spark-issue-libc-not-found/"
+            ),
+            (
+                r"(?i)ArrowInvalid", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+            ),
+            (
+                r"(?i)TypeError: .*has no len()", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+            ),
+            (
+                r"(?i)CalledProcessError: Command .* returned non-zero exit status", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+            ),
+            (
+                r"(?i)error: Found argument .* which wasn't expected", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+            ),
+            (
+                r"(?i)RuntimeError: Result vector from pandas_udf was not the required length",
+                1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+            ),
+            (
                 "(?i)object has no attribute", 1,
                 "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
@@ -269,10 +294,6 @@ class LogFilter:
                 "http://www.legendu.net/misc/blog/spark-issue-table-not-found/"
             ),
             (
-                "(?i)libc.*not found", 1,
-                "http://www.legendu.net/misc/blog/spark-issue-libc-not-found/"
-            ),
-            (
                 "(?i)SparkContext: A master URL must be set", 1,
                 "http://www.legendu.net/misc/blog/spark-issue-a-master-url-must-be-set-in-your-configuration/"
             ),
@@ -302,19 +323,6 @@ class LogFilter:
             (
                 r"(?i)IllegalArgumentException: System memory \d* must be at least", 1,
                 "http://www.legendu.net/misc/blog/spark-issue:-IllegalArgumentException:-System-memory-must-be-at-least"
-            ),
-            (
-                r"(?i)CalledProcessError: Command .* returned non-zero exit status", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-CalledProcessError:-Command-returned-non-zero-exit-status"
-            ),
-            (
-                r"(?i)error: Found argument .* which wasn't expected", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-error:-Found-argument-which-was-not-expected"
-            ),
-            (
-                r"(?i)RuntimeError: Result vector from pandas_udf was not the required length",
-                1,
-                "http://www.legendu.net/misc/blog/spark-issue:-RuntimeError:-Result-vector-of-pandas_udf-was-not-the-required-length"
             ),
             (
                 r"(?i)InvalidResourceRequestException", 1,

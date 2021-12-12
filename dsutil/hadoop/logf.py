@@ -1,6 +1,7 @@
 """Script for fetch and filtering Spark application logs.
 """
 from typing import Optional
+from pathlib import Path
 import re
 from argparse import ArgumentParser, Namespace
 import subprocess as sp
@@ -54,6 +55,43 @@ def fetch(args):
     filter_(args)
 
 
+def status(args):
+    """Get status of a Spark application.
+
+    :param args: A Namespace object containing command-line options.
+    """
+    if "app_id" in args:
+        cmd = ["yarn", "application", "-status", args.app_id]
+        sp.run(cmd, check=True)
+        return
+    report = """Application Report : 
+        Application-Id : {app_id}
+        Application-Name : {app_name}
+        Application-Type : {app_type}
+        User : {user}
+        Queue : {queue}
+        Application Priority : {priority}
+        Start-Time : {start_time}
+        Finish-Time : {finish_time}
+        Progress : {progress}
+        State : {state}
+        Final-State : {status}
+        Tracking-URL : {url}
+        RPC Port : {port}
+        AM Host : {host}
+        Aggregate Resource Allocation : {resource}
+        Log Aggregation Status : {log_status}
+        Diagnostics : 
+        Unmanaged Application : {unmanaged}
+        Application Node Label Expression : {app_node_label}
+        AM container Node Label Expression : {con_node_label}
+    """
+    with args.log_file.open() as fin:
+        for line in fin:
+            pass
+    print(report)
+
+
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
     
@@ -66,7 +104,22 @@ def parse_args(args=None, namespace=None) -> Namespace:
     subparsers = parser.add_subparsers(help="Sub commands.")
     _subparser_fetch(subparsers)
     _subparser_filter(subparsers)
+    _subparser_status(subparsers)
     return parser.parse_args(args=args, namespace=namespace)
+
+
+def _subparser_status(subparsers):
+    subparser_status = subparsers.add_parser(
+        "status", help="filter key information from a Spark/Hive application log."
+    )
+    mutex_group = subparser_status.add_mutually_exclusive_group(required=True)
+    mutex_group.add_argument(
+        "-i", "--id", "--app-id", dest="app_id", type=str, help="An application ID."
+    )
+    mutex_group.add_argument(
+        "-l", "-f", "--log-file", dest="log_file", type=Path, help="An application ID."
+    )
+    subparser_status.set_defaults(func=status)
 
 
 def _option_filter(subparser) -> None:
