@@ -319,8 +319,16 @@ def _submit_cluster(args, config: dict[str, Any]) -> bool:
     if not os.path.isfile(spark_submit):
         raise ValueError(f"{spark_submit} does not exist!")
     opts = (
-        "files", "master", "deploy-mode", "queue", "num-executors", "executor-memory",
-        "driver-memory", "executor-cores", "archives", "jars", 
+        "files",
+        "master",
+        "deploy-mode",
+        "queue",
+        "num-executors",
+        "executor-memory",
+        "driver-memory",
+        "executor-cores",
+        "archives",
+        "jars",
     )
     lines = [config["spark-submit"]] + [
         f"--{opt} {config[opt]}" for opt in opts if opt in config and config[opt]
