@@ -65,30 +65,45 @@ def status(args):
         sp.run(cmd, check=True)
         return
     report = """Application Report : 
-        Application-Id : {app_id}
-        Application-Name : {app_name}
-        Application-Type : {app_type}
-        User : {user}
-        Queue : {queue}
-        Application Priority : {priority}
-        Start-Time : {start_time}
-        Finish-Time : {finish_time}
-        Progress : {progress}
-        State : {state}
-        Final-State : {status}
-        Tracking-URL : {url}
-        RPC Port : {port}
-        AM Host : {host}
-        Aggregate Resource Allocation : {resource}
-        Log Aggregation Status : {log_status}
+        Application-Id : {APP_ID}
+        Application-Name : {APP_NAME}
+        Application-Type : {APP_TYPE}
+        User : {USER}
+        Queue : {QUEUE}
+        Application Priority : {PRIORITY}
+        Start-Time : {START_TIME}
+        Finish-Time : {FINISH_TIME}
+        Progress : {PROGRESS}
+        State : {STATE}
+        Final-State : {STATUS}
+        Tracking-URL : {URL}
+        RPC Port : {PORT}
+        AM Host : {HOST}
+        Aggregate Resource Allocation : {RESOURCE}
+        Log Aggregation Status : {LOG_STATUS}
         Diagnostics : 
-        Unmanaged Application : {unmanaged}
-        Application Node Label Expression : {app_node_label}
-        AM container Node Label Expression : {con_node_label}
+        Unmanaged Application : {UNMANAGED}
+        Application Node Label Expression : {APP_NODE_LABEL}
+        AM container Node Label Expression : {CON_NODE_LABEL}
     """
     with args.log_file.open() as fin:
         for line in fin:
-            pass
+            if "{APP_ID}" in report:
+                match = re.search(r"(application_\d+_\d+)", line)
+                if match:
+                    report = report.replace("{APP_ID}", match.group())
+            if "{APP_NAME}" in report:
+                match = re.search(r"--primary-py-file (.*) ", line)
+                if match:
+                    report = report.replace("{APP_NAME}", match.group())
+            if "{USER}" in report:
+                match = re.search(r"local/usercache/(.*)/", line)
+                if match:
+                    report = report.replace("{USER}", match.group())
+            if "{STATUS}" in report:
+                match = re.search(r"Final app status: (.*),", line)
+                if match:
+                    report = report.replace("{STATUS}", match.group())
     print(report)
 
 
