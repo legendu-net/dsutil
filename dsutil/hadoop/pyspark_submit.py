@@ -320,13 +320,11 @@ def _submit_cluster(args, config: dict[str, Any]) -> bool:
         raise ValueError(f"{spark_submit} does not exist!")
     opts = (
         "files", "master", "deploy-mode", "queue", "num-executors", "executor-memory",
-        "driver-memory", "executor-cores", "archives"
+        "driver-memory", "executor-cores", "archives", "jars", 
     )
     lines = [config["spark-submit"]] + [
-        f"--{opt} {config[opt]}" for opt in opts if opt in config
+        f"--{opt} {config[opt]}" for opt in opts if opt in config and config[opt]
     ] + [f"--conf {k}={v}" for k, v in config["conf"].items()]
-    if config["jars"]:
-        lines.append(f"--jars {config['jars']}")
     lines.extend(args.cmd)
     for idx in range(1, len(lines)):
         lines[idx] = " " * 4 + lines[idx]
@@ -358,11 +356,14 @@ def submit(args: Namespace) -> None:
         config["python-local"] = args.python_local
     if "files" not in config:
         config["files"] = []
-    config["files"] = _files(config) + args.files
-    if "jars" not in config:
-        config["jars"] = ""
-    if isinstance(config["jars"], (list, tuple)):
-        config["jars"] = ",".join(config["jars"])
+    config["files"].extend(args.files)
+    config["files"] = _files(config)
+    if "archives" in config:
+        if isinstance(config["archives"], (list, tuple)):
+            config["archives"] = ",".join(config["archives"])
+    if "jars" in config:
+        if isinstance(config["jars"], (list, tuple)):
+            config["jars"] = ",".join(config["jars"])
     # submit Spark applications
     if _submit_local(args, config):
         _submit_cluster(args, config)
@@ -407,6 +408,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
         help="Specify a path for generating a configration example."
     )
     mutex_group.add_argument(
+        "--cmd",
         dest="cmd",
         nargs="+",
         help="The command (of PySpark script) to submit to Spark to run."
