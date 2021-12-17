@@ -290,6 +290,10 @@ class LogFilter:
                 "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
+                r"(?i)TypeError: withReplacement", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-TypeError-withReplacement"
+            ),
+            (
                 "(?i)table not found", 1,
                 "http://www.legendu.net/misc/blog/spark-issue-table-not-found/"
             ),

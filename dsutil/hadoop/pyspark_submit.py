@@ -9,6 +9,7 @@ import sys
 import itertools as it
 from argparse import Namespace, ArgumentParser
 from pathlib import Path
+import tempfile
 import shutil
 import subprocess as sp
 import re
@@ -113,16 +114,14 @@ class SparkSubmit:
         return False
 
     @staticmethod
-    def _print_filter(line: str, log_filter: Union[Callable, None] = None) -> bool:
+    def _filter(line: str, time_begin, log_filter: Union[Callable, None] = None) -> str:
         if not line:
-            return False
-        if log_filter is None:
-            print(line)
-            return True
-        if log_filter(line):
-            print(line)
-            return True
-        return False
+            return ""
+        if log_filter is None or log_filter(line):
+            if "final status:" in line or " (state: " in line:
+                line = line + f" (Time elapsed: {datetime.datetime.now() - time_begin})"
+            return line
+        return ""
 
     def submit(self, cmd: str, attachments: Union[None, list[str]] = None) -> bool:
         """Submit a Spark job.
@@ -131,19 +130,25 @@ class SparkSubmit:
         :param attachments: Attachments to send with the notification email.
         :return: True if the Spark application succeeds and False otherwise.
         """
-        logger.info("Submitting Spark job...\n{}", cmd)
+        time_begin = datetime.datetime.now()
+        logger.info("Submitting Spark job ...\n{}", cmd)
         stdout = []
         self._spark_submit_log.clear()
         process = sp.Popen(cmd, shell=True, stderr=sp.PIPE)
         while True:
             if process.poll() is None:
                 line = process.stderr.readline().decode().rstrip()  # pytype: disable=attribute-error
-                if self._print_filter(line, self._spark_log_filter):
+                line = self._filter(line, time_begin, self._spark_log_filter)
+                if line:
+                    print(line)
                     stdout.append(line)
             else:
                 for line in process.stderr.readlines():  # pytype: disable=attribute-error
-                    line = line.decode().rstrip()
-                    if self._print_filter(line, self._spark_log_filter):
+                    line = self._filter(
+                        line.decode().rstrip(), time_begin, self._spark_log_filter
+                    )
+                    if line:
+                        print(line)
                         stdout.append(line)
                 break
         # status
@@ -168,13 +173,20 @@ class SparkSubmit:
                     attachments = [attachments]
                 if not isinstance(attachments, list):
                     attachments = list(attachments)
-                param["attachments"] = attachments
+                param["attachments"] = self._attach_txt(attachments)
             notifiers.get_notifier("email").notify(**param)
         if status == "FAILED":
             if self.email:
                 self._notify_log(app_id, "Re: " + subject)
             return False
         return True
+
+    @staticmethod
+    def _attach_txt(attachments: list[str]) -> list[str]:
+        dir_ = Path(tempfile.mkdtemp())
+        for attach in attachments:
+            shutil.copy2(attach, dir_)
+        return [str(path) + ".txt" for path in dir_.iterdir()]
 
     def _notify_log(self, app_id, subject):
         logger.info("Waiting for 300 seconds for the log to be available...")
