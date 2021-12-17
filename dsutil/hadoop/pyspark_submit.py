@@ -9,6 +9,7 @@ import sys
 import itertools as it
 from argparse import Namespace, ArgumentParser
 from pathlib import Path
+import tempfile
 import shutil
 import subprocess as sp
 import re
@@ -143,7 +144,9 @@ class SparkSubmit:
                     stdout.append(line)
             else:
                 for line in process.stderr.readlines():  # pytype: disable=attribute-error
-                    line = self._filter(line.decode().rstrip(), time_begin, self._spark_log_filter)
+                    line = self._filter(
+                        line.decode().rstrip(), time_begin, self._spark_log_filter
+                    )
                     if line:
                         print(line)
                         stdout.append(line)
