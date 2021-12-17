@@ -168,13 +168,20 @@ class SparkSubmit:
                     attachments = [attachments]
                 if not isinstance(attachments, list):
                     attachments = list(attachments)
-                param["attachments"] = attachments
+                param["attachments"] = self._attach_txt(attachments)
             notifiers.get_notifier("email").notify(**param)
         if status == "FAILED":
             if self.email:
                 self._notify_log(app_id, "Re: " + subject)
             return False
         return True
+
+    @staticmethod
+    def _attach_txt(attachments: list[str]) -> list[str]:
+        dir_ = Path(tempfile.mkdtemp())
+        for attach in attachments:
+            shutil.copy2(attach, dir_)
+        return [str(path) + ".txt" for path in dir_.iterdir()]
 
     def _notify_log(self, app_id, subject):
         logger.info("Waiting for 300 seconds for the log to be available...")
