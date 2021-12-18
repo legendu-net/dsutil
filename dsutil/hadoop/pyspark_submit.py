@@ -184,9 +184,11 @@ class SparkSubmit:
     @staticmethod
     def _attach_txt(attachments: list[str]) -> list[str]:
         dir_ = Path(tempfile.mkdtemp())
-        for attach in attachments:
-            shutil.copy2(attach, dir_)
-        return [str(path) + ".txt" for path in dir_.iterdir()]
+        paths = (dir_ / (Path(attach).name + ".txt") for attach in attachments)
+        paths = [str(path) for path in paths]
+        for attach, path in zip(attachments, paths):
+            shutil.copy2(attach, path)
+        return paths
 
     def _notify_log(self, app_id, subject):
         logger.info("Waiting for 300 seconds for the log to be available...")
