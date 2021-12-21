@@ -225,8 +225,9 @@ class SparkSubmit:
         :return: The final status (SUCCEED or FAILED) of the Spark application.
         """
         for line in reversed(stdout):
-            if "final status: " in line:
-                return line.split(": ")[-1]
+            match = re.search("final status: ([A-Z]+)", line)
+            if match:
+                return match.group(1)
         return ""
 
 

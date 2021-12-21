@@ -3,7 +3,6 @@
 from __future__ import annotations
 from typing import Union
 from pathlib import Path
-import os
 import subprocess as sp
 import pandas as pd
 from loguru import logger
@@ -144,20 +143,6 @@ class Hdfs():
             f"Content of the HDFS path {hdfs_path} has been fetch into the local directory {local_dir}"
         )
 
-    @staticmethod
-    def _file_size_1(path: str, size: int, dir_size: dict[str, int]):
-        while path != "/":
-            path = os.path.dirname(path)
-            dir_size.setdefault(path, 0)
-            dir_size[path] += size
-
-    def _file_size(self, files):
-        dir_size = {}
-        for path, bytes_ in files.bytes[~files.permissions.str.
-                                        startswith("d")].iteritems():
-            self._file_size_1(path, bytes_, dir_size)
-        return dir_size
-
     def count_path(self, path: str) -> pd.Series:
         """Count frequence of paths and their parent paths.
 
@@ -166,21 +151,6 @@ class Hdfs():
         """
         frame = self.ls(path, recursive=True)
         return count_path(frame.path)
-
-    def size(self, path: str) -> pd.DataFrame:
-        """Calculate sizes of subdirs and subfiles under a path.
-
-        :param path: A HDFS path.
-        :return: Size information of the HDFS path as a pandas DataFrame.
-        """
-        files = self.ls(path, recursive=True)
-        files.set_index("path", inplace=True)
-        dir_size = self._file_size(files)
-        bytes_ = pd.Series(dir_size, name="bytes")
-        files.update(bytes_)
-        files.reset_index(inplace=True)
-        files.insert(6, "metabytes", round(files.bytes / 1E6, 2))
-        return files.sort_values("bytes", ascending=False)
 
     def mkdir(self, path: str) -> None:
         """Create a HDFS path.
