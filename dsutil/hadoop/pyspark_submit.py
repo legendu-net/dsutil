@@ -18,6 +18,7 @@ import datetime
 import yaml
 from loguru import logger
 import notifiers
+import dsutil.filesystem as fs
 
 
 class SparkSubmit:
@@ -194,11 +195,16 @@ class SparkSubmit:
         logger.info("Waiting for 300 seconds for the log to be available...")
         time.sleep(300)
         sp.run(f"logf fetch {app_id}", shell=True, check=True)
+        lines = fs.filter(
+            path=Path(app_id + "_s"),
+            pattern=r"^-+\s+Deduped Error Lines\s+-+$",
+            num_lines=999
+        )
         notifiers.get_notifier("email").notify(
             from_=self.email["from"],
             to=self.email["to"],
             subject="Re: " + subject,
-            message=Path(app_id + "_s").read_text(),
+            message="".join(lines[0]),
             host=self.email["host"],
             username="",
             password="",
@@ -320,10 +326,10 @@ def _submit_local(args, config: dict[str, Any]) -> bool:
     python = _python(config)
     lines.append(f"--conf spark.pyspark.driver.python={python}")
     lines.append(f"--conf spark.pyspark.python={python}")
-    lines.extend(args.cmd)
+    lines.extend(args.pyfile)
     for idx in range(2, len(lines)):
         lines[idx] = " " * 4 + lines[idx]
-    return SparkSubmit().submit(" \\\n".join(lines) + "\n", args.cmd[:1])
+    return SparkSubmit().submit(" \\\n".join(lines) + "\n", args.pyfile[:1])
 
 
 def _submit_cluster(args, config: dict[str, Any]) -> bool:
@@ -348,11 +354,11 @@ def _submit_cluster(args, config: dict[str, Any]) -> bool:
     lines = [config["spark-submit"]] + [
         f"--{opt} {config[opt]}" for opt in opts if opt in config and config[opt]
     ] + [f"--conf {k}={v}" for k, v in config["conf"].items()]
-    lines.extend(args.cmd)
+    lines.extend(args.pyfile)
     for idx in range(1, len(lines)):
         lines[idx] = " " * 4 + lines[idx]
     return SparkSubmit(email=config["email"]
-                      ).submit(" \\\n".join(lines) + "\n", args.cmd[:1])
+                      ).submit(" \\\n".join(lines) + "\n", args.pyfile[:1])
 
 
 def submit(args: Namespace) -> None:
@@ -431,8 +437,9 @@ def parse_args(args=None, namespace=None) -> Namespace:
         help="Specify a path for generating a configration example."
     )
     mutex_group.add_argument(
-        "--cmd",
-        dest="cmd",
+        "--py",
+        "--pyfile",
+        dest="pyfile",
         nargs="+",
         help="The command (of PySpark script) to submit to Spark to run."
     )
