@@ -45,7 +45,7 @@ def save_passwd(passwd: str) -> None:
     """
     bytes_ = passwd.encode("ascii")
     encode = base64.b64encode(bytes_).decode()
-    with open(PROFILE, "w") as fout:
+    with open(PROFILE, "w", encoding="utf-8") as fout:
         fout.write(encode)
     os.chmod(PROFILE, 0o600)
 
@@ -58,7 +58,7 @@ def read_passwd() -> str:
     os.chmod(PROFILE, 0o600)
     if not os.path.isfile(PROFILE):
         return ""
-    with open(PROFILE, "r") as fin:
+    with open(PROFILE, "r", encoding="utf-8") as fin:
         return base64.b64decode(fin.read()).decode()
 
 
@@ -170,7 +170,7 @@ def _read_config(config: Union[Path, str]) -> Dict[str, Any]:
         config = Path(config)
     if not config.is_file():
         return {"email": {}}
-    with config.open("r") as fin:
+    with config.open("r", encoding="utf-8") as fin:
         return yaml.load(fin, Loader=yaml.FullLoader)
 
 

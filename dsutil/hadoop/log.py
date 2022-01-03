@@ -80,7 +80,7 @@ class LogFilter:
         log_file: Union[str, Path],
         context_size: int = 5,
         keywords: Sequence[str] = KEYWORDS,
-        patterns: Sequence[str] = PATTERNS,
+        patterns: Sequence[tuple[str, str]] = PATTERNS,
         output: Union[str, Path] = "",
         threshold: float = 0.7,
         dump_by_keyword: bool = False,
@@ -89,11 +89,11 @@ class LogFilter:
                           if isinstance(log_file, Path) else Path(log_file)).resolve()
         self._context_size: int = context_size
         self._keywords: Sequence[str] = keywords
-        self._patterns: Sequence[str] = patterns
+        self._patterns: Sequence[tuple[str, str]] = patterns
         self._num_rows: int = 0
         self._lookup: dict[str, dict[str, int]] = {kwd: {} for kwd in self._keywords}
         self._queue: deque = deque()
-        self._output: str = self._get_output(output)
+        self._output: Path = self._get_output(output)
         self._threshold: float = threshold
         self._dump_by_keyword: bool = dump_by_keyword
 
@@ -153,7 +153,7 @@ class LogFilter:
         if self._num_rows:
             return
         logger.info("Counting total number of rows ...")
-        with open(self._log_file, "r") as fin:
+        with open(self._log_file, "r", encoding="utf-8") as fin:
             self._num_rows = sum(1 for line in fin)
         logger.info("Total number of rows: {:,}", self._num_rows)
 
@@ -161,7 +161,7 @@ class LogFilter:
         print()
         logger.info("Scanning for error lines in the log ...")
         lines = [DASH_50 + " Possible Error Lines " + DASH_50 + "\n"]
-        with open(self._log_file, "r") as fin:
+        with open(self._log_file, "r", encoding="utf-8") as fin:
             dump_flag = -1
             for idx, line in tqdm(enumerate(fin), total=self._num_rows):
                 self._queue.append(f"L{idx}: {line}")
@@ -179,7 +179,7 @@ class LogFilter:
                     dump_flag = -1
             if dump_flag >= 0:
                 self._dump_queue(lines)
-        with open(self._output, "w") as fout:
+        with open(self._output, "w", encoding="utf-8") as fout:
             fout.writelines(lines)
         logger.info("Possible Error Lines have been dumped into {}", self._output)
 
@@ -210,7 +210,7 @@ class LogFilter:
             lines_unique.extend(self._dedup_log_1(kwd, lines, dir_))
         lines_unique = [self._error_priority(line) for line in lines_unique]
         lines_unique.sort()
-        with self._output.open("a") as fout:
+        with self._output.open("a", encoding="utf-8") as fout:
             self._write_lines_unique(lines_unique, fout)
         self._write_lines_unique(lines_unique, sys.stdout)
 

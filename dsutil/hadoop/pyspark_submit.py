@@ -135,23 +135,23 @@ class SparkSubmit:
         logger.info("Submitting Spark job ...\n{}", cmd)
         stdout = []
         self._spark_submit_log.clear()
-        process = sp.Popen(cmd, shell=True, stderr=sp.PIPE)
-        while True:
-            if process.poll() is None:
-                line = process.stderr.readline().decode().rstrip()  # pytype: disable=attribute-error
-                line = self._filter(line, time_begin, self._spark_log_filter)
-                if line:
-                    print(line)
-                    stdout.append(line)
-            else:
-                for line in process.stderr.readlines():  # pytype: disable=attribute-error
-                    line = self._filter(
-                        line.decode().rstrip(), time_begin, self._spark_log_filter
-                    )
+        with sp.Popen(cmd, shell=True, stderr=sp.PIPE) as process:
+            while True:
+                if process.poll() is None:
+                    line = process.stderr.readline().decode().rstrip()  # pytype: disable=attribute-error
+                    line = self._filter(line, time_begin, self._spark_log_filter)
                     if line:
                         print(line)
                         stdout.append(line)
-                break
+                else:
+                    for line in process.stderr.readlines():  # pytype: disable=attribute-error
+                        line = self._filter(
+                            line.decode().rstrip(), time_begin, self._spark_log_filter
+                        )
+                        if line:
+                            print(line)
+                            stdout.append(line)
+                    break
         # status
         status = self._final_status(stdout)
         app_id = self._app_id(stdout)
@@ -376,7 +376,7 @@ def submit(args: Namespace) -> None:
     if not args.config:
         config = {}
     else:
-        with open(args.config, "r") as fin:
+        with open(args.config, "r", encoding="utf-8") as fin:
             config = yaml.load(fin, Loader=yaml.FullLoader)
     # handle various options
     if args.spark_submit_local:

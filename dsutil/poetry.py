@@ -1,7 +1,7 @@
 """This module makes it easy to work with poetry to managing your Python project.
 """
 from __future__ import annotations
-from typing import Union, Iterable
+from typing import Optional, Union, Iterable
 from pathlib import Path
 import sys
 import os
@@ -101,7 +101,7 @@ def _update_version(ver: str, proj_dir: Path) -> None:
 def version(
     ver: str = "",
     commit: bool = False,
-    proj_dir: Path = None,
+    proj_dir: Optional[Path] = None,
 ) -> None:
     """List or update the version of the package.
 
@@ -166,7 +166,7 @@ def add_tag_release(
 def format_code(
     inplace: bool = False,
     commit: bool = False,
-    proj_dir: Path = None,
+    proj_dir: Optional[Path] = None,
     files: Iterable[Union[Path, str]] = ()
 ) -> None:
     """Format code.
@@ -304,7 +304,9 @@ def build_package(
     sp.run(f"cd '{proj_dir}' && poetry build", shell=True, check=True)
 
 
-def clean(proj_dir: Path = None, ignore: Union[str, Path, None] = None) -> None:
+def clean(
+    proj_dir: Optional[Path] = None, ignore: Union[str, Path, None] = None
+) -> None:
     """Remove non-essential files from the current project.
 
     :param proj_dir: The root directory of the Poetry project.
@@ -319,7 +321,7 @@ def clean(proj_dir: Path = None, ignore: Union[str, Path, None] = None) -> None:
     if not ignore.is_file():
         return
     logger.info("Use the GitIgnore file: {}", ignore)
-    with ignore.open("r") as fin:
+    with ignore.open("r", encoding="utf-8") as fin:
         patterns = [line.strip() for line in fin]
     spec = pathspec.PathSpec.from_lines(pathspec.patterns.GitWildMatchPattern, patterns)
     _clean(proj_dir, spec)

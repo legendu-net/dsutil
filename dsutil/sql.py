@@ -14,13 +14,13 @@ def format(path: Union[Path, str]):
     if isinstance(path, str):
         path = Path(path)
     query = sqlparse.format(
-        path.read_text(),
+        path.read_text(encoding="utf-8"),
         keyword_case="upper",
         identifier_case="lower",
         strip_comments=False,
         reindent=True,
         indent_width=2
     )
-    path.write_text(query)
+    path.write_text(query, encoding="utf-8")
     cmd = f"pg_format --function-case 1 --type-case 3 --inplace {path}"
     sp.run(cmd, shell=True, check=True)

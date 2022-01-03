@@ -1,7 +1,7 @@
 """Docker related utils.
 """
 from __future__ import annotations
-from typing import Union
+from typing import Optional, Union
 from dataclasses import dataclass
 import tempfile
 from pathlib import Path
@@ -124,7 +124,7 @@ class DockerImage:
         git_url: str,
         branch: str = "dev",
         branch_fallback: str = "dev",
-        repo_path: dict[str, str] = None
+        repo_path: Optional[dict[str, str]] = None
     ):
         """Initialize a DockerImage object.
 
@@ -299,7 +299,7 @@ class DockerImage:
                 action="build",
                 seconds=(time.perf_counter_ns() - time_begin) / 1E9,
             )
-        except docker.errors.ImageNotFound as err:
+        except docker.errors.ImageNotFound:
             return DockerActionResult(
                 succeed=False,
                 err_msg="",
@@ -392,7 +392,7 @@ class DockerImageBuilder:
         builder: str = _get_docker_builder(),
     ):
         if isinstance(branch_urls, (str, Path)):
-            with open(branch_urls, "r") as fin:
+            with open(branch_urls, "r", encoding="utf-8") as fin:
                 branch_urls = yaml.load(fin, Loader=yaml.FullLoader)
         self._branch_urls = branch_urls
         self._branch_fallback = branch_fallback
@@ -514,7 +514,7 @@ class DockerImageBuilder:
     def save_graph(self, output="graph.yaml") -> None:
         """Save the underlying graph structure to files.
         """
-        with open(output, "w") as fout:
+        with open(output, "w", encoding="utf-8") as fout:
             # nodes and attributes
             fout.write("nodes:\n")
             for node in self._graph.nodes:
@@ -536,7 +536,7 @@ class DockerImageBuilder:
 
     def build_images(
         self,
-        tag_build: str = None,
+        tag_build: Optional[str] = None,
         copy_ssh_to: str = "",
         push: bool = True,
         remove: bool = False,
