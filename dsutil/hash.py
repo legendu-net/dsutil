@@ -23,12 +23,12 @@ def rmd5(path: Union[str, Path], output: Union[str, Path] = "") -> str:
     if output:
         if isinstance(output, str):
             output = Path(output)
-        with output.open("w") as fout:
+        with output.open("w", encoding="utf-8") as fout:
             fout.write(text)
     return hashlib.md5(text.encode()).hexdigest()
 
 
-def _rmd5(path: Path, res: list[tuple[str]]) -> None:
+def _rmd5(path: Path, res: list[str]) -> None:
     """Helper function of rmd5.
 
     :param path: The Path object of a file or directory.

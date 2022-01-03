@@ -1,7 +1,7 @@
 """Shell command related utils.
 """
 from __future__ import annotations
-from typing import Union
+from typing import Union, Sequence
 import re
 import subprocess as sp
 import pandas as pd
@@ -11,8 +11,8 @@ def to_frame(
     cmd="",
     split: str = r"  +",
     header: Union[int, list[str], None] = None,
-    skip: Union[int, list[int]] = (),
-    lines: list[str] = (),
+    skip: Union[int, Sequence[int]] = (),
+    lines: Sequence[str] = (),
     split_by_header: bool = False
 ) -> pd.DataFrame:
     """Convert the result of a shell command to a DataFrame.

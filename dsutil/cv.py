@@ -42,7 +42,7 @@ def video_to_image(
 
 def resize_image(
     paths: Union[str, Path, Iterable[Path]], desdir: Union[str, Path, None],
-    size: tuple[int]
+    size: tuple[int, int]
 ) -> None:
     """Resize images to a given size.
 

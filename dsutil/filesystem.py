@@ -2,7 +2,7 @@
 """Filesystem related util functions.
 """
 from __future__ import annotations
-from typing import Union, Iterable, Callable
+from typing import Optional, Union, Iterable, Callable
 import os
 import sys
 import re
@@ -20,7 +20,7 @@ import dulwich.porcelain
 HOME = Path.home()
 
 
-def copy_if_exists(src: str, dst: str = HOME) -> bool:
+def copy_if_exists(src: str, dst: Union[str, Path] = HOME) -> bool:
     """Copy a file.
     No exception is thrown if the source file does not exist.
 
@@ -37,7 +37,9 @@ def copy_if_exists(src: str, dst: str = HOME) -> bool:
         return False
 
 
-def link_if_exists(src: str, dst: str = HOME, target_is_directory: bool = True) -> bool:
+def link_if_exists(
+    src: str, dst: Union[str, Path] = HOME, target_is_directory: bool = True
+) -> bool:
     """Make a symbolic link of a file.
     No exception is thrown if the source file does not exist.
 
@@ -217,7 +219,7 @@ def find_data_tables(
 def _find_data_tables_file(file, filter_, patterns) -> set[str]:
     if isinstance(file, str):
         file = Path(file)
-    text = file.read_text().lower()
+    text = file.read_text(encoding="utf-8").lower()
     patterns = {
         r"from\s+(\w+)\W*\s*",
         r"from\s+(\w+\.\w+)\W*\s*",
@@ -313,7 +315,7 @@ def find_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> list[P
 
 
 def _find_ess_empty(
-    path: Path, ignore: Callable, ess_empty: dict[Path, bool], ess_empty_dir: list[str]
+    path: Path, ignore: Callable, ess_empty: dict[Path, bool], ess_empty_dir: list[Path]
 ):
     if is_ess_empty(path=path, ignore=ignore, ess_empty=ess_empty):
         ess_empty_dir.append(path)
@@ -326,7 +328,9 @@ def _find_ess_empty(
 
 
 def is_ess_empty(
-    path: Path, ignore: Callable = _ignore, ess_empty: dict[Path, bool] = None
+    path: Path,
+    ignore: Callable = _ignore,
+    ess_empty: Optional[dict[Path, bool]] = None
 ):
     """Check if a directory is essentially empty.
 
@@ -365,9 +369,9 @@ def is_ess_empty(
 
 def update_file(
     path: Path,
-    regex: list[tuple[str, str]] = None,
-    exact: list[tuple[str, str]] = None,
-    append: Union[str, Iterable[str]] = None,
+    regex: Optional[list[tuple[str, str]]] = None,
+    exact: Optional[list[tuple[str, str]]] = None,
+    append: Union[None, str, Iterable[str]] = None,
     exist_skip: bool = True,
 ) -> None:
     """Update a text file using regular expression substitution.
@@ -382,7 +386,7 @@ def update_file(
     """
     if isinstance(path, str):
         path = Path(path)
-    text = path.read_text()
+    text = path.read_text(encoding="utf-8")
     if regex:
         for pattern, replace in regex:
             text = re.sub(pattern, replace, text)
@@ -394,7 +398,7 @@ def update_file(
             append = "\n".join(append)
         if not exist_skip or append not in text:
             text += append
-    path.write_text(text)
+    path.write_text(text, encoding="utf-8")
 
 
 def get_files(dir_: Union[str, Path], exts: Union[str, list[str]]) -> Iterable[Path]:
@@ -581,7 +585,9 @@ def prune_json(input: Union[str, Path], output: Union[str, Path] = ""):
         else:
             output = input.with_name(input.stem + "_prune.json")
     skip = False
-    with input.open("r") as fin, output.open("w") as fout:
+    with input.open("r", encoding="utf-8") as fin, output.open(
+        "w", encoding="utf-8"
+    ) as fout:
         for line in fin:
             line = line.strip()
             if line == '"value_counts": {':
@@ -601,7 +607,7 @@ def _filter_num(path: Union[str, Path], pattern: str, num_lines: int):
     results = []
     res = []
     count = 0
-    for line in path.open():
+    for line in path.open(encoding="utf-8"):
         if count > 0:
             res.append(line)
             count -= 1
@@ -623,7 +629,7 @@ def _filter_sp(path: Union[str, Path], pattern: str, sub_pattern: str):
     results = []
     res = []
     sub = False
-    for line in path.open():
+    for line in path.open(encoding="utf-8"):
         if sub:
             if re.search(sub_pattern, line):
                 res.append(line)
