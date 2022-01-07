@@ -14,7 +14,7 @@ class Hdfs():
     """A class abstring the hdfs command.
     """
     def __init__(self, bin: str = "/apache/hadoop/bin/hdfs"):
-        self.bin = bin
+        self._bin = bin
 
     def ls(
         self,
@@ -41,7 +41,7 @@ class Hdfs():
         ]
         flag_dir_only = "-d" if dir_only else ""
         flag_recursive = "-R" if recursive else ""
-        cmd = f"{self.bin} dfs -ls {flag_dir_only} {flag_recursive} {path}"
+        cmd = f"{self._bin} dfs -ls {flag_dir_only} {flag_recursive} {path}"
         logger.info("Running command: {}. Might take a while.", cmd)
         frame = to_frame(cmd, split=r" +", skip=() if dir_only else [0], header=cols)
         frame.bytes = frame.bytes.astype(int)
@@ -55,7 +55,7 @@ class Hdfs():
         :param path: A HDFS path.
         :return: The result of hdfs dfs -count as a pandas DataFrame.
         """
-        cmd = f"{self.bin} dfs -count -q -v {path}"
+        cmd = f"{self._bin} dfs -count -q -v {path}"
         logger.info("Running command: {}. Might take a while.", cmd)
         frame = to_frame(cmd, split=r" +", header=0)
         frame.columns = frame.columns.str.lower()
@@ -80,7 +80,7 @@ class Hdfs():
         return self._du_helper(path)
 
     def _du_helper(self, path: str) -> pd.DataFrame:
-        cmd = f"{self.bin} dfs -du {path}"
+        cmd = f"{self._bin} dfs -du {path}"
         logger.info("Running command: {}. Might take a while.", cmd)
         frame = to_frame(cmd, split=r" +", header=["bytes", "path"])
         frame.bytes = frame.bytes.astype(int)
@@ -92,7 +92,7 @@ class Hdfs():
         :param path: A HDFS path.
         :return: True if the HDFS path exists and False otherwise.
         """
-        cmd = f"{self.bin} dfs -test -e {path}"
+        cmd = f"{self._bin} dfs -test -e {path}"
         logger.info("Running command: {}. Might take a while.", cmd)
         try:
             sp.run(cmd, shell=True, check=True)
@@ -104,7 +104,7 @@ class Hdfs():
         """Remove a HDFS path.
         :param path: A HDFS path.
         """
-        cmd = f"{self.bin} dfs -rm -r {path}"
+        cmd = f"{self._bin} dfs -rm -r {path}"
         logger.info("Running command: {}. Might take a while.", cmd)
         sp.run(cmd, shell=True, check=True)
 
@@ -114,7 +114,7 @@ class Hdfs():
         :param path: A HDFS path.
         :return: The number of partitions under the HDFS path.
         """
-        cmd = f"{self.bin} dfs -ls {path}/part-* | wc -l"
+        cmd = f"{self._bin} dfs -ls {path}/part-* | wc -l"
         logger.info("Running command: {}. Might take a while.", cmd)
         return int(sp.check_output(cmd, shell=True))
 
@@ -134,9 +134,9 @@ class Hdfs():
             local_dir = Path(local_dir)
         local_dir.mkdir(parents=True, exist_ok=True)
         if is_file:
-            cmd = f"{self.bin} dfs -get {hdfs_path} {local_dir}"
+            cmd = f"{self._bin} dfs -get {hdfs_path} {local_dir}"
         else:
-            cmd = f"{self.bin} dfs -get {hdfs_path}/* {local_dir}"
+            cmd = f"{self._bin} dfs -get {hdfs_path}/* {local_dir}"
         logger.info("Running command: {}. Might take a while.", cmd)
         sp.run(cmd, shell=True, check=True)
         print(
@@ -157,7 +157,7 @@ class Hdfs():
 
         :param path: The HDFS path to create.
         """
-        cmd = f"{self.bin} dfs -mkdir -p {path}"
+        cmd = f"{self._bin} dfs -mkdir -p {path}"
         logger.info("Running command: {}. Might take a while.", cmd)
         sp.run(cmd, shell=True, check=True)
         logger.info(f"The HDFS path {path} has been created.")
@@ -175,7 +175,7 @@ class Hdfs():
         """
         if create_hdfs_path:
             self.mkdir(hdfs_path)
-        cmd = f"{self.bin} dfs -put -f {local_path} {hdfs_path}"
+        cmd = f"{self._bin} dfs -put -f {local_path} {hdfs_path}"
         logger.info("Running command: {}. Might take a while.", cmd)
         sp.run(cmd, shell=True, check=True)
         logger.info(
@@ -204,7 +204,7 @@ class Hdfs():
         """
         flag_skip_trash = "-skipTrash" if skip_trash else ""
         flag_recursive = "-r" if recursive else ""
-        cmd = f"{self.bin} dfs -rm {flag_recursive} {flag_skip_trash} {path}"
+        cmd = f"{self._bin} dfs -rm {flag_recursive} {flag_skip_trash} {path}"
         logger.info("Running command: {}. Might take a while.", cmd)
         proc = sp.run(cmd, shell=True)  # pylint: disable=W1510
         return proc.returncode == 0
