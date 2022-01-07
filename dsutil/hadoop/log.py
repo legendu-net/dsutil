@@ -290,6 +290,14 @@ class LogFilter:
                 "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
+                "(?i)IndentationError: unexpected indent", 1,
+                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+            ),
+            (
+                "(?i)NSQuotaExceededException", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-namespace-quota-is-exceeded"
+            ),
+            (
                 r"(?i)TypeError: withReplacement", 1,
                 "http://www.legendu.net/misc/blog/spark-issue:-TypeError-withReplacement"
             ),
