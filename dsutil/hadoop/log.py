@@ -233,6 +233,10 @@ class LogFilter:
         """
         patterns = [
             (
+                "(?i)panicked at.*RUST_BACKTRACE", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-rust-panic/"
+            ),
+            (
                 "(?i)libc.*not found", 1,
                 "http://www.legendu.net/misc/blog/spark-issue-libc-not-found/"
             ),
