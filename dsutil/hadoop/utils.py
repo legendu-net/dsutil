@@ -2,6 +2,8 @@
 """
 from __future__ import annotations
 from typing import Union
+import sys
+import datetime
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import col, spark_partition_id, rank, coalesce, lit, max, sum
 
@@ -71,3 +73,27 @@ def calc_global_rank(frame: DataFrame, order_by: Union[str, list[str]]) -> DataF
         ["part_id"],
     ).withColumn("rank",
                  col("local_rank") + col("sum_factor"))
+
+
+def repart_hdfs(spark, path: str, num_parts: int) -> None:
+    """Repartition a HDFS path of the Parquet format.
+
+    :param spark: A SparkSession object. 
+    :param path: The HDFS path to repartition. 
+    :param num_parts: The new number of partitions. 
+    """
+    path = path.rstrip("/")
+    ts = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+    path_tmp = path + f"_repart_tmp_{ts}"
+    spark.read.parquet(path).repartition(num_parts) \
+        .write.mode("overwrite").parquet(path_tmp)
+    sc = spark.sparkContext
+    fs = sc._jvm.org.apache.hadoop.fs.FileSystem.get(sc._jsc.hadoopConfiguration())  # pylint: disable=W0212
+    if fs.delete(sc._jvm.org.apache.hadoop.fs.Path(path), True):  # pylint: disable=W0212
+        if not fs.rename(
+            sc._jvm.org.apache.hadoop.fs.Path(path_tmp),  # pylint: disable=W0212
+            sc._jvm.org.apache.hadoop.fs.Path(path),  # pylint: disable=W0212
+        ):
+            sys.exit(f"Failed to rename the HDFS path {path_tmp} to {path}!")
+    else:
+        sys.exit(f"Failed to remove the (old) HDFS path: {path}!")
