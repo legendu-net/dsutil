@@ -25,7 +25,7 @@ Currently, Python 3.7 and 3.8 are supported.
 
 You can download a copy of the latest release and install it using pip.
 ```bash
-pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.69.0/dsutil-0.69.0-py3-none-any.whl
+pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.69.1/dsutil-0.69.1-py3-none-any.whl
 ```
 Or you can use the following command to install the latest master branch
 if you have pip 20.0+.
@@ -35,7 +35,7 @@ pip3 install --user -U git+https://github.com/dclong/dsutil@main
 Use one of the following commands if you want to install all components of dsutil. 
 Available additional components are `cv`, `docker`, `pdf`, `jupyter`, `admin` and `all`.
 ```bash
-pip3 install "dsutil[cv] @ https://github.com/dclong/dsutil/releases/download/v0.69.0/dsutil-0.69.0-py3-none-any.whl"
+pip3 install "dsutil[cv] @ https://github.com/dclong/dsutil/releases/download/v0.69.1/dsutil-0.69.1-py3-none-any.whl"
 # or
 pip3 install --user -U "dsutil[all] @ git+https://github.com/dclong/dsutil@main"
 ```
