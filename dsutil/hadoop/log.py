@@ -233,6 +233,14 @@ class LogFilter:
         """
         patterns = [
             (
+                "SIGILL", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-shell-related"
+            ),
+            (
+                "(?i)command not found", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-shell-related"
+            ),
+            (
                 "(?i)panicked at.*RUST_BACKTRACE", 1,
                 "http://www.legendu.net/misc/blog/spark-issue:-rust-panic/"
             ),
