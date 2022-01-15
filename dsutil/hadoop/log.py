@@ -310,6 +310,10 @@ class LogFilter:
                 "http://www.legendu.net/misc/blog/spark-issue:-namespace-quota-is-exceeded"
             ),
             (
+                r"(?i)RuntimeException: Unsupported literal type class", 1,
+                " http://www.legendu.net/misc/blog/spark-issue:-RuntimeException:-unsupported-literal-type-class"
+            ),
+            (
                 r"(?i)TypeError: withReplacement", 1,
                 "http://www.legendu.net/misc/blog/spark-issue:-TypeError-withReplacement"
             ),
