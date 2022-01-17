@@ -232,10 +232,7 @@ class LogFilter:
         :return: The priority of the error line.
         """
         patterns = [
-            (
-                "SIGILL", 1,
-                "http://www.legendu.net/en/blog/spark-issue:-shell-related"
-            ),
+            ("SIGILL", 1, "http://www.legendu.net/en/blog/spark-issue:-shell-related"),
             (
                 "(?i)command not found", 1,
                 "http://www.legendu.net/en/blog/spark-issue:-shell-related"
