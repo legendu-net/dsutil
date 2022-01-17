@@ -307,7 +307,7 @@ class LogFilter:
             ),
             (
                 "(?i)NSQuotaExceededException", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-namespace-quota-is-exceeded"
+                "http://www.legendu.net/en/blog/spark-issue:-namespace-quota-is-exceeded"
             ),
             (
                 r"(?i)RuntimeException: Unsupported literal type class", 1,
