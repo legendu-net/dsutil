@@ -234,15 +234,15 @@ class LogFilter:
         patterns = [
             (
                 "SIGILL", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-shell-related"
+                "http://www.legendu.net/en/blog/spark-issue:-shell-related"
             ),
             (
                 "(?i)command not found", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-shell-related"
+                "http://www.legendu.net/en/blog/spark-issue:-shell-related"
             ),
             (
                 "(?i)panicked at.*RUST_BACKTRACE", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-rust-panic/"
+                "http://www.legendu.net/en/blog/spark-issue:-rust-panic/"
             ),
             (
                 "(?i)libc.*not found", 1,
@@ -307,11 +307,11 @@ class LogFilter:
             ),
             (
                 "(?i)NSQuotaExceededException", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-namespace-quota-is-exceeded"
+                "http://www.legendu.net/en/blog/spark-issue:-namespace-quota-is-exceeded"
             ),
             (
                 r"(?i)RuntimeException: Unsupported literal type class", 1,
-                " http://www.legendu.net/misc/blog/spark-issue:-RuntimeException:-unsupported-literal-type-class"
+                " http://www.legendu.net/en/blog/spark-issue:-RuntimeException:-unsupported-literal-type-class"
             ),
             (
                 r"(?i)TypeError: withReplacement", 1,
