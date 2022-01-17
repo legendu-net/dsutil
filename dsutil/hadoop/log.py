@@ -234,11 +234,11 @@ class LogFilter:
         patterns = [
             (
                 "SIGILL", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-shell-related"
+                "http://www.legendu.net/en/blog/spark-issue:-shell-related"
             ),
             (
                 "(?i)command not found", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-shell-related"
+                "http://www.legendu.net/en/blog/spark-issue:-shell-related"
             ),
             (
                 "(?i)panicked at.*RUST_BACKTRACE", 1,
@@ -311,7 +311,7 @@ class LogFilter:
             ),
             (
                 r"(?i)RuntimeException: Unsupported literal type class", 1,
-                " http://www.legendu.net/misc/blog/spark-issue:-RuntimeException:-unsupported-literal-type-class"
+                " http://www.legendu.net/en/blog/spark-issue:-RuntimeException:-unsupported-literal-type-class"
             ),
             (
                 r"(?i)TypeError: withReplacement", 1,
