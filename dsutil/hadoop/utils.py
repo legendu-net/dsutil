@@ -75,18 +75,23 @@ def calc_global_rank(frame: DataFrame, order_by: Union[str, list[str]]) -> DataF
                  col("local_rank") + col("sum_factor"))
 
 
-def repart_hdfs(spark, path: str, num_parts: int) -> None:
+def repart_hdfs(spark, path: str, num_parts: int, coalesce: bool = False) -> None:
     """Repartition a HDFS path of the Parquet format.
 
     :param spark: A SparkSession object. 
     :param path: The HDFS path to repartition. 
     :param num_parts: The new number of partitions. 
+    :param coalesce: If True, use coalesce instead of repartition.
     """
     path = path.rstrip("/")
     ts = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
     path_tmp = path + f"_repart_tmp_{ts}"
-    spark.read.parquet(path).repartition(num_parts) \
-        .write.mode("overwrite").parquet(path_tmp)
+    if coalesce:
+        spark.read.parquet(path).coalesce(num_parts) \
+            .write.mode("overwrite").parquet(path_tmp)
+    else:
+        spark.read.parquet(path).repartition(num_parts) \
+            .write.mode("overwrite").parquet(path_tmp)
     sc = spark.sparkContext
     fs = sc._jvm.org.apache.hadoop.fs.FileSystem.get(sc._jsc.hadoopConfiguration())  # pylint: disable=W0212
     if fs.delete(sc._jvm.org.apache.hadoop.fs.Path(path), True):  # pylint: disable=W0212

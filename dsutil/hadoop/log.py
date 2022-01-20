@@ -302,6 +302,7 @@ class LogFilter:
                 "(?i)IndentationError: unexpected indent", 1,
                 "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
+            (r"SIGBUS", 1, "http://www.legendu.net/misc/blog/spark-issue:-SIGBUS"),
             (
                 "(?i)NSQuotaExceededException", 1,
                 "http://www.legendu.net/en/blog/spark-issue:-namespace-quota-is-exceeded"
