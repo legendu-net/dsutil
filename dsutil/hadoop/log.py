@@ -218,7 +218,7 @@ class LogFilter:
     def _write_lines_unique(lines_unique: list[tuple[int, str, str]], fout: TextIO):
         fout.write("\n" + DASH_50 + " Deduped Error Lines " + DASH_50 + "\n")
         fout.write(
-            "http://www.legendu.net/misc/blog/A-comprehensive-list-of-issues-in-spark-applications\n\n"
+            "https://www.legendu.net/misc/blog/A-comprehensive-list-of-issues-in-spark-applications\n\n"
         )
         for _, line, url in lines_unique:
             fout.write(line)
@@ -232,166 +232,166 @@ class LogFilter:
         :return: The priority of the error line.
         """
         patterns = [
-            ("SIGILL", 1, "http://www.legendu.net/en/blog/spark-issue:-shell-related"),
+            ("SIGILL", 1, "https://www.legendu.net/en/blog/spark-issue:-shell-related"),
             (
                 "(?i)command not found", 1,
-                "http://www.legendu.net/en/blog/spark-issue:-shell-related"
+                "https://www.legendu.net/en/blog/spark-issue:-shell-related"
             ),
             (
                 "(?i)panicked at.*RUST_BACKTRACE", 1,
-                "http://www.legendu.net/en/blog/spark-issue:-rust-panic/"
+                "https://www.legendu.net/en/blog/spark-issue:-rust-panic/"
             ),
             (
                 "(?i)libc.*not found", 1,
-                "http://www.legendu.net/misc/blog/spark-issue-libc-not-found/"
+                "https://www.legendu.net/misc/blog/spark-issue-libc-not-found/"
             ),
             (
                 r"(?i)ArrowInvalid", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 r"(?i)TypeError: .*has no len()", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 r"(?i)CalledProcessError: Command .* returned non-zero exit status", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 r"(?i)error: Found argument .* which wasn't expected", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 r"(?i)RuntimeError: Result vector from pandas_udf was not the required length",
                 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 "(?i)object has no attribute", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 "(?i)No such file or directory:", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 "(?i)error: the following arguments are required:", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 "(?i)error: unrecognized arguments:", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 "(?i)error: argument", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 "(?i)ModuleNotFoundError: No module named", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 "(?i)SyntaxError: invalid syntax", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 "(?i)NameError: name .* is not defined", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
                 "(?i)IndentationError: unexpected indent", 1,
-                "http://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
-            (r"SIGBUS", 1, "http://www.legendu.net/misc/blog/spark-issue:-SIGBUS"),
+            (r"SIGBUS", 1, "https://www.legendu.net/misc/blog/spark-issue:-SIGBUS"),
             (
                 "(?i)NSQuotaExceededException", 1,
-                "http://www.legendu.net/en/blog/spark-issue:-namespace-quota-is-exceeded"
+                "https://www.legendu.net/en/blog/spark-issue:-namespace-quota-is-exceeded"
             ),
             (
                 r"(?i)RuntimeException: Unsupported literal type class", 1,
-                " http://www.legendu.net/en/blog/spark-issue:-RuntimeException:-unsupported-literal-type-class"
+                " https://www.legendu.net/en/blog/spark-issue:-RuntimeException:-unsupported-literal-type-class"
             ),
             (
                 r"(?i)TypeError: withReplacement", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-TypeError-withReplacement"
+                "https://www.legendu.net/misc/blog/spark-issue:-TypeError-withReplacement"
             ),
             (
                 "(?i)table not found", 1,
-                "http://www.legendu.net/misc/blog/spark-issue-table-not-found/"
+                "https://www.legendu.net/misc/blog/spark-issue-table-not-found/"
             ),
             (
                 "(?i)SparkContext: A master URL must be set", 1,
-                "http://www.legendu.net/misc/blog/spark-issue-a-master-url-must-be-set-in-your-configuration/"
+                "https://www.legendu.net/misc/blog/spark-issue-a-master-url-must-be-set-in-your-configuration/"
             ),
             (
                 r"(?i)org\.apache\.spark\.sql\.AnalysisException.*cannot resolve", 1,
-                "http://www.legendu.net/misc/blog/spark-issue-AnalysisException-cannot-resolve"
+                "https://www.legendu.net/misc/blog/spark-issue-AnalysisException-cannot-resolve"
             ),
             (
                 r"(?i)org\.apache\.spark\.sql\.AnalysisException.*Path does not exist",
                 1,
-                "http://www.legendu.net/misc/blog/spark-issue-AnalysisException-Path-does-not-exist"
+                "https://www.legendu.net/misc/blog/spark-issue-AnalysisException-Path-does-not-exist"
             ),
             (
                 r"(?i)org\.apache\.hadoop\.security\.AccessControlException.*Permission denied",
                 1,
-                "http://www.legendu.net/misc/blog/Spark-Issue-AccessControlException-Permission-denied"
+                "https://www.legendu.net/misc/blog/Spark-Issue-AccessControlException-Permission-denied"
             ),
             (
                 r"(?i)org\.apache\.spark\.InsertOperationConflictException.*Failed to hold insert operation lock",
                 1,
-                "http://www.legendu.net/misc/blog/spark-issue-InsertOperationConflictException-failed-to-hold-insert-operation-lock"
+                "https://www.legendu.net/misc/blog/spark-issue-InsertOperationConflictException-failed-to-hold-insert-operation-lock"
             ),
             (
                 r"(?i)max number of executor failures", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-max-number-of-executor-failures-reached"
+                "https://www.legendu.net/misc/blog/spark-issue:-max-number-of-executor-failures-reached"
             ),
             (
                 r"(?i)IllegalArgumentException: System memory \d* must be at least", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-IllegalArgumentException:-System-memory-must-be-at-least"
+                "https://www.legendu.net/misc/blog/spark-issue:-IllegalArgumentException:-System-memory-must-be-at-least"
             ),
             (
                 r"(?i)InvalidResourceRequestException", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-InvalidResourceRequestException"
+                "https://www.legendu.net/misc/blog/spark-issue:-InvalidResourceRequestException"
             ),
             (
                 "(?i)serialized results is bigger than spark.driver.maxResultSize", 2,
-                "http://www.legendu.net/misc/blog/spark-issues-total-size-bigger-than-maxresultsize/"
+                "https://www.legendu.net/misc/blog/spark-issues-total-size-bigger-than-maxresultsize/"
             ),
             (
                 "(?i)Block rdd_.* could not be removed as it was not found on disk or in memory",
                 2,
-                "http://www.legendu.net/misc/blog/spark-issue:-block-could-not-be-removed-as-it-was-not-found-on-disk-or-in-memory"
+                "https://www.legendu.net/misc/blog/spark-issue:-block-could-not-be-removed-as-it-was-not-found-on-disk-or-in-memory"
             ),
             (
                 r"(?i)java\.io\.FileNotFoundException", 2,
-                "http://www.legendu.net/misc/blog/spark-issue-file-not-found-exception/"
+                "https://www.legendu.net/misc/blog/spark-issue-file-not-found-exception/"
             ),
             (
                 "(?i)Container killed by YARN for exceeding memory limits", 2,
-                "http://www.legendu.net/misc/blog/spark-issue-Container-killed-by-YARN-for-exceeding-memory-limits/"
+                "https://www.legendu.net/misc/blog/spark-issue-Container-killed-by-YARN-for-exceeding-memory-limits/"
             ),
             (
                 r"(?i)org\.apache\.spark\.memory\.SparkOutOfMemoryError", 3,
-                "http://www.legendu.net/misc/tag/spark-issue.html"
+                "https://www.legendu.net/misc/tag/spark-issue.html"
             ),
             (
                 "(?i)Container from a bad node", 3,
-                "http://www.legendu.net/misc/tag/spark-issue.html"
+                "https://www.legendu.net/misc/tag/spark-issue.html"
             ),
             (
                 "(?i)No live nodes contain block BP", 3,
-                "http://www.legendu.net/misc/tag/spark-issue.html"
+                "https://www.legendu.net/misc/tag/spark-issue.html"
             ),
             (
                 "(?i)ReplicaNotFoundException: Replica not found for", 3,
-                "http://www.legendu.net/misc/tag/spark-issue.html"
+                "https://www.legendu.net/misc/tag/spark-issue.html"
             ),
         ]
         for pattern, priority, url in patterns:
             if re.search(pattern, line):
                 return priority, line, url
-        return 10, line, "http://www.legendu.net/misc/tag/spark-issue.html"
+        return 10, line, "https://www.legendu.net/misc/tag/spark-issue.html"
 
     def _dedup_log_1(self, kwd: str, lines: dict[str, int],
                      dir_: Optional[Path]) -> list[str]:
