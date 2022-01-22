@@ -355,6 +355,10 @@ class LogFilter:
                 "https://www.legendu.net/misc/blog/spark-issue:-InvalidResourceRequestException"
             ),
             (
+                "(?i)broadcastTimeout", 2,
+                "http://www.legendu.net/misc/blog/spark-issue:-could-not-execute-broadcast-in-300s"
+            ),
+            (
                 "(?i)serialized results is bigger than spark.driver.maxResultSize", 2,
                 "https://www.legendu.net/misc/blog/spark-issues-total-size-bigger-than-maxresultsize/"
             ),
