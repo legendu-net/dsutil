@@ -1,4 +1,4 @@
-spark-submit-local: /workdir/spark-2.3.1-bin-hadoop2.7/bin/spark-submit
+spark-submit-local: /workdir/spark-3.2.0-bin-hadoop2.7/bin/spark-submit
 python-local:
   - .venv/bin/python3
   - python3.7
