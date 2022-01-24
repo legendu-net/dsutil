@@ -4,7 +4,7 @@ python-local:
   - python3.7
   - python3
   - python
-spark-submit: /apache/spark2.3/bin/spark-submit
+spark-submit: /apache/spark3.1/bin/spark-submit
 files:
   - file:///apache/hive/conf/hive-site.xml
   - file:///apache/hadoop/etc/hadoop/ssl-client.xml
