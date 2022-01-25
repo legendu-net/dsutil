@@ -60,7 +60,7 @@ def status(args):
 
     :param args: A Namespace object containing command-line options.
     """
-    if "app_id" in args:
+    if args.app_id:
         cmd = ["yarn", "application", "-status", args.app_id]
         sp.run(cmd, check=True)
         return

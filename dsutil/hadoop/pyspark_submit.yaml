@@ -1,10 +1,10 @@
-spark-submit-local: /workdir/spark-2.3.1-bin-hadoop2.7/bin/spark-submit
+spark-submit-local: /workdir/spark-3.2.0-bin-hadoop2.7/bin/spark-submit
 python-local:
   - .venv/bin/python3
   - python3.7
   - python3
   - python
-spark-submit: /apache/spark2.3/bin/spark-submit
+spark-submit: /apache/spark3.1/bin/spark-submit
 files:
   - file:///apache/hive/conf/hive-site.xml
   - file:///apache/hadoop/etc/hadoop/ssl-client.xml
