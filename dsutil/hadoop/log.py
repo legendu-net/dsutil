@@ -254,6 +254,10 @@ class LogFilter:
                 "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
+                r"(?i)ValueError: min() arg is an empty sequence", 1,
+                "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+            ),
+            (
                 r"(?i)CalledProcessError: Command .* returned non-zero exit status", 1,
                 "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
