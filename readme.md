@@ -17,6 +17,9 @@ This is a Python pacakage that contains misc utils for Data Science.
     - `dsutil.shell`: parse command-line output to a pandas DataFrame
     - `dsutil.shebang`: auto correct SheBang of scripts
     - `dsutil.poetry`: tools for making it even easier to manage Python project using Poetry
+    - `dsuti.pdf`: easy and flexible extracting of PDF pages
+    - `dsuti.memory`: query and consume memory to a specified range
+    - `dsutil.jupyter`: Jupyter/Lab notebook related tools (cell code formating, converting, etc.)
     - `dsutil.hadoop`: 
         - A Spark application log analyzing tool for identify root causes of failed Spark applications.
         - Pythonic wrappers to the `hdfs` command.
