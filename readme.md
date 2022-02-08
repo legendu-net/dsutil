@@ -8,7 +8,7 @@ This is a Python pacakage that contains misc utils for Data Science.
     - pandas DataFrame
     - datetime
 2. Misc other tools
-    - `dsutil.git`: a module for checking modified but unpushed repository under a directory recursively
+    - `dsutil.git`: check and report modified but unpushed repository under a directory recursively
     - `dsutil.docker`: provides a way to auto build many Docker images with tree-like dependencies among them; various tools for managing Docker images and containers
     - `dsutil.filesystem`: a module for working with text manipulation
     - `dsutil.url`: URL formatting for HTML, Excel, etc.
