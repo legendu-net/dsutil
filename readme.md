@@ -11,10 +11,12 @@ This is a Python pacakage that contains misc utils for Data Science.
     - `dsutil.git`: a module for checking modified but unpushed repository under a directory recursively
     - `dsutil.docker`: provides a way to auto build many Docker images with tree-like dependencies among them; various tools for managing Docker images and containers
     - `dsutil.filesystem`: a module for working with text manipulation
-    - html
-    - misc
+    - `dsutil.url`: URL formatting for HTML, Excel, etc.
+    - `dsutil.sql`: SQL formatting
     - `dsutil.cv`
-    - `dsutil.shell`
+    - `dsutil.shell`: parse command-line output to a pandas DataFrame
+    - `dsutil.shebang`: auto correct SheBang of scripts
+    - `dsutil.poetry`: tools for making it even easier to manage Python project using Poetry
     - `dsutil.hadoop`: 
         - A Spark application log analyzing tool for identify root causes of failed Spark applications.
         - Pythonic wrappers to the `hdfs` command.
