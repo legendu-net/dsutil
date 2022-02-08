@@ -10,7 +10,7 @@ This is a Python pacakage that contains misc utils for Data Science.
 2. Misc other tools
     - `dsutil.git`: check and report modified but unpushed repository under a directory recursively
     - `dsutil.docker`: provides a way to auto build many Docker images with tree-like dependencies among them; various tools for managing Docker images and containers
-    - `dsutil.filesystem`: a module for working with text manipulation
+    - `dsutil.filesystem`: misc tools for manipulating filesystems; convenient tools for manipulating text files.
     - `dsutil.url`: URL formatting for HTML, Excel, etc.
     - `dsutil.sql`: SQL formatting
     - `dsutil.cv`
