@@ -20,6 +20,7 @@ This is a Python pacakage that contains misc utils for Data Science.
     - `dsuti.pdf`: easy and flexible extracting of PDF pages
     - `dsuti.memory`: query and consume memory to a specified range
     - `dsutil.jupyter`: Jupyter/Lab notebook related tools (cell code formating, converting, etc.)
+    - `dsutil.dockerhub`: managing Docker images on DockerHub in batch mode using Python
     - `dsutil.hadoop`: 
         - A Spark application log analyzing tool for identify root causes of failed Spark applications.
         - Pythonic wrappers to the `hdfs` command.
