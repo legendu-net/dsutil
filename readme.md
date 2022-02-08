@@ -13,7 +13,7 @@ This is a Python pacakage that contains misc utils for Data Science.
     - `dsutil.filesystem`: misc tools for querying and manipulating filesystems; convenient tools for manipulating text files.
     - `dsutil.url`: URL formatting for HTML, Excel, etc.
     - `dsutil.sql`: SQL formatting
-    - `dsutil.cv`
+    - `dsutil.cv`: some more tools (in addition to OpenCV) for image processing
     - `dsutil.shell`: parse command-line output to a pandas DataFrame
     - `dsutil.shebang`: auto correct SheBang of scripts
     - `dsutil.poetry`: tools for making it even easier to manage Python project using Poetry
