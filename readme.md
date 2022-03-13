@@ -8,14 +8,27 @@ This is a Python pacakage that contains misc utils for Data Science.
     - pandas DataFrame
     - datetime
 2. Misc other tools
-    - git
-      ```
-      dsutil.git.check
-      ```
-    - docker
-    - text manipulation
-    - html
-    - misc
+    - `dsutil.git`: check and report modified but unpushed repository under a directory recursively
+    - `dsutil.docker`: 
+        - Provides a way to auto build many Docker images with tree-like dependencies among them.
+        - Various tools for managing Docker images and containers
+    - `dsutil.filesystem`: misc tools for querying and manipulating filesystems; convenient tools for manipulating text files.
+    - `dsutil.url`: URL formatting for HTML, Excel, etc.
+    - `dsutil.sql`: SQL formatting
+    - `dsutil.cv`: some more tools (in addition to OpenCV) for image processing
+    - `dsutil.shell`: parse command-line output to a pandas DataFrame
+    - `dsutil.shebang`: auto correct SheBang of scripts
+    - `dsutil.poetry`: tools for making it even easier to manage Python project using Poetry
+    - `dsuti.pdf`: easy and flexible extracting of PDF pages
+    - `dsuti.memory`: query and consume memory to a specified range
+    - `dsutil.jupyter`: Jupyter/Lab notebook related tools (cell code formating, converting, etc.)
+    - `dsutil.dockerhub`: managing Docker images on DockerHub in batch mode using Python
+    - `dsutil.hadoop`: 
+        - A Spark application log analyzing tool for identify root causes of failed Spark applications.
+        - Pythonic wrappers to the `hdfs` command.
+        - A auto authentication tool for Kerberos.
+        - An improved version of `spark_submit`.
+        - Other misc PySpark functions. 
     
 ## Supported Python Version
 
