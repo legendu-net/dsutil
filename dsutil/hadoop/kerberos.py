@@ -27,17 +27,6 @@ USER = getpass.getuser()
 PID = os.getpid()
 
 
-class ExceptionNoPassword(Exception):
-    """Exception due to no password specified.
-    """
-    def __init__(self) -> None:
-        super().__init__()
-        self.value = "No password is specified."
-
-    def __str__(self):
-        return repr(self.value)
-
-
 def save_passwd(passwd: str) -> None:
     """Encrypt and save the password into a profile that is readable/writable only by the user.
 
@@ -55,11 +44,13 @@ def read_passwd() -> str:
 
     :return: Password in the profile file or empty string if the file does not exist.
     """
-    os.chmod(PROFILE, 0o600)
-    if not os.path.isfile(PROFILE):
-        return ""
-    with open(PROFILE, "r", encoding="utf-8") as fin:
-        return base64.b64decode(fin.read()).decode()
+    if os.path.isfile(PROFILE):
+        os.chmod(PROFILE, 0o600)
+        with open(PROFILE, "r", encoding="utf-8") as fin:
+            return base64.b64decode(fin.read()).decode()
+    passwd = input("Please enter password for kinit: ")
+    save_passwd(passwd)
+    return passwd
 
 
 def _warn_passwd_expiration(process, email: Dict[str, str]):
@@ -183,8 +174,6 @@ def main() -> None:
     if args.password:
         save_passwd(args.password)
     password = read_passwd()
-    if not password:
-        raise ExceptionNoPassword()
     config = _read_config(args.config)
     if args.minute:
         while True:
