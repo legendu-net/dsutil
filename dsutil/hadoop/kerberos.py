@@ -48,7 +48,7 @@ def read_passwd() -> str:
         os.chmod(PROFILE, 0o600)
         with open(PROFILE, "r", encoding="utf-8") as fin:
             return base64.b64decode(fin.read()).decode()
-    passwd = input("Please enter password for kinit: ")
+    passwd = getpass.getpass("Please enter password for kinit: ")
     save_passwd(passwd)
     return passwd
 
