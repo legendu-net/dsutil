@@ -320,6 +320,14 @@ class LogFilter:
                 "https://www.legendu.net/misc/blog/spark-issue:-TypeError-withReplacement"
             ),
             (
+                "(?i)URISyntaxException", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-URISyntaxException"
+            ),
+            (
+                "(?i)Could not find any configured addresses for URI", 1,
+                "http://www.legendu.net/misc/blog/spark-issue:-RuntimeException:-Could-not-find-any-configured-addresses-for-URI"
+            ),
+            (
                 "(?i)table not found", 1,
                 "https://www.legendu.net/misc/blog/spark-issue-table-not-found/"
             ),
