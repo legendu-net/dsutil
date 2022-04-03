@@ -71,12 +71,12 @@ class Hdfs():
         """
         index = len(path.rstrip("/"))
         if depth > 1:
-            paths = self.ls(path, recursive=True).filename
+            paths = self.ls(path, recursive=True).path
             frames = [
                 self._du_helper(path)
                 for path in paths if path[index:].count("/") + 1 == depth
             ]
-            return pd.concat(frames)
+            return pd.concat(frames, ignore_index=True)
         return self._du_helper(path)
 
     def _du_helper(self, path: str) -> pd.DataFrame:
