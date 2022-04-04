@@ -42,7 +42,7 @@ def main(args: Optional[Namespace] = None):
     """
     if args is None:
         args = parse_args()
-    repart_hdfs(spark, path=args.hdfs_path, num_parts=args.num_parts)
+    repart_hdfs(spark, src_path=args.hdfs_path, num_parts=args.num_parts)
 
 
 if __name__ == "__main__":

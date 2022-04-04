@@ -79,7 +79,8 @@ def calc_global_rank(frame: DataFrame, order_by: Union[str, list[str]]) -> DataF
 
 def repart_hdfs(
     spark,
-    path: str,
+    src_path: str,
+    dst_path: str = "",
     num_parts: Optional[int] = None,
     mb_per_part: float = 64,
     min_num_parts: int = 1,
@@ -94,29 +95,36 @@ def repart_hdfs(
     """
     sc = spark.sparkContext
     hdfs = sc._jvm.org.apache.hadoop.fs.FileSystem.get(sc._jsc.hadoopConfiguration())  # pylint: disable=W0212
-    path = path.rstrip("/")
-    path_hdfs = sc._jvm.org.apache.hadoop.fs.Path(path)  # pylint: disable=W0212
+    src_path = src_path.rstrip("/")
+    src_path_hdfs = sc._jvm.org.apache.hadoop.fs.Path(src_path)  # pylint: disable=W0212
     # num of partitions
     if num_parts is None:
-        bytes_path = hdfs.getContentSummary(path_hdfs).getLength()
+        bytes_path = hdfs.getContentSummary(src_path_hdfs).getLength()
         num_parts = round(bytes_path / 1_048_576 / mb_per_part)
     num_parts = max(num_parts, min_num_parts)
     # temp path for repartitioned table
-    ts = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
-    path_tmp = path + f"_repart_tmp_{ts}"
+    if dst_path == src_path:
+        dst_path = ""
+    if dst_path:
+        path_tmp = dst_path
+    else:
+        ts = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+        path_tmp = src_path + f"_repart_tmp_{ts}"
     # repartition
     if coalesce:
-        spark.read.parquet(path).coalesce(num_parts) \
+        spark.read.parquet(src_path).coalesce(num_parts) \
             .write.mode("overwrite").parquet(path_tmp)
     else:
-        spark.read.parquet(path).repartition(num_parts) \
+        spark.read.parquet(src_path).repartition(num_parts) \
             .write.mode("overwrite").parquet(path_tmp)
-    # rename path
-    if hdfs.delete(path_hdfs, True):
+    # path_tmp --> src_path
+    if dst_path:
+        return
+    if hdfs.delete(src_path_hdfs, True):
         if not hdfs.rename(
             sc._jvm.org.apache.hadoop.fs.Path(path_tmp),  # pylint: disable=W0212
-            path_hdfs,  # pylint: disable=W0212
+            src_path_hdfs,  # pylint: disable=W0212
         ):
-            sys.exit(f"Failed to rename the HDFS path {path_tmp} to {path}!")
+            sys.exit(f"Failed to rename the HDFS path {path_tmp} to {src_path}!")
     else:
-        sys.exit(f"Failed to remove the (old) HDFS path: {path}!")
+        sys.exit(f"Failed to remove the (old) HDFS path: {src_path}!")

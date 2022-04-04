@@ -250,6 +250,14 @@ class LogFilter:
                 "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
             (
+                r"(?i)ArrowTypeError: Expected", 1,
+                "https://www.legendu.net/misc/blog/spark-issue:-ArrowTypeError:-Expect-a-type-but-got-a-different-type"
+            ),
+            (
+                r"(?i)Arrow legacy IPC format is not supported", 1,
+                "https://www.legendu.net/misc/blog/spark-issue:-RuntimeError:-Arrow-legacy-IPC-format-is-not-supported"
+            ),
+            (
                 r"(?i)TypeError: .*has no len()", 1,
                 "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
             ),
@@ -269,6 +277,14 @@ class LogFilter:
                 r"(?i)RuntimeError: Result vector from pandas_udf was not the required length",
                 1,
                 "https://www.legendu.net/misc/blog/Spark-issue:-Pure-Python-code-errors"
+            ),
+            (
+                "(?i)ViewFs: Cannot initialize: Empty Mount table in config", 1,
+                "https://www.legendu.net/misc/blog/spark-issue:-ViewFs:-Cannot-initialize:-Empty-Mount-table-in-config"
+            ),
+            (
+                "(?i)IllegalArgumentException: Wrong FS", 1,
+                "https://www.legendu.net/misc/blog/spark-issue:-IllegalArgumentException:-Wrong-FS"
             ),
             (
                 "(?i)object has no attribute", 1,
@@ -321,11 +337,11 @@ class LogFilter:
             ),
             (
                 "(?i)URISyntaxException", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-URISyntaxException"
+                "https://www.legendu.net/misc/blog/spark-issue:-URISyntaxException"
             ),
             (
                 "(?i)Could not find any configured addresses for URI", 1,
-                "http://www.legendu.net/misc/blog/spark-issue:-RuntimeException:-Could-not-find-any-configured-addresses-for-URI"
+                "https://www.legendu.net/misc/blog/spark-issue:-RuntimeException:-Could-not-find-any-configured-addresses-for-URI"
             ),
             (
                 "(?i)table not found", 1,
@@ -367,8 +383,16 @@ class LogFilter:
                 "https://www.legendu.net/misc/blog/spark-issue:-InvalidResourceRequestException"
             ),
             (
+                r"(?i)The quota system is disabled", 1,
+                "https://www.legendu.net/misc/blog/spark-issue:-getQuotaUsage"
+            ),
+            (
+                r"(?i)AnalysisException: Found duplicate column(s)", 1,
+                "https://www.legendu.net/misc/blog/spark-issue:-AnalysisException:-Found-duplicated-columns"
+            ),
+            (
                 "(?i)broadcastTimeout", 2,
-                "http://www.legendu.net/misc/blog/spark-issue:-could-not-execute-broadcast-in-300s"
+                "https://www.legendu.net/misc/blog/spark-issue:-could-not-execute-broadcast-in-300s"
             ),
             (
                 "(?i)serialized results is bigger than spark.driver.maxResultSize", 2,
