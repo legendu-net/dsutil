@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 from argparse import ArgumentParser, Namespace
 import subprocess as sp
+from loguru import logger
 from .log import LogFilter
 
 YARN = "/apache/hadoop/bin/yarn"
@@ -49,6 +50,7 @@ def fetch(args):
     cmd = [YARN, "logs", "-size_limit_mb", "-1", "-applicationId", app_id]
     if args.user:
         cmd = cmd + ["-appOwner", args.user]
+    logger.info(f"Fetching log of the application {app_id} ...")
     with open(output, "w", encoding="utf-8") as fout:
         sp.run(cmd, stdout=fout, check=True)
     args.log_file = output

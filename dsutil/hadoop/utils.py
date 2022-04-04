@@ -1,11 +1,11 @@
 """Utils functions for Hadoop.
 """
 from __future__ import annotations
-from typing import Union
+from typing import Optional, Union
 import sys
 import datetime
 from pyspark.sql import DataFrame, Window
-from pyspark.sql.functions import col, spark_partition_id, rank, coalesce, lit, max, sum
+import pyspark.sql.functions as sf
 
 
 def sample(
@@ -50,32 +50,42 @@ def calc_global_rank(frame: DataFrame, order_by: Union[str, list[str]]) -> DataF
     # calculate local rank
     wspec1 = Window.partitionBy("part_id").orderBy(*order_by)
     frame_local_rank = frame.orderBy(order_by).withColumn(
-        "part_id", spark_partition_id()
+        "part_id", sf.spark_partition_id()
     ).withColumn("local_rank",
-                 rank().over(wspec1)).persist()
+                 sf.rank().over(wspec1)).persist()
     # calculate accumulative rank
     wspec2 = Window.orderBy("part_id").rowsBetween(
         Window.unboundedPreceding, Window.currentRow
     )
     stat = frame_local_rank.groupBy("part_id").agg(
-        max("local_rank").alias("max_rank")
+        sf.max("local_rank").alias("max_rank")
     ).withColumn("cum_rank",
-                 sum("max_rank").over(wspec2))
+                 sf.sum("max_rank").over(wspec2))
     # self join and shift 1 row to get sum factor
     stat2 = stat.alias("l").join(
         stat.alias("r"),
-        col("l.part_id") == col("r.part_id") + 1, "left_outer"
-    ).select(col("l.part_id"),
-             coalesce(col("r.cum_rank"), lit(0)).alias("sum_factor"))
+        sf.col("l.part_id") == sf.col("r.part_id") + 1, "left_outer"
+    ).select(
+        sf.col("l.part_id"),
+        sf.coalesce(sf.col("r.cum_rank"), sf.lit(0)).alias("sum_factor")
+    )
     return frame_local_rank.join(
         #broadcast(stat2),
         stat2,
         ["part_id"],
     ).withColumn("rank",
-                 col("local_rank") + col("sum_factor"))
+                 sf.col("local_rank") + sf.col("sum_factor"))
 
 
-def repart_hdfs(spark, path: str, num_parts: int, coalesce: bool = False) -> None:
+def repart_hdfs(
+    spark,
+    src_path: str,
+    dst_path: str = "",
+    num_parts: Optional[int] = None,
+    mb_per_part: float = 64,
+    min_num_parts: int = 1,
+    coalesce: bool = False
+) -> None:
     """Repartition a HDFS path of the Parquet format.
 
     :param spark: A SparkSession object. 
@@ -83,22 +93,38 @@ def repart_hdfs(spark, path: str, num_parts: int, coalesce: bool = False) -> Non
     :param num_parts: The new number of partitions. 
     :param coalesce: If True, use coalesce instead of repartition.
     """
-    path = path.rstrip("/")
-    ts = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
-    path_tmp = path + f"_repart_tmp_{ts}"
-    if coalesce:
-        spark.read.parquet(path).coalesce(num_parts) \
-            .write.mode("overwrite").parquet(path_tmp)
-    else:
-        spark.read.parquet(path).repartition(num_parts) \
-            .write.mode("overwrite").parquet(path_tmp)
     sc = spark.sparkContext
-    fs = sc._jvm.org.apache.hadoop.fs.FileSystem.get(sc._jsc.hadoopConfiguration())  # pylint: disable=W0212
-    if fs.delete(sc._jvm.org.apache.hadoop.fs.Path(path), True):  # pylint: disable=W0212
-        if not fs.rename(
-            sc._jvm.org.apache.hadoop.fs.Path(path_tmp),  # pylint: disable=W0212
-            sc._jvm.org.apache.hadoop.fs.Path(path),  # pylint: disable=W0212
-        ):
-            sys.exit(f"Failed to rename the HDFS path {path_tmp} to {path}!")
+    hdfs = sc._jvm.org.apache.hadoop.fs.FileSystem.get(sc._jsc.hadoopConfiguration())  # pylint: disable=W0212
+    src_path = src_path.rstrip("/")
+    src_path_hdfs = sc._jvm.org.apache.hadoop.fs.Path(src_path)  # pylint: disable=W0212
+    # num of partitions
+    if num_parts is None:
+        bytes_path = hdfs.getContentSummary(src_path_hdfs).getLength()
+        num_parts = round(bytes_path / 1_048_576 / mb_per_part)
+    num_parts = max(num_parts, min_num_parts)
+    # temp path for repartitioned table
+    if dst_path == src_path:
+        dst_path = ""
+    if dst_path:
+        path_tmp = dst_path
     else:
-        sys.exit(f"Failed to remove the (old) HDFS path: {path}!")
+        ts = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
+        path_tmp = src_path + f"_repart_tmp_{ts}"
+    # repartition
+    if coalesce:
+        spark.read.parquet(src_path).coalesce(num_parts) \
+            .write.mode("overwrite").parquet(path_tmp)
+    else:
+        spark.read.parquet(src_path).repartition(num_parts) \
+            .write.mode("overwrite").parquet(path_tmp)
+    # path_tmp --> src_path
+    if dst_path:
+        return
+    if hdfs.delete(src_path_hdfs, True):
+        if not hdfs.rename(
+            sc._jvm.org.apache.hadoop.fs.Path(path_tmp),  # pylint: disable=W0212
+            src_path_hdfs,  # pylint: disable=W0212
+        ):
+            sys.exit(f"Failed to rename the HDFS path {path_tmp} to {src_path}!")
+    else:
+        sys.exit(f"Failed to remove the (old) HDFS path: {src_path}!")
