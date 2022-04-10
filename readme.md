@@ -32,7 +32,11 @@ This is a Python pacakage that contains misc utils for Data Science.
     
 ## Supported Operating Systems and Python Versions
 
-Currently, Python 3.7 - 3.10 are supported.
+| OS      | Python 3.7 | Python 3.8 | Python 3.9 | Python 3.10 |
+|---------|------------|------------|------------|-------------|
+| Linux   | Y          | Y          | Y          | Y           |
+| macOS   | Y          | Y          | Y          | Y           |
+| Windows | Y          | Y          | Y          | Y           |
 
 ## Installation
 
