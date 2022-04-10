@@ -30,7 +30,7 @@ This is a Python pacakage that contains misc utils for Data Science.
         - An improved version of `spark_submit`.
         - Other misc PySpark functions. 
     
-## Supported Python Version
+## Supported Operating Systems and Python Versions
 
 Currently, Python 3.7 - 3.10 are supported.
 
