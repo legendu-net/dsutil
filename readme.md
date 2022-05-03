@@ -9,9 +9,6 @@ This is a Python pacakage that contains misc utils for Data Science.
     - datetime
 2. Misc other tools
     - `dsutil.git`: check and report modified but unpushed repository under a directory recursively
-    - `dsutil.docker`: 
-        - Provides a way to auto build many Docker images with tree-like dependencies among them.
-        - Various tools for managing Docker images and containers
     - `dsutil.filesystem`: misc tools for querying and manipulating filesystems; convenient tools for manipulating text files.
     - `dsutil.url`: URL formatting for HTML, Excel, etc.
     - `dsutil.sql`: SQL formatting
@@ -30,9 +27,13 @@ This is a Python pacakage that contains misc utils for Data Science.
         - An improved version of `spark_submit`.
         - Other misc PySpark functions. 
     
-## Supported Python Version
+## Supported Operating Systems and Python Versions
 
-Currently, Python 3.7 and 3.8 are supported.
+| OS      | Python 3.7 | Python 3.8 | Python 3.9 | Python 3.10 |
+|---------|------------|------------|------------|-------------|
+| Linux   | Y          | Y          | Y          | Y           |
+| macOS   | Y          | Y          | Y          | Y           |
+| Windows | Y          | Y          | Y          | Y           |
 
 ## Installation
 
