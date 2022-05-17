@@ -33,10 +33,10 @@ jobs:
         ~/.local/bin/poetry install -E all
     - name: Lint with pylint
       run: |
-        ~/.local/bin/poetry run pylint -E dsutil/
+        ~/.local/bin/poetry run pylint -E aiutil/ tests/
     - name: Lint with pytype
       run: |
-        ~/.local/bin/poetry run pytype dsutil/ tests/
+        ~/.local/bin/poetry run pytype ./
     - name: Check code format
       run: |
-        ~/.local/bin/poetry run yapf -dr dsutil/ tests/
+        ~/.local/bin/poetry run yapf -dr ./
