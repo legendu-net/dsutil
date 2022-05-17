@@ -18,7 +18,7 @@ def extract_pages(file: str, subfiles: dict[str, Union[int, Iterable[int]]]) -> 
         .. highlight:: python
         .. code-block:: python
 
-        from dsutil.pdf import extract_pages
+        from aiutil.pdf import extract_pages
         extract_pages("raw.pdf", {"first.pdf": range(5), "second.pdf": [5, 7], "third.pdf": 6})
     """
     with open(file, "rb") as fin:

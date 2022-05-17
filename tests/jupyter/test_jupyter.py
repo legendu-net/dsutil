@@ -1,10 +1,10 @@
-"""Test the dsutil.jupyter module.
+"""Test the aiutil.jupyter module.
 """
 from pathlib import Path
-import dsutil.jupyter
+import aiutil.jupyter
 
 BASE_DIR = Path(__file__).parent
 
 
 def test_nbconvert_notebooks():
-    dsutil.jupyter.nbconvert_notebooks(BASE_DIR / "notebooks")
+    aiutil.jupyter.nbconvert_notebooks(BASE_DIR / "notebooks")
