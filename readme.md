@@ -9,9 +9,6 @@ This is a Python pacakage that contains misc utils for Data Science.
     - datetime
 2. Misc other tools
     - `dsutil.git`: check and report modified but unpushed repository under a directory recursively
-    - `dsutil.docker`: 
-        - Provides a way to auto build many Docker images with tree-like dependencies among them.
-        - Various tools for managing Docker images and containers
     - `dsutil.filesystem`: misc tools for querying and manipulating filesystems; convenient tools for manipulating text files.
     - `dsutil.url`: URL formatting for HTML, Excel, etc.
     - `dsutil.sql`: SQL formatting
