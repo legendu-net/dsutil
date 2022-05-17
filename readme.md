@@ -1,4 +1,4 @@
-# [dsutil](https://github.com/dclong/dsutil): Data Science Utils
+# [aiutil](https://github.com/dclong/aiutil): Data Science Utils
 
 This is a Python pacakage that contains misc utils for Data Science.
 
@@ -8,19 +8,19 @@ This is a Python pacakage that contains misc utils for Data Science.
     - pandas DataFrame
     - datetime
 2. Misc other tools
-    - `dsutil.git`: check and report modified but unpushed repository under a directory recursively
-    - `dsutil.filesystem`: misc tools for querying and manipulating filesystems; convenient tools for manipulating text files.
-    - `dsutil.url`: URL formatting for HTML, Excel, etc.
-    - `dsutil.sql`: SQL formatting
-    - `dsutil.cv`: some more tools (in addition to OpenCV) for image processing
-    - `dsutil.shell`: parse command-line output to a pandas DataFrame
-    - `dsutil.shebang`: auto correct SheBang of scripts
-    - `dsutil.poetry`: tools for making it even easier to manage Python project using Poetry
-    - `dsuti.pdf`: easy and flexible extracting of PDF pages
-    - `dsuti.memory`: query and consume memory to a specified range
-    - `dsutil.jupyter`: Jupyter/Lab notebook related tools (cell code formating, converting, etc.)
-    - `dsutil.dockerhub`: managing Docker images on DockerHub in batch mode using Python
-    - `dsutil.hadoop`: 
+    - `aiutil.git`: check and report modified but unpushed repository under a directory recursively
+    - `aiutil.filesystem`: misc tools for querying and manipulating filesystems; convenient tools for manipulating text files.
+    - `aiutil.url`: URL formatting for HTML, Excel, etc.
+    - `aiutil.sql`: SQL formatting
+    - `aiutil.cv`: some more tools (in addition to OpenCV) for image processing
+    - `aiutil.shell`: parse command-line output to a pandas DataFrame
+    - `aiutil.shebang`: auto correct SheBang of scripts
+    - `aiutil.poetry`: tools for making it even easier to manage Python project using Poetry
+    - `aiutil.pdf`: easy and flexible extracting of PDF pages
+    - `aiutil.memory`: query and consume memory to a specified range
+    - `aiutil.jupyter`: Jupyter/Lab notebook related tools (cell code formating, converting, etc.)
+    - `aiutil.dockerhub`: managing Docker images on DockerHub in batch mode using Python
+    - `aiutil.hadoop`: 
         - A Spark application log analyzing tool for identify root causes of failed Spark applications.
         - Pythonic wrappers to the `hdfs` command.
         - A auto authentication tool for Kerberos.
@@ -37,19 +37,11 @@ This is a Python pacakage that contains misc utils for Data Science.
 
 ## Installation
 
-You can download a copy of the latest release and install it using pip.
 ```bash
-pip3 install --user -U https://github.com/dclong/dsutil/releases/download/v0.74.0/dsutil-0.74.0-py3-none-any.whl
+pip3 install --user -U aiutil
 ```
-Or you can use the following command to install the latest master branch
-if you have pip 20.0+.
-```bash
-pip3 install --user -U git+https://github.com/dclong/dsutil@main
-```
-Use one of the following commands if you want to install all components of dsutil. 
+Use the following commands if you want to install all components of aiutil. 
 Available additional components are `cv`, `docker`, `pdf`, `jupyter`, `admin` and `all`.
 ```bash
-pip3 install "dsutil[cv] @ https://github.com/dclong/dsutil/releases/download/v0.74.0/dsutil-0.74.0-py3-none-any.whl"
-# or
-pip3 install --user -U "dsutil[all] @ git+https://github.com/dclong/dsutil@main"
+pip3 install --user -U aiutil[all]
 ```

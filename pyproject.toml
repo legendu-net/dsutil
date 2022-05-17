@@ -1,15 +1,15 @@
 [tool.poetry]
-name = "dsutil"
+name = "aiutil"
 version = "0.74.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 
 [tool.poetry.scripts]
-logf = "dsutil.hadoop:logf.main"
-repart_hdfs = "dsutil.hadoop:repart_hdfs.main"
-pyspark_submit = "dsutil.hadoop:pyspark_submit.main"
-pykinit = "dsutil.hadoop:kerberos.main"
-match_memory = "dsutil:memory.main"
+logf = "aiutil.hadoop:logf.main"
+repart_hdfs = "aiutil.hadoop:repart_hdfs.main"
+pyspark_submit = "aiutil.hadoop:pyspark_submit.main"
+pykinit = "aiutil.hadoop:kerberos.main"
+match_memory = "aiutil:memory.main"
 
 [tool.poetry.dependencies]
 python = ">=3.7.1,<3.11"
