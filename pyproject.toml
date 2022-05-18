@@ -3,6 +3,10 @@ name = "aiutil"
 version = "0.74.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
+license = "MIT"
+readme = "readme.md"
+repository = "https://github.com/legendu-net/aiutil"
+keywords = ["AI", "Machine Learning", "tools", "utils"]
 
 [tool.poetry.scripts]
 logf = "aiutil.hadoop:logf.main"
