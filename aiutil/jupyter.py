@@ -54,7 +54,7 @@ def format_notebook(path: Union[str, Path], yapf_config: str = ""):
     if not yapf_config:
         fd, yapf_config = tempfile.mkstemp()
         with os.fdopen(fd, "w") as fout:
-            fout.write("[style]\nbased_on_style = facebook\ncolumn_limit = 88\n")
+            fout.write("[style]\nbased_on_style = facebook\ncolumn_limit = 80\n")
     if isinstance(path, (str, Path)):
         path = [path]
     for p in path:
