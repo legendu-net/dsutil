@@ -367,12 +367,33 @@ def is_ess_empty(
     return True
 
 
-def update_file(
+def append_lines(
     path: Path,
-    regex: Optional[list[tuple[str, str]]] = None,
-    exact: Optional[list[tuple[str, str]]] = None,
-    append: Union[None, str, Iterable[str]] = None,
+    lines: Union[str, Iterable[str]],
     exist_skip: bool = True,
+) -> None:
+    """Update a text file using regular expression substitution.
+
+    :param path: A Path object to the file to be updated.
+    :param lines: A (list of) line(s) to append.
+        Note that "\\n" is automatically added to the end of each line to append.
+    :param exist_skip: Skip if lines to append already exists in the file.
+    """
+    if isinstance(path, str):
+        path = Path(path)
+    text = path.read_text(encoding="utf-8")
+    if not isinstance(lines, str):
+        lines = "\n".join(lines)
+    if not exist_skip or lines not in text:
+        text += lines
+    path.write_text(text, encoding="utf-8")
+
+
+def replace_lines(
+    path: Path,
+    pattern: Union[str, Iterable[str]],
+    replace: Union[Iterable[str], Callable],
+    exact: bool = False,
 ) -> None:
     """Update a text file using regular expression substitution.
 
@@ -387,17 +408,17 @@ def update_file(
     if isinstance(path, str):
         path = Path(path)
     text = path.read_text(encoding="utf-8")
-    if regex:
-        for pattern, replace in regex:
-            text = re.sub(pattern, replace, text)
+    if isinstance(pattern, str):
+        pattern = [pattern]
+    if callable(replace):
+        func = replace
+        replace = [func(pat) for pat in pattern]
     if exact:
-        for pattern, replace in exact:
-            text = text.replace(pattern, replace)
-    if append:
-        if not isinstance(append, str):
-            append = "\n".join(append)
-        if not exist_skip or append not in text:
-            text += append
+        for pat, rep in zip(pattern, replace):
+            text = text.replace(pat, rep)
+    else:
+        for pat, rep in zip(pattern, replace):
+            text = re.sub(pat, rep, text)
     path.write_text(text, encoding="utf-8")
 
 
