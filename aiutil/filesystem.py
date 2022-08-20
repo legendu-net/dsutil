@@ -390,36 +390,35 @@ def append_lines(
     path.write_text(text, encoding="utf-8")
 
 
-def replace_lines(
+def replace_patterns(
     path: Path,
-    pattern: Union[str, Iterable[str]],
-    replace: Union[Iterable[str], Callable],
-    exact: bool = False,
+    patterns: Union[str, Iterable[str]],
+    repls: Union[Iterable[str], Callable],
+    regex: bool = True,
 ) -> None:
     """Update a text file using regular expression substitution.
 
     :param path: A Path object to the file to be updated.
-    :param regex: A list of tuples containing regular expression patterns
-        and the corresponding replacement text.
-    :param exact: A list of tuples containing exact patterns and the corresponding replacement text.
-    :param append: A string or a list of lines to append.
-        When append is a list of lines, "\\n" is automatically added to the end of each line.
-    :param exist_skip: Skip appending if already exists.
+    :param patterns: A (list of) patterns to replace.
+    :param repls: A list of replacements.
+        or a function to map patterns to replacements.
+    :param regex: If true, treat patterns as regular expression pattern;
+        otherwise, perform exact matches.
     """
     if isinstance(path, str):
         path = Path(path)
     text = path.read_text(encoding="utf-8")
-    if isinstance(pattern, str):
-        pattern = [pattern]
-    if callable(replace):
-        func = replace
-        replace = [func(pat) for pat in pattern]
-    if exact:
-        for pat, rep in zip(pattern, replace):
-            text = text.replace(pat, rep)
+    if isinstance(patterns, str):
+        patterns = [patterns]
+    if callable(repls):
+        func = repls
+        repls = [func(pattern) for pattern in patterns]
+    if regex:
+        for pattern, repl in zip(patterns, repls):
+            text = re.sub(pattern, repl, text)
     else:
-        for pat, rep in zip(pattern, replace):
-            text = re.sub(pat, rep, text)
+        for pattern, repl in zip(patterns, repls):
+            text = text.replace(pattern, repl)
     path.write_text(text, encoding="utf-8")
 
 
