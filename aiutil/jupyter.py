@@ -15,11 +15,11 @@ from yapf.yapflib.yapf_api import FormatCode
 HOME = Path.home()
 
 
-def _format_cell(cell: dict, style_file: str) -> bool:
+def _format_cell(cell: dict, yapf_config: str) -> bool:
     """Format a cell in a Jupyter notebook.
 
     :param cell: A cell in the notebook.
-    :param style_file: The path to a style file for formatting.
+    :param yapf_config: The path of a yapf configuration file.
     :return: True if the cell is formatted (correctly) and False otherwise.
     """
     if cell["cell_type"] != "code":
@@ -29,7 +29,7 @@ def _format_cell(cell: dict, style_file: str) -> bool:
     if not lines:
         return False
     try:
-        formatted, _ = FormatCode(code, style_config=style_file)
+        formatted, _ = FormatCode(code, style_config=yapf_config)
     except Exception as err:
         logger.debug(
             "Failed to format the cell with the following code:\n{}"
@@ -44,20 +44,21 @@ def _format_cell(cell: dict, style_file: str) -> bool:
     return False
 
 
-def format_notebook(path: Union[str, Path], style_file: str = ""):
+def format_notebook(path: Union[str, Path], yapf_config: str = ""):
     """Format code in a Jupyter/Lab notebook.
 
     :param path: A (list of) path(s) to notebook(s).
-    :param style_file: [description], defaults to ".style.yapf"
+    :param yapf_config: The path of a yapf configuration file.
+        If not specified, a default one will be generated and used.
     """
-    if not style_file:
-        fd, style_file = tempfile.mkstemp()
+    if not yapf_config:
+        fd, yapf_config = tempfile.mkstemp()
         with os.fdopen(fd, "w") as fout:
-            fout.write("[style]\nbased_on_style = facebook\ncolumn_limit = 88\n")
+            fout.write("[style]\nbased_on_style = facebook\ncolumn_limit = 80\n")
     if isinstance(path, (str, Path)):
         path = [path]
     for p in path:
-        _format_notebook(p, style_file)
+        _format_notebook(p, yapf_config)
 
 
 def nbconvert_notebooks(root_dir: Union[str, Path], cache: bool = False) -> None:
@@ -79,7 +80,7 @@ def nbconvert_notebooks(root_dir: Union[str, Path], cache: bool = False) -> None
         html.write_text(code, encoding="utf-8")
 
 
-def _format_notebook(path: Path, style_file: str) -> None:
+def _format_notebook(path: Path, yapf_config: str) -> None:
     if isinstance(path, str):
         path = Path(path)
     if path.suffix != ".ipynb":
@@ -90,7 +91,7 @@ def _format_notebook(path: Path, style_file: str) -> None:
     #nbformat.validate(notebook)
     changed = False
     for cell in notebook.cells:
-        changed |= _format_cell(cell, style_file=style_file)
+        changed |= _format_cell(cell, yapf_config=yapf_config)
     if changed:
         nbformat.write(notebook, path, version=nbformat.NO_CONVERT)
         logger.info('The notebook "{}" is formatted.\n', path)

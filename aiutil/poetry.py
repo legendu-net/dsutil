@@ -11,7 +11,7 @@ import toml
 from loguru import logger
 import git
 import pathspec
-from .filesystem import update_file
+from .filesystem import replace_patterns
 
 DIST = "dist"
 README = "readme.md"
@@ -58,7 +58,7 @@ def _update_version_readme(ver: str, proj_dir: Path) -> None:
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
-    update_file(proj_dir / README, regex=[(r"\d+\.\d+\.\d+", f"{ver}")])
+    replace_patterns(proj_dir / README, patterns=r"\d+\.\d+\.\d+", repls=f"{ver}")
 
 
 def _update_version_toml(ver: str, proj_dir: Path) -> None:
@@ -67,8 +67,10 @@ def _update_version_toml(ver: str, proj_dir: Path) -> None:
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
-    update_file(
-        proj_dir / TOML, regex=[(r"version = .\d+\.\d+\.\d+.", f'version = "{ver}"')]
+    replace_patterns(
+        proj_dir / TOML,
+        patterns=r"version = .\d+\.\d+\.\d+.",
+        repls=f'version = "{ver}"'
     )
 
 
@@ -80,8 +82,10 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
     """
     pkg = _project_name(proj_dir)
     for path in (proj_dir / pkg).glob("**/*.py"):
-        update_file(
-            path, regex=[(r"__version__ = .\d+\.\d+\.\d+.", f'__version__ = "{ver}"')]
+        replace_patterns(
+            path,
+            patterns=r"__version__ = .\d+\.\d+\.\d+.",
+            repls=f'__version__ = "{ver}"'
         )
 
 

@@ -272,7 +272,8 @@ def _ignore(path: Path) -> bool:
     if path.is_file() and path.name.startswith("."):
         return True
     if path.is_dir() and path.name in (
-        ".ipynb_checkpoints", ".mypy_cache", ".pytest_cache", ".mtj.tmp", "__pycache__"
+        ".jukit", ".ipynb_checkpoints", ".mypy_cache", ".pytest_cache", ".mtj.tmp",
+        "__pycache__"
     ):
         return True
     return False
@@ -367,37 +368,57 @@ def is_ess_empty(
     return True
 
 
-def update_file(
+def append_lines(
     path: Path,
-    regex: Optional[list[tuple[str, str]]] = None,
-    exact: Optional[list[tuple[str, str]]] = None,
-    append: Union[None, str, Iterable[str]] = None,
+    lines: Union[str, Iterable[str]],
     exist_skip: bool = True,
 ) -> None:
     """Update a text file using regular expression substitution.
 
     :param path: A Path object to the file to be updated.
-    :param regex: A list of tuples containing regular expression patterns
-        and the corresponding replacement text.
-    :param exact: A list of tuples containing exact patterns and the corresponding replacement text.
-    :param append: A string or a list of lines to append.
-        When append is a list of lines, "\\n" is automatically added to the end of each line.
-    :param exist_skip: Skip appending if already exists.
+    :param lines: A (list of) line(s) to append.
+        Note that "\\n" is automatically added to the end of each line to append.
+    :param exist_skip: Skip if lines to append already exists in the file.
     """
     if isinstance(path, str):
         path = Path(path)
     text = path.read_text(encoding="utf-8")
+    if not isinstance(lines, str):
+        lines = "\n".join(lines)
+    if not exist_skip or lines not in text:
+        text += lines
+    path.write_text(text, encoding="utf-8")
+
+
+def replace_patterns(
+    path: Path,
+    patterns: Union[str, Iterable[str]],
+    repls: Union[Iterable[str], Callable],
+    regex: bool = True,
+) -> None:
+    """Update a text file using regular expression substitution.
+
+    :param path: A Path object to the file to be updated.
+    :param patterns: A (list of) patterns to replace.
+    :param repls: A list of replacements.
+        or a function to map patterns to replacements.
+    :param regex: If true, treat patterns as regular expression pattern;
+        otherwise, perform exact matches.
+    """
+    if isinstance(path, str):
+        path = Path(path)
+    text = path.read_text(encoding="utf-8")
+    if isinstance(patterns, str):
+        patterns = [patterns]
+    if callable(repls):
+        func = repls
+        repls = [func(pattern) for pattern in patterns]
     if regex:
-        for pattern, replace in regex:
-            text = re.sub(pattern, replace, text)
-    if exact:
-        for pattern, replace in exact:
-            text = text.replace(pattern, replace)
-    if append:
-        if not isinstance(append, str):
-            append = "\n".join(append)
-        if not exist_skip or append not in text:
-            text += append
+        for pattern, repl in zip(patterns, repls):
+            text = re.sub(pattern, repl, text)
+    else:
+        for pattern, repl in zip(patterns, repls):
+            text = text.replace(pattern, repl)
     path.write_text(text, encoding="utf-8")
 
 

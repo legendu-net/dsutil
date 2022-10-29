@@ -2,9 +2,25 @@
 """
 from __future__ import annotations
 from typing import Union, Sequence
+from pathlib import Path
 import re
 import subprocess as sp
 import pandas as pd
+
+
+def ls(path: Union[Path, str]):
+    """List files in the given path.
+    This function is similar to the shell command `ls`.
+    
+    :param path: A path to a file or a directory.
+    """
+    if isinstance(path, str):
+        path = Path(path)
+    paths = list(path.iterdir()) if path.is_dir() else [path]
+    return pd.DataFrame({
+        "paths": paths,
+        "name": (p.name for p in paths),
+    })
 
 
 def to_frame(
