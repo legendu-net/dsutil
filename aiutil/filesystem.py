@@ -393,7 +393,7 @@ def append_lines(
 def replace_patterns(
     path: Path,
     patterns: Union[str, Iterable[str]],
-    repls: Union[Iterable[str], Callable],
+    repls: Union[str, Iterable[str]],
     regex: bool = True,
 ) -> None:
     """Update a text file using regular expression substitution.
@@ -410,9 +410,8 @@ def replace_patterns(
     text = path.read_text(encoding="utf-8")
     if isinstance(patterns, str):
         patterns = [patterns]
-    if callable(repls):
-        func = repls
-        repls = [func(pattern) for pattern in patterns]
+    if isinstance(repls, str):
+        repls = [repls]
     if regex:
         for pattern, repl in zip(patterns, repls):
             text = re.sub(pattern, repl, text)
