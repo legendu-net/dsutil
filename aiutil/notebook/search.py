@@ -10,7 +10,7 @@ Criterion: TypeAlias = str | list[str] | dict[str, list[str]]
 
 
 def _reg_criterion(criterion: str | list[str] | dict[str, list[str]]):
-    if isinstance(criterion, str): 
+    if isinstance(criterion, str):
         if criterion == "":
             criterion = []
         else:
@@ -31,12 +31,13 @@ class Cell():
     def match_keyword(self, keyword: Criterion):
         kwd = _reg_criterion(keyword)
         return all(k in self._source for k in kwd["include"]
-              ) and not any(k in self._source for k in kwd["exclude"])
+                  ) and not any(k in self._source for k in kwd["exclude"])
 
     def match_type(self, type_: str) -> bool:
         if type_ == "":
             return True
         return cell["cell_type"] == type_
+
 
 class Notebook():
     def __init__(self, path: str | Path):
@@ -57,29 +58,44 @@ class Notebook():
     def match_language(self, language: Criterion) -> bool:
         lang = _reg_criterion(language)
         return all(self.lang == l.lower() for l in lang["include"]
-              ) and not any(self.lang == l.lower() for l in lang["exclude"])
+                  ) and not any(self.lang == l.lower() for l in lang["exclude"])
 
     def cells(self, keyword: Criterion, type_: str = "") -> list[Cell]:
-        return [cell for cell in self._cells
-                if cell.match_type(type_) and cell.match_keyword(keyword)]
+        return [
+            cell for cell in self._cells
+            if cell.match_type(type_) and cell.match_keyword(keyword)
+        ]
 
     def __repr__(self) -> str:
         return f"Notebook({self.path})"
 
 
-def print_nb_cells(nb_cells: tuple[tuple[Notebook, Cell], ...], num_notebooks: int, num_cells: int):
+def print_nb_cells(
+    nb_cells: tuple[tuple[Notebook, Cell], ...], num_notebooks: int, num_cells: int
+):
     n = len(nb_cells)
     print(f"Matched {n} notebooks")
-    print(f"Display {min(n, num_notebooks)} notebooks each with up to {num_cells} cells\n")
+    print(
+        f"Display {min(n, num_notebooks)} notebooks each with up to {num_cells} cells\n"
+    )
     for nb, cells in nb_cells[:num_notebooks]:
         print(f"{nb.path}: {nb.lang}")
         for idx, cell in enumerate(cells[:num_cells]):
-            print(f"    ------------------------------------ Cell {idx} ------------------------------------")
+            print(
+                f"    ------------------------------------ Cell {idx} ------------------------------------"
+            )
             print(cell.source(4))
-        print(f"========================================================================================\n\n")
+        print(
+            f"========================================================================================\n\n"
+        )
 
 
-def search_notebooks(notebooks: list[Notebook], keyword: Criterion = "", type_: str = "", language: Criterion = ""):
+def search_notebooks(
+    notebooks: list[Notebook],
+    keyword: Criterion = "",
+    type_: str = "",
+    language: Criterion = ""
+):
     notebooks = [nb for nb in notebooks if nb.match_language(language)]
     return tuple((nb, cells) for nb in notebooks if (cells := nb.cells(keyword, type_)))
 
