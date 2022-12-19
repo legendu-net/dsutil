@@ -36,7 +36,7 @@ class Cell():
     def match_type(self, type_: str) -> bool:
         if type_ == "":
             return True
-        return cell["cell_type"] == type_
+        return self._cell["cell_type"] == type_
 
 
 class Notebook():
