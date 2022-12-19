@@ -1,4 +1,4 @@
-# [aiutil](https://github.com/dclong/aiutil): Data Science Utils
+# [aiutil](https://github.com/legendu-net/aiutil): Data Science Utils
 
 This is a Python pacakage that contains misc utils for Data Science.
 
