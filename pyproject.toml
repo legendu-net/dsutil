@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiutil"
-version = "0.75.0"
+version = "0.76.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 license = "MIT"
@@ -88,7 +88,7 @@ ignored-modules = "pyspark.sql.functions"
 ignored-classes = "Namespace"
 
 [tool.pylint.messages_control]
-disable = "C0103,C0200,C0301,C0303,C0330,R0902,R0903,R0911,R0912,R0913,W0621,W0622,W0702,W0703,W1116"
+disable = "C0103,C0200,C0301,C0303,R0902,R0903,R0911,R0912,R0913,W0621,W0622,W0702,W0703,W1116"
 
 [build-system]
 requires = ["poetry>=1.0.0"]

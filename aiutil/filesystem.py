@@ -392,15 +392,15 @@ def append_lines(
 
 def replace_patterns(
     path: Path,
-    patterns: Union[str, Iterable[str]],
-    repls: Union[str, Iterable[str]],
+    pattern: Union[str, Iterable[str]],
+    repl: Union[str, Iterable[str]],
     regex: bool = True,
 ) -> None:
     """Update a text file using regular expression substitution.
 
     :param path: A Path object to the file to be updated.
-    :param patterns: A (list of) patterns to replace.
-    :param repls: A list of replacements.
+    :param pattern: A (list of) patterns to replace.
+    :param repl: A (list of) replacements.
         or a function to map patterns to replacements.
     :param regex: If true, treat patterns as regular expression pattern;
         otherwise, perform exact matches.
@@ -408,16 +408,16 @@ def replace_patterns(
     if isinstance(path, str):
         path = Path(path)
     text = path.read_text(encoding="utf-8")
-    if isinstance(patterns, str):
-        patterns = [patterns]
-    if isinstance(repls, str):
-        repls = [repls]
+    if isinstance(pattern, str):
+        pattern = [pattern]
+    if isinstance(repl, str):
+        repl = [repl]
     if regex:
-        for pattern, repl in zip(patterns, repls):
-            text = re.sub(pattern, repl, text)
+        for p, r in zip(pattern, repl):
+            text = re.sub(p, r, text)
     else:
-        for pattern, repl in zip(patterns, repls):
-            text = text.replace(pattern, repl)
+        for p, r in zip(pattern, repl):
+            text = text.replace(p, r)
     path.write_text(text, encoding="utf-8")
 
 
