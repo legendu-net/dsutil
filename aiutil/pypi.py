@@ -21,7 +21,7 @@ def dep(pkg: str, recursive: bool = False) -> set[str]:
 
 def _dep(pkg):
     url = f"https://pypi.org/pypi/{pkg}/json"
-    deps = requests.get(url).json()["info"]["requires_dist"]
+    deps = requests.get(url, timeout=10).json()["info"]["requires_dist"]
     if deps is None:
         return set()
     return set(dep for dep in deps if "extra ==" not in dep)

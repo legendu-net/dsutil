@@ -58,7 +58,7 @@ def _update_version_readme(ver: str, proj_dir: Path) -> None:
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
     """
-    replace_patterns(proj_dir / README, patterns=r"\d+\.\d+\.\d+", repls=f"{ver}")
+    replace_patterns(proj_dir / README, pattern=r"\d+\.\d+\.\d+", repl=f"{ver}")
 
 
 def _update_version_toml(ver: str, proj_dir: Path) -> None:
@@ -69,8 +69,8 @@ def _update_version_toml(ver: str, proj_dir: Path) -> None:
     """
     replace_patterns(
         proj_dir / TOML,
-        patterns=r"version = .\d+\.\d+\.\d+.",
-        repls=f'version = "{ver}"'
+        pattern=r"version = .\d+\.\d+\.\d+.",
+        repl=f'version = "{ver}"'
     )
 
 
@@ -84,8 +84,8 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
     for path in (proj_dir / pkg).glob("**/*.py"):
         replace_patterns(
             path,
-            patterns=r"__version__ = .\d+\.\d+\.\d+.",
-            repls=f'__version__ = "{ver}"'
+            pattern=r"__version__ = .\d+\.\d+\.\d+.",
+            repl=f'__version__ = "{ver}"'
         )
 
 

@@ -21,7 +21,7 @@ class DockerHub():
         if "/" in image:
             user, image = image.split("/")
         url = f"https://hub.docker.com/v2/repositories/{user}/{image}/tags/"
-        res = requests.get(url)
+        res = requests.get(url, timeout=10)
         return res.json()["results"]
 
     def token(self, password: str) -> None:
@@ -35,6 +35,7 @@ class DockerHub():
                 "username": self.user,
                 "password": password
             },
+            timeout=10,
         )
         self._token = res.json()["token"]
 
@@ -59,6 +60,7 @@ class DockerHub():
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"JWT {self._token}"
-            }
+            },
+            timeout=10,
         )
         return tag if res else ""
