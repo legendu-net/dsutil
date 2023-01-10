@@ -145,9 +145,9 @@ class SparkSubmit:
         with sp.Popen(cmd, shell=True, stderr=sp.PIPE) as process:
             while True:
                 if process.poll() is None:
-                    line = (
-                        process.stderr.readline().decode().rstrip()
-                    )  # pytype: disable=attribute-error
+                    # pytype: disable=attribute-error
+                    line = process.stderr.readline().decode().rstrip()
+                    # pytype: enable=attribute-error
                     line = self._filter(line, time_begin, self._spark_log_filter)
                     if line:
                         print(line)
