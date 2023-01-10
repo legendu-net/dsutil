@@ -63,7 +63,7 @@ def count_path(paths: Iterable[str], ascending=False) -> pd.Series:
     """Count frequence of paths and their parent paths.
 
     :param paths: An iterable collection of paths.
-    :param ascending: If true, sort paths according to their frequencies in ascending order, 
+    :param ascending: If true, sort paths according to their frequencies in ascending order,
         vice versa.
     :return: A pandas Series with paths as index and frequencies of paths as value.
     """
@@ -121,8 +121,8 @@ def _flatten_dir(dir_: Path) -> None:
 
 def split_dir(dir_: Union[str, Path], batch_size: int, wildcard: str = "*") -> None:
     """Split files in a directory into sub-directories.
-    This function is for the convenience of splitting a directory 
-    with a large number of files into smaller directories 
+    This function is for the convenience of splitting a directory
+    with a large number of files into smaller directories
     so that those subdirs can zipped (into relatively smaller files) and uploaded to cloud quickly.
 
     :param dir_: The root directory whose files are to be splitted into sub-directories.
@@ -149,7 +149,7 @@ def _split_dir_1(
     :param batch_size: The size of the batch.
     """
     desdir.mkdir(exist_ok=True)
-    for path in files[(batch_idx * batch_size):((batch_idx + 1) * batch_size)]:
+    for path in files[(batch_idx * batch_size) : ((batch_idx + 1) * batch_size)]:
         path.rename(desdir / path.name)
 
 
@@ -157,7 +157,7 @@ def find_images(root_dir: Union[str, Path, list[str], list[Path]]) -> list[Path]
     """Find all PNG images in a (sequence) of dir(s) or its/their subdirs.
 
     :param root_dir: A (list) of dir(s).
-    :return: A list of Path objects to PNG images. 
+    :return: A list of Path objects to PNG images.
     """
     if isinstance(root_dir, (str, Path)):
         root_dir = [root_dir]
@@ -206,7 +206,8 @@ def find_data_tables(
         ".json",
     } | set(extensions)
     paths = (
-        path for path in Path(root).glob("**/*")
+        path
+        for path in Path(root).glob("**/*")
         if path.suffix.lower() in extensions and path.is_file()
     )
     return set(
@@ -272,8 +273,12 @@ def _ignore(path: Path) -> bool:
     if path.is_file() and path.name.startswith("."):
         return True
     if path.is_dir() and path.name in (
-        ".jukit", ".ipynb_checkpoints", ".mypy_cache", ".pytest_cache", ".mtj.tmp",
-        "__pycache__"
+        ".jukit",
+        ".ipynb_checkpoints",
+        ".mypy_cache",
+        ".pytest_cache",
+        ".mtj.tmp",
+        "__pycache__",
     ):
         return True
     return False
@@ -329,9 +334,7 @@ def _find_ess_empty(
 
 
 def is_ess_empty(
-    path: Path,
-    ignore: Callable = _ignore,
-    ess_empty: Optional[dict[Path, bool]] = None
+    path: Path, ignore: Callable = _ignore, ess_empty: Optional[dict[Path, bool]] = None
 ):
     """Check if a directory is essentially empty.
 
@@ -445,8 +448,7 @@ def _get_files(dir_: Path, exts: list[str]) -> Iterable[Path]:
 
 
 def has_header(
-    files: Union[str, Path, list[Union[str, Path]]],
-    num_files_checking: int = 5
+    files: Union[str, Path, list[Union[str, Path]]], num_files_checking: int = 5
 ) -> bool:
     """Check whether the files have headers.
 
@@ -476,12 +478,11 @@ def has_header(
 
 
 def _merge_with_headers(
-    files: Union[str, Path, list[Union[str, Path]]],
-    output: Union[str, Path] = ""
+    files: Union[str, Path, list[Union[str, Path]]], output: Union[str, Path] = ""
 ) -> None:
     """Merge files with headers. Keep only one header.
 
-    :param files: A list of files 
+    :param files: A list of files
         or the path to a directory containing a list of files to merge.
     :param output: output files for merging the files.
     """
@@ -497,12 +498,11 @@ def _merge_with_headers(
 
 
 def _merge_without_header(
-    files: Union[str, Path, list[Union[str, Path]]],
-    output: Union[str, Path] = ""
+    files: Union[str, Path, list[Union[str, Path]]], output: Union[str, Path] = ""
 ) -> None:
     """Merge files without header.
 
-    :param files: A list of files 
+    :param files: A list of files
         or the path to a directory containing a list of files to merge.
     :param output: output files for merging the files.
     """
@@ -517,11 +517,11 @@ def _merge_without_header(
 def merge(
     files: Union[str, Path, list[Union[str, Path]]],
     output: str = "",
-    num_files_checking: int = 5
+    num_files_checking: int = 5,
 ) -> None:
     """Merge files. If there are headers in files, keep only one header in the single merged file.
 
-    :param files: A list of files 
+    :param files: A list of files
         or the path to a directory containing a list of files to merge.
     :param output: output files for merging the files.
     :param num_files_checking: number of files for checking whether there are headers in files.
@@ -541,15 +541,16 @@ def merge(
 
 def dedup_header(file: Union[str, Path], output: Union[str, Path] = "") -> None:
     """Dedup headers in a file (due to the hadoop getmerge command).
-    Only the header on the first line is kept and headers (identical line to the first line) 
+    Only the header on the first line is kept and headers (identical line to the first line)
     on other lines are removed.
 
     :param file: The path to the file to be deduplicated.
-    :param output: The path of the output file. 
+    :param output: The path of the output file.
         If empty, then output to the standard output.
     """
-    with open(file, "rb"
-             ) as fin, open(output, "wb") if output else sys.stdout.buffer as fout:
+    with open(file, "rb") as fin, open(
+        output, "wb"
+    ) if output else sys.stdout.buffer as fout:
         header = fin.readline()
         fout.write(header)
         for line in fin:
@@ -561,14 +562,14 @@ def select(
     path: Union[str, Path],
     columns: Union[str, list[str]],
     delimiter: str,
-    output: str = ""
+    output: str = "",
 ):
     """Select fields by name from a delimited file (not necessarily well structured).
 
     :param path: To path to a file (containing delimited values in each row).
     :param columns: A list of columns to extract from the file.
     :param delimiter: The delimiter of fields.
-    :param output: The path of the output file. 
+    :param output: The path of the output file.
         If empty, then output to the standard output.
     """
     if isinstance(path, str):
@@ -667,10 +668,7 @@ def _filter_sp(path: Union[str, Path], pattern: str, sub_pattern: str):
 
 
 def filter(
-    path: Union[str, Path],
-    pattern: str,
-    sub_pattern: str = "",
-    num_lines: int = 0
+    path: Union[str, Path], pattern: str, sub_pattern: str = "", num_lines: int = 0
 ) -> list[list[str]]:
     """Filter lines from a file.
     A main regex pattern is used to identify main rows.

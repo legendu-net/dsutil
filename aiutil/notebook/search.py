@@ -20,7 +20,7 @@ def _reg_criterion(criterion: str | list[str] | dict[str, list[str]]):
     return criterion
 
 
-class Cell():
+class Cell:
     def __init__(self, cell: dict):
         self._cell = cell
         self._source = self.source(0)
@@ -30,8 +30,9 @@ class Cell():
 
     def match_keyword(self, keyword: Criterion):
         kwd = _reg_criterion(keyword)
-        return all(k in self._source for k in kwd["include"]
-                  ) and not any(k in self._source for k in kwd["exclude"])
+        return all(k in self._source for k in kwd["include"]) and not any(
+            k in self._source for k in kwd["exclude"]
+        )
 
     def match_type(self, type_: str) -> bool:
         if type_ == "":
@@ -39,7 +40,7 @@ class Cell():
         return self._cell["cell_type"] == type_
 
 
-class Notebook():
+class Notebook:
     def __init__(self, path: str | Path):
         self.path = Path(path) if isinstance(path, str) else path
         self._notebook = self._read_notebook()
@@ -47,9 +48,18 @@ class Notebook():
         self._cells = [Cell(cell) for cell in self._notebook["cells"]]
 
     def _get_lang(self) -> str:
-        if self._notebook["nbformat"] <= 4:
-            return self._notebook["metadata"]["language_info"]["name"]
-        return self._notebook["metadata"]["kernelspec"]["language"]
+        if "metadata" not in self._notebook:
+            return "python"
+        metadata = self._notebook["metadata"]
+        if "kernelspec" in metadata:
+            kernelspec = metadata["kernelspec"]
+            if "language" in kernelspec:
+                return kernelspec["language"]
+            if "name" in kernelspec:
+                return kernelspec["name"]
+        elif "language_info" in metadata:
+            return metadata["language_info"]["name"]
+        return "python"
 
     def _read_notebook(self) -> dict:
         with self.path.open() as fin:
@@ -57,12 +67,14 @@ class Notebook():
 
     def match_language(self, language: Criterion) -> bool:
         lang = _reg_criterion(language)
-        return all(self.lang == l.lower() for l in lang["include"]
-                  ) and not any(self.lang == l.lower() for l in lang["exclude"])
+        return all(self.lang == l.lower() for l in lang["include"]) and not any(
+            self.lang == l.lower() for l in lang["exclude"]
+        )
 
     def cells(self, keyword: Criterion, type_: str = "") -> list[Cell]:
         return [
-            cell for cell in self._cells
+            cell
+            for cell in self._cells
             if cell.match_type(type_) and cell.match_keyword(keyword)
         ]
 
@@ -94,7 +106,7 @@ def search_notebooks(
     notebooks: list[Notebook],
     keyword: Criterion = "",
     type_: str = "",
-    language: Criterion = ""
+    language: Criterion = "",
 ):
     notebooks = [nb for nb in notebooks if nb.match_language(language)]
     return tuple((nb, cells) for nb in notebooks if (cells := nb.cells(keyword, type_)))
@@ -145,8 +157,7 @@ def _search_notebooks_args(args):
 
 
 def parse_args(args=None, namespace=None) -> Namespace:
-    """Parse command-line arguments.
-    """
+    """Parse command-line arguments."""
     parser = ArgumentParser(description="Search for notebooks.")
     subparsers = parser.add_subparsers(dest="sub_cmd", help="Sub commands.")
     _subparse_search(subparsers)
@@ -166,7 +177,7 @@ def _subparse_list(subparsers):
         dest="paths",
         nargs="+",
         required=True,
-        help="Paths to notebooks or directories containing notebooks."
+        help="Paths to notebooks or directories containing notebooks.",
     )
     subparser_list.set_defaults(func=_list_langs_args)
 
@@ -183,7 +194,7 @@ def _subparse_search(subparsers):
         dest="paths",
         nargs="+",
         required=True,
-        help="Paths to notebooks or directories containing notebooks."
+        help="Paths to notebooks or directories containing notebooks.",
     )
     subparser_search.add_argument(
         "-l",
@@ -191,7 +202,7 @@ def _subparse_search(subparsers):
         dest="lang_include",
         nargs="*",
         default=(),
-        help="The language of notebooks."
+        help="The language of notebooks.",
     )
     subparser_search.add_argument(
         "-L",
@@ -199,7 +210,7 @@ def _subparse_search(subparsers):
         dest="lang_exclude",
         nargs="*",
         default=(),
-        help="Languages that notebooks shouldn't include."
+        help="Languages that notebooks shouldn't include.",
     )
     subparser_search.add_argument(
         "-k",
@@ -207,7 +218,7 @@ def _subparse_search(subparsers):
         dest="kwd_include",
         nargs="*",
         default=(),
-        help="Keywords to search for in cells of notebooks."
+        help="Keywords to search for in cells of notebooks.",
     )
     subparser_search.add_argument(
         "-K",
@@ -215,7 +226,7 @@ def _subparse_search(subparsers):
         dest="kwd_exclude",
         nargs="*",
         default=(),
-        help="Keywords that cells of notebooks shouldn't include."
+        help="Keywords that cells of notebooks shouldn't include.",
     )
     subparser_search.add_argument(
         "-n",
@@ -223,7 +234,7 @@ def _subparse_search(subparsers):
         dest="num_notebooks",
         type=int,
         default=10,
-        help="Number of matched notebooks to display."
+        help="Number of matched notebooks to display.",
     )
     subparser_search.add_argument(
         "-c",
@@ -231,14 +242,13 @@ def _subparse_search(subparsers):
         dest="num_cells",
         type=int,
         default=10,
-        help="Number of matched cells in each notebook to display."
+        help="Number of matched cells in each notebook to display.",
     )
     subparser_search.set_defaults(func=_search_notebooks_args)
 
 
 def main() -> None:
-    """The main function of the script.
-    """
+    """The main function of the script."""
     args = parse_args()
     args.func(args)
 

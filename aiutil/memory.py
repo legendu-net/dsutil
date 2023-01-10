@@ -30,7 +30,8 @@ def get_memory_usage(user: str = USER) -> int:
     )
     try:
         return sum(
-            p.memory_info().rss for p in psutil.process_iter()
+            p.memory_info().rss
+            for p in psutil.process_iter()
             if p.username() == USER and p.status() in STATUS
         )
     except:
@@ -52,12 +53,12 @@ def match_memory_usage(
     target: float,
     arr_size: int = 1_000_000,
     sleep_min: float = 1,
-    sleep_max: float = 30
+    sleep_max: float = 30,
 ):
     """Match a user's memory usage to the specified value.
-    The memory usage will gradually increase to the specified value 
+    The memory usage will gradually increase to the specified value
     if it is smaller than the specified value.
-    Otherwise, 
+    Otherwise,
     the memory usage drops immediately to match the specified value.
 
     :param target: The target memory in bytes.
@@ -78,7 +79,9 @@ def match_memory_usage(
         mem = get_memory_usage(USER)
         logger.info(
             "Current used memory by {}: {:,} out of which {:,} is contributed by the memory matcher",
-            USER, mem, size * len(dq)
+            USER,
+            mem,
+            size * len(dq),
         )
         diff = (target - mem) / size
         if diff > 0:
@@ -96,7 +99,7 @@ def match_memory_usage(
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
 
-    :param args: The arguments to parse. 
+    :param args: The arguments to parse.
         If None, the arguments from command-line are parsed.
     :param namespace: An inital Namespace object.
     :return: A namespace object containing parsed options.
@@ -109,20 +112,19 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "-g",
         dest="target",
         type=lambda s: int(s) * 1073741824,
-        help="Specify target memory in gigabytes."
+        help="Specify target memory in gigabytes.",
     )
     mutex.add_argument(
         "-m",
         dest="target",
         type=lambda s: int(s) * 1048576,
-        help="Specify target memory in megabytes."
+        help="Specify target memory in megabytes.",
     )
     return parser.parse_args(args=args, namespace=namespace)
 
 
 def main():
-    """The main function for scripting usage.
-    """
+    """The main function for scripting usage."""
     args = parse_args()
     match_memory_usage(args.target)
 

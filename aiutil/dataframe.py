@@ -11,7 +11,7 @@ from pandas_profiling import ProfileReport
 def table_2w(
     frame: Union[pd.DataFrame, pd.Series],
     columns: Union[str, list[str], None],
-    na_as=None
+    na_as=None,
 ) -> pd.DataFrame:
     """Create 2-way table from columns of a DataFrame.
 

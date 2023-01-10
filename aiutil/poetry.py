@@ -68,9 +68,7 @@ def _update_version_toml(ver: str, proj_dir: Path) -> None:
     :param proj_dir: The root directory of the Poetry project.
     """
     replace_patterns(
-        proj_dir / TOML,
-        pattern=r"version = .\d+\.\d+\.\d+.",
-        repl=f'version = "{ver}"'
+        proj_dir / TOML, pattern=r"version = .\d+\.\d+\.\d+.", repl=f'version = "{ver}"'
     )
 
 
@@ -85,7 +83,7 @@ def _update_version_init(ver: str, proj_dir: Path) -> None:
         replace_patterns(
             path,
             pattern=r"__version__ = .\d+\.\d+\.\d+.",
-            repl=f'__version__ = "{ver}"'
+            repl=f'__version__ = "{ver}"',
         )
 
 
@@ -135,9 +133,7 @@ def _get_tag(proj_dir):
 
 
 def add_tag_release(
-    proj_dir: Union[str, Path, None] = None,
-    tag: str = "",
-    release_branch: str = "main"
+    proj_dir: Union[str, Path, None] = None, tag: str = "", release_branch: str = "main"
 ) -> None:
     """Add a tag to the latest commit on the release branch for releasing.
     The tag is decided based on the current version of the project.
@@ -168,10 +164,9 @@ def add_tag_release(
 
 
 def format_code(
-    inplace: bool = False,
     commit: bool = False,
     proj_dir: Optional[Path] = None,
-    files: Iterable[Union[Path, str]] = ()
+    files: Iterable[Union[Path, str]] = (),
 ) -> None:
     """Format code.
 
@@ -184,34 +179,19 @@ def format_code(
         If empty, then the whole project is formatted.
     """
     PATH = os.environ["PATH"]
-    cmd = f"PATH={proj_dir}/.venv/bin:{PATH} yapf"
-    if inplace:
-        cmd += " -ir"
-        logger.info("Formatting code...")
-    else:
-        cmd += " -dr"
-        logger.info("Checking code formatting...")
+    cmd = f"PATH={proj_dir}/.venv/bin:{PATH} black "
     if files:
-        cmd += " " + " ".join(files)
+        cmd += " ".join(f"'{file}'" for file in files)
     else:
         if proj_dir is None:
             proj_dir = _project_dir()
-        # source dir
-        pkg = _project_name(proj_dir)
-        cmd += " " + str(proj_dir / pkg)
-        # tests dir
-        test = proj_dir / "tests"
-        if test.is_dir():
-            cmd += " " + str(test)
+        cmd += str(proj_dir)
     proc = sp.run(cmd, shell=True, check=False, stdout=sp.PIPE)
     if proc.returncode:
-        logger.warning(
-            "Please format the code: {}\n{}", cmd.replace(" -dr ", " -ir "),
-            proc.stdout.decode()
-        )
+        logger.warning("Please format the code: {}\n{}", cmd, proc.stdout.decode())
         sys.stdout.flush()
         sys.stderr.flush()
-    if inplace and commit:
+    if commit:
         repo = git.Repo(proj_dir)
         repo.git.add(".")
         repo.index.commit("format code")
@@ -238,7 +218,9 @@ def _lint_code_pytype(proj_dir: Union[Path, None]):
     if not proj_dir:
         proj_dir = _project_dir()
     pkg = _project_name(proj_dir)
-    cmd = f"PATH={proj_dir}/.venv/bin:$PATH pytype {proj_dir / pkg} {proj_dir / 'tests'}"
+    cmd = (
+        f"PATH={proj_dir}/.venv/bin:$PATH pytype {proj_dir / pkg} {proj_dir / 'tests'}"
+    )
     try:
         sp.run(cmd, shell=True, check=True)
     except sp.CalledProcessError:
@@ -284,7 +266,7 @@ def _lint_code_darglint(proj_dir: Union[Path, None]):
 def build_package(
     proj_dir: Union[Path, None] = None,
     linter: Union[str, Iterable[str]] = ("pylint", "pytype"),
-    test: bool = True
+    test: bool = True,
 ) -> None:
     """Build the package using poetry.
 

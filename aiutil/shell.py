@@ -11,16 +11,18 @@ import pandas as pd
 def ls(path: Union[Path, str]):
     """List files in the given path.
     This function is similar to the shell command `ls`.
-    
+
     :param path: A path to a file or a directory.
     """
     if isinstance(path, str):
         path = Path(path)
     paths = list(path.iterdir()) if path.is_dir() else [path]
-    return pd.DataFrame({
-        "paths": paths,
-        "name": (p.name for p in paths),
-    })
+    return pd.DataFrame(
+        {
+            "paths": paths,
+            "name": (p.name for p in paths),
+        }
+    )
 
 
 def to_frame(
@@ -29,7 +31,7 @@ def to_frame(
     header: Union[int, list[str], None] = None,
     skip: Union[int, Sequence[int]] = (),
     lines: Sequence[str] = (),
-    split_by_header: bool = False
+    split_by_header: bool = False,
 ) -> pd.DataFrame:
     """Convert the result of a shell command to a DataFrame.
     The headers are splitted by a regular expression
@@ -38,13 +40,13 @@ def to_frame(
     :param cmd: A shell command.
     :param split: A regular expression pattern for splitting a line into fields.
     :param header: An integer, list of string or None specifiying the header of the data frame.
-        If header is an integer, 
-        the corresponding row of lines after removing empty and skipped rows is used as header of the data frame; 
+        If header is an integer,
+        the corresponding row of lines after removing empty and skipped rows is used as header of the data frame;
         if header is a list of string then it is used as the header of the data frame.
         if header is None, then default header is used for the data frame.
     :param skip: Indexes of rows to skip.
     :param lines: The output of the shell command.
-    :param split_by_header: If true, the headers are splitted by a regular expression 
+    :param split_by_header: If true, the headers are splitted by a regular expression
         and the columns are splitted by the right-most position of the headers.
         Otherwise, all lines are splitted by the specified regular expression.
     :return: A pandas DataFrame.
@@ -69,7 +71,7 @@ def _to_frame_space(
     :param lines: The output of a shell command as lines of rows.
     :param split: A regular expression pattern for splitting a line into fields.
     :param header: An integer, list of string or None specifiying the header of the data frame.
-        If header is an integer, the corresponding row of lines after removing empty and skipped rows is used as header of the data frame; 
+        If header is an integer, the corresponding row of lines after removing empty and skipped rows is used as header of the data frame;
         if header is a list of string then it is used as the header of the data frame.
         if header is None, then default header is used for the data frame.
     :return: A pandas DataFrame.

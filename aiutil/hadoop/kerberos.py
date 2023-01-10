@@ -57,7 +57,8 @@ def read_passwd() -> str:
 def _warn_passwd_expiration(process, email: dict[str, str]):
     lines = process.stdout.decode().split("\n")
     msg = "\n".join(
-        line for line in lines
+        line
+        for line in lines
         if line.strip().startswith("Warning: Your password will expire")
     )
     if msg and email:
@@ -87,7 +88,7 @@ def authenticate(password: str, email: dict[str, str], user: str = "") -> None:
             ["/usr/bin/kinit", user if user else USER],
             input=password.encode(),
             check=True,
-            capture_output=True
+            capture_output=True,
         )
         subject = SUBJECT.format("succeeded")
         msg = MSG.format("succeeded")
@@ -122,7 +123,7 @@ def authenticate(password: str, email: dict[str, str], user: str = "") -> None:
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments for the script.
 
-    :param args: The arguments to parse. 
+    :param args: The arguments to parse.
     If None, the command-line arguments are parsed.
     :param namespace: An initial Namespace object.
     :return: A Namespace object containing parsed command-line options.
@@ -133,7 +134,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "--user",
         dest="user",
         default="",
-        help="The name of the user to authenticate."
+        help="The name of the user to authenticate.",
     )
     parser.add_argument(
         "-p", "--password", dest="password", default="", help="the user's password."
@@ -144,7 +145,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
         dest="minute",
         type=int,
         default=None,
-        help="Run the script as a deamon with the specified frequency (in minutes)."
+        help="Run the script as a deamon with the specified frequency (in minutes).",
     )
     parser.add_argument(
         "-c",
@@ -152,7 +153,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
         dest="config",
         type=Path,
         default=HOME / ".pykinit.yaml",
-        help="The path to a configure file which contains email information."
+        help="The path to a configure file which contains email information.",
     )
     return parser.parse_args(args, namespace)
 

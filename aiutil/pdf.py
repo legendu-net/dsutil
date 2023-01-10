@@ -12,7 +12,7 @@ def extract_pages(file: str, subfiles: dict[str, Union[int, Iterable[int]]]) -> 
     :param subfiles: A dictionary specifying sub PDF files
         and their corresponding indexes (0-based) of pages from the raw PDF file.
         For example,
-        the following code extract pages 0-4 as first.pdf, 
+        the following code extract pages 0-4 as first.pdf,
         pages 5 and 7 as second.pdf,
         and page 6 as third.pdf from raw.pdf.
         .. highlight:: python

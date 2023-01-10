@@ -10,17 +10,14 @@ from ..shell import to_frame
 from ..filesystem import count_path
 
 
-class Hdfs():
-    """A class abstring the hdfs command.
-    """
+class Hdfs:
+    """A class abstring the hdfs command."""
+
     def __init__(self, bin: str = "/apache/hadoop/bin/hdfs"):
         self._bin = bin
 
     def ls(
-        self,
-        path: str,
-        dir_only: bool = False,
-        recursive: bool = False
+        self, path: str, dir_only: bool = False, recursive: bool = False
     ) -> pd.DataFrame:
         """Return the results of hdfs dfs -ls /hdfs/path as a DataFrame.
 
@@ -74,7 +71,8 @@ class Hdfs():
             paths = self.ls(path, recursive=True).path
             frames = [
                 self._du_helper(path)
-                for path in paths if path[index:].count("/") + 1 == depth
+                for path in paths
+                if path[index:].count("/") + 1 == depth
             ]
             return pd.concat(frames, ignore_index=True)
         return self._du_helper(path)
@@ -119,12 +117,9 @@ class Hdfs():
         return int(sp.check_output(cmd, shell=True))
 
     def get(
-        self,
-        hdfs_path: str,
-        local_dir: Union[str, Path] = "",
-        is_file: bool = False
+        self, hdfs_path: str, local_dir: Union[str, Path] = "", is_file: bool = False
     ) -> None:
-        """Download data from HDFS into a local directory. 
+        """Download data from HDFS into a local directory.
 
         :param hdfs_path: The HDFS path (can be both a file or a directory) to copy.
         :param local_dir: The local directory to copy HDFS files into.
@@ -166,7 +161,7 @@ class Hdfs():
         self,
         local_path: Union[str, Path],
         hdfs_path: str,
-        create_hdfs_path: bool = False
+        create_hdfs_path: bool = False,
     ) -> None:
         """Copy data from local to HDFS.
         :param local_path: A local path to copy to HDFS.
@@ -182,9 +177,9 @@ class Hdfs():
             f"The local path {local_path} has been uploaded into the HDFS path {hdfs_path}"
         )
 
-    def fetch_partition_names(self,
-                              path: str,
-                              extension: str = ".parquet") -> list[str]:
+    def fetch_partition_names(
+        self, path: str, extension: str = ".parquet"
+    ) -> list[str]:
         """Get Parquet partition names (with the parent directory) under a HDFS path.
 
         :param path: A HDFS path.
@@ -209,13 +204,12 @@ class Hdfs():
         proc = sp.run(cmd, shell=True)  # pylint: disable=W1510
         return proc.returncode == 0
 
-    def rm_robust(self,
-                  path: str,
-                  skip_trash: bool = False,
-                  user: str = "") -> list[str]:
-        """Remove a HDFS path in a robust way. 
-            If removing a directory fails, 
-            the method continues to remove its subfiles and subdirs 
+    def rm_robust(
+        self, path: str, skip_trash: bool = False, user: str = ""
+    ) -> list[str]:
+        """Remove a HDFS path in a robust way.
+            If removing a directory fails,
+            the method continues to remove its subfiles and subdirs
             insteadd of throwing an exception.
 
         :param path: A HDFS path to remove.

@@ -19,7 +19,7 @@ def format(path: Union[Path, str]):
         identifier_case="lower",
         strip_comments=False,
         reindent=True,
-        indent_width=2
+        indent_width=2,
     )
     path.write_text(query, encoding="utf-8")
     cmd = f"pg_format --function-case 1 --type-case 3 --inplace {path}"
