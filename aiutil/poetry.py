@@ -186,11 +186,8 @@ def format_code(
         if proj_dir is None:
             proj_dir = _project_dir()
         cmd += str(proj_dir)
-    proc = sp.run(cmd, shell=True, check=False, stdout=sp.PIPE)
-    if proc.returncode:
-        logger.warning("Please format the code: {}\n{}", cmd, proc.stdout.decode())
-        sys.stdout.flush()
-        sys.stderr.flush()
+    logger.info("Formatting code using black ...")
+    sp.run(cmd, shell=True, check=False, stdout=sp.PIPE)
     if commit:
         repo = git.Repo(proj_dir)
         repo.git.add(".")
