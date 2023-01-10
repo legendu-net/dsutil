@@ -164,7 +164,6 @@ def add_tag_release(
 
 
 def format_code(
-    inplace: bool = False,
     commit: bool = False,
     proj_dir: Optional[Path] = None,
     files: Iterable[Union[Path, str]] = (),

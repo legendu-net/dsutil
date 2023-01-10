@@ -15,10 +15,7 @@ files = [
 [package.dependencies]
 lazy-object-proxy = ">=1.4.0"
 typing-extensions = ">=4.0.0"
-wrapt = [
-    {version = ">=1.11,<2", markers = "python_version < \"3.11\""},
-    {version = ">=1.14,<2", markers = "python_version >= \"3.11\""},
-]
+wrapt = {version = ">=1.11,<2", markers = "python_version < \"3.11\""}
 
 [[package]]
 name = "attrs"
@@ -62,7 +59,7 @@ lxml = ["lxml"]
 name = "black"
 version = "22.12.0"
 description = "The uncompromising code formatter."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -765,14 +762,14 @@ i18n = ["Babel (>=2.7)"]
 
 [[package]]
 name = "joblib"
-version = "1.1.1"
+version = "1.2.0"
 description = "Lightweight pipelining with Python functions"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = [
-    {file = "joblib-1.1.1-py2.py3-none-any.whl", hash = "sha256:f9d6c3cdf2a7778e9058e10e9dba028e47771a1a355e5768f46704bf05342eba"},
-    {file = "joblib-1.1.1.tar.gz", hash = "sha256:301f0375f49586a7effee3f6348c419d5765fca1c750186b20690a0d90b82900"},
+    {file = "joblib-1.2.0-py3-none-any.whl", hash = "sha256:091138ed78f800342968c523bdde947e7a305b8594b910a0fea2ab83c3c6d385"},
+    {file = "joblib-1.2.0.tar.gz", hash = "sha256:e1cee4a79e4af22881164f218d4311f60074197fb707e082e803b61f6d137018"},
 ]
 
 [[package]]
@@ -1207,27 +1204,6 @@ files = [
 ]
 
 [[package]]
-name = "missingno"
-version = "0.5.1"
-description = "Missing data visualization module for Python."
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "missingno-0.5.1-py3-none-any.whl", hash = "sha256:74e8fa1ea68c9482479a9429009856ae6cc64725f085092429950e30a8d78f55"},
-    {file = "missingno-0.5.1.tar.gz", hash = "sha256:22e1735a9213df7425e76123ebcc627d11a2608a1d725b90c6a2d7329db718db"},
-]
-
-[package.dependencies]
-matplotlib = "*"
-numpy = "*"
-scipy = "*"
-seaborn = "*"
-
-[package.extras]
-tests = ["pytest", "pytest-mpl"]
-
-[[package]]
 name = "mistune"
 version = "2.0.4"
 description = "A sane Markdown parser with useful plugins and renderers"
@@ -1255,7 +1231,7 @@ files = [
 name = "mypy-extensions"
 version = "0.4.3"
 description = "Experimental type system extensions for programs checked with the mypy typechecker."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 files = [
@@ -1360,22 +1336,22 @@ files = [
 
 [[package]]
 name = "networkx"
-version = "3.0"
+version = "2.8.3"
 description = "Python package for creating and manipulating graphs and networks"
 category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "networkx-3.0-py3-none-any.whl", hash = "sha256:58058d66b1818043527244fab9d41a51fcd7dcc271748015f3c181b8a90c8e2e"},
-    {file = "networkx-3.0.tar.gz", hash = "sha256:9a9992345353618ae98339c2b63d8201c381c2944f38a2ab49cb45a4c667e412"},
+    {file = "networkx-2.8.3-py3-none-any.whl", hash = "sha256:f151edac6f9b0cf11fecce93e236ac22b499bb9ff8d6f8393b9fef5ad09506cc"},
+    {file = "networkx-2.8.3.tar.gz", hash = "sha256:67fab04a955a73eb660fe7bf281b6fa71a003bc6e23a92d2f6227654c5223dbe"},
 ]
 
 [package.extras]
-default = ["matplotlib (>=3.4)", "numpy (>=1.20)", "pandas (>=1.3)", "scipy (>=1.8)"]
-developer = ["mypy (>=0.991)", "pre-commit (>=2.20)"]
-doc = ["nb2plots (>=0.6)", "numpydoc (>=1.5)", "pillow (>=9.2)", "pydata-sphinx-theme (>=0.11)", "sphinx (==5.2.3)", "sphinx-gallery (>=0.11)", "texext (>=0.6.7)"]
-extra = ["lxml (>=4.6)", "pydot (>=1.4.2)", "pygraphviz (>=1.10)", "sympy (>=1.10)"]
-test = ["codecov (>=2.1)", "pytest (>=7.2)", "pytest-cov (>=4.0)"]
+default = ["matplotlib (>=3.4)", "numpy (>=1.19)", "pandas (>=1.3)", "scipy (>=1.8)"]
+developer = ["mypy (>=0.960)", "pre-commit (>=2.19)"]
+doc = ["nb2plots (>=0.6)", "numpydoc (>=1.3)", "pillow (>=9.1)", "pydata-sphinx-theme (>=0.8.1)", "sphinx (>=4.5)", "sphinx-gallery (>=0.10)", "texext (>=0.6.6)"]
+extra = ["lxml (>=4.6)", "pydot (>=1.4.2)", "pygraphviz (>=1.9)", "sympy (>=1.10)"]
+test = ["codecov (>=2.1)", "pytest (>=7.1)", "pytest-cov (>=3.0)"]
 
 [[package]]
 name = "ninja"
@@ -1580,10 +1556,7 @@ files = [
 ]
 
 [package.dependencies]
-numpy = [
-    {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
-    {version = ">=1.23.2", markers = "python_version >= \"3.11\""},
-]
+numpy = {version = ">=1.21.0", markers = "python_version >= \"3.10\""}
 python-dateutil = ">=2.8.1"
 pytz = ">=2020.1"
 
@@ -1592,38 +1565,37 @@ test = ["hypothesis (>=5.5.3)", "pytest (>=6.0)", "pytest-xdist (>=1.31)"]
 
 [[package]]
 name = "pandas-profiling"
-version = "3.2.0"
+version = "3.6.2"
 description = "Generate profile report for pandas DataFrame"
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7, <3.11"
 files = [
-    {file = "pandas-profiling-3.2.0.tar.gz", hash = "sha256:8897c2628e3a9b5c915d038aa1782be7fa9e322e405a51aa4586466ab84e8461"},
-    {file = "pandas_profiling-3.2.0-py2.py3-none-any.whl", hash = "sha256:dd063f35a99f8f0c75f109a2bbfa13a58209424b84b67842139562630d9035f7"},
+    {file = "pandas-profiling-3.6.2.tar.gz", hash = "sha256:e1ade1333d53714e75248c43dd82582f8ae36dd98c3a7da45290200ed36a4119"},
+    {file = "pandas_profiling-3.6.2-py2.py3-none-any.whl", hash = "sha256:8636c7939202c2a140276de1b3953dff21057def72f872131e32da1dcfd528ff"},
 ]
 
 [package.dependencies]
-htmlmin = ">=0.1.12"
-jinja2 = ">=2.11.1"
-joblib = ">=1.1.0,<1.2.0"
-markupsafe = ">=2.1.1,<2.2.0"
-matplotlib = ">=3.2.0"
-missingno = ">=0.4.2"
-multimethod = ">=1.4"
-numpy = ">=1.16.0"
-pandas = ">=0.25.3,<1.0.0 || >1.0.0,<1.0.1 || >1.0.1,<1.0.2 || >1.0.2,<1.1.0 || >1.1.0"
-phik = ">=0.11.1"
-pydantic = ">=1.8.1"
-PyYAML = ">=5.0.0"
-requests = ">=2.24.0"
-scipy = ">=1.4.1"
-seaborn = ">=0.10.1"
-tangled-up-in-unicode = "0.2.0"
-tqdm = ">=4.48.2"
-visions = {version = "0.7.4", extras = ["type-image-path"]}
+htmlmin = "0.1.12"
+jinja2 = ">=2.11.1,<3.2"
+matplotlib = ">=3.2,<3.7"
+multimethod = ">=1.4,<1.10"
+numpy = ">=1.16.0,<1.24"
+pandas = ">1.1,<1.4.0 || >1.4.0,<1.6"
+phik = ">=0.11.1,<0.13"
+pydantic = ">=1.8.1,<1.11"
+PyYAML = ">=5.0.0,<6.1"
+requests = ">=2.24.0,<2.29"
+scipy = ">=1.4.1,<1.10"
+seaborn = ">=0.10.1,<0.13"
+statsmodels = ">=0.13.2,<0.14"
+tqdm = ">=4.48.2,<4.65"
+typeguard = ">=2.13.2,<2.14"
+visions = {version = "0.7.5", extras = ["type-image-path"]}
 
 [package.extras]
 notebook = ["ipywidgets (>=7.5.1)", "jupyter-client (>=5.3.4)", "jupyter-core (>=4.6.3)"]
+unicode = ["tangled-up-in-unicode (==0.2.0)"]
 
 [[package]]
 name = "pandocfilters"
@@ -1648,6 +1620,25 @@ files = [
     {file = "pathspec-0.10.3-py3-none-any.whl", hash = "sha256:3c95343af8b756205e2aba76e843ba9520a24dd84f68c22b9f93251507509dd6"},
     {file = "pathspec-0.10.3.tar.gz", hash = "sha256:56200de4077d9d0791465aa9095a01d421861e405b5096955051deefd697d6f6"},
 ]
+
+[[package]]
+name = "patsy"
+version = "0.5.3"
+description = "A Python package for describing statistical models and for building design matrices."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "patsy-0.5.3-py2.py3-none-any.whl", hash = "sha256:7eb5349754ed6aa982af81f636479b1b8db9d5b1a6e957a6016ec0534b5c86b7"},
+    {file = "patsy-0.5.3.tar.gz", hash = "sha256:bdc18001875e319bc91c812c1eb6a10be4bb13cb81eb763f466179dca3b67277"},
+]
+
+[package.dependencies]
+numpy = ">=1.4"
+six = "*"
+
+[package.extras]
+test = ["pytest", "pytest-cov", "scipy"]
 
 [[package]]
 name = "phik"
@@ -1990,10 +1981,7 @@ files = [
 [package.dependencies]
 astroid = ">=2.12.13,<=2.14.0-dev0"
 colorama = {version = ">=0.4.5", markers = "sys_platform == \"win32\""}
-dill = [
-    {version = ">=0.2", markers = "python_version < \"3.11\""},
-    {version = ">=0.3.6", markers = "python_version >= \"3.11\""},
-]
+dill = {version = ">=0.2", markers = "python_version < \"3.11\""}
 isort = ">=4.2.5,<6"
 mccabe = ">=0.6,<0.8"
 platformdirs = ">=2.2.0"
@@ -2148,35 +2136,31 @@ files = [
 
 [[package]]
 name = "pytype"
-version = "2022.6.6"
+version = "2022.12.15"
 description = "Python type inferencer"
 category = "dev"
 optional = false
 python-versions = "<3.11,>=3.7"
-files = [
-    {file = "pytype-2022.6.6-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:a4078e3f190f0c815e9d3fbfedc114dc68685e5f5e3d100c6e30d0e61e3dd6f7"},
-    {file = "pytype-2022.6.6-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c619b693815e3e90085c2e40cb4af2f47dd4dc196b4cf6113bf372806f953c9a"},
-    {file = "pytype-2022.6.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2ae9635715b9cd9e54f7874c6b851a22c1600b0e2c74239fde57ee3683683c6d"},
-    {file = "pytype-2022.6.6-cp37-cp37m-macosx_10_15_x86_64.whl", hash = "sha256:93d1d9b25f8eaad4accb29c0161c518041739f7269ef23e8af868b79d0a50838"},
-    {file = "pytype-2022.6.6-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:1733a59d8056f6ffd0fca4d3f2fa200f856f8cb7afd939f4c9cbf97ee172d0e1"},
-    {file = "pytype-2022.6.6-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a3635b2ba405ee8a04e95e862ca7fd2e63fc5e5e324e76566c2c233eb5e69467"},
-    {file = "pytype-2022.6.6-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:5856c8f47fc468172505bceffe655cc9391585effd0b7f07722d88e0d335532b"},
-    {file = "pytype-2022.6.6-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:e9c8c95b9f17e00efaa77a9e2b5e02bc2c0c5d49eb8ed1135a2003e5bcdbf5b9"},
-    {file = "pytype-2022.6.6-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d1611ec0816798075f96b7d9775d71c16b1e14af78ad6f63d0657832c3bded79"},
-    {file = "pytype-2022.6.6-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:1031bd3a946aefadcd635fedfd6c4fea7416409732b15a125f22cb4cbb7c0203"},
-    {file = "pytype-2022.6.6-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:acee5003cc91a87dc0a296bb712532964f267c6e3905ed9dbe8d2577a677e9d8"},
-    {file = "pytype-2022.6.6-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:589778b507caa48d4d74b9f3c0708ee21177a8cef71a3659cfe1bb7048df0b1e"},
-    {file = "pytype-2022.6.6.tar.gz", hash = "sha256:a4f3c197a08ba932b3272774e77c246990704a28ee294f29ae2f7ef95ee28544"},
-]
+files = []
+develop = false
 
 [package.dependencies]
-attrs = ">=21.2.0"
-importlab = ">=0.7"
-libcst = "*"
+attrs = ">=21.4.0"
+importlab = ">=0.8"
+jinja2 = ">=3.1.2"
+libcst = ">=0.4.5"
+networkx = "<2.8.4"
 ninja = ">=1.10.0.post2"
-pydot = "*"
-tabulate = "*"
-toml = "*"
+pydot = ">=1.4.2"
+tabulate = ">=0.8.10"
+toml = ">=0.10.2"
+typing-extensions = ">=4.3.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/google/pytype.git"
+reference = "HEAD"
+resolved_reference = "0eb2c04f81257877c6374f9e022f91d8c23a1dd2"
 
 [[package]]
 name = "pytz"
@@ -2704,6 +2688,56 @@ files = [
 ]
 
 [[package]]
+name = "statsmodels"
+version = "0.13.5"
+description = "Statistical computations and models for Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "statsmodels-0.13.5-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:c75319fddded9507cc310fc3980e4ae4d64e3ff37b322ad5e203a84f89d85203"},
+    {file = "statsmodels-0.13.5-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:6f148920ef27c7ba69a5735724f65de9422c0c8bcef71b50c846b823ceab8840"},
+    {file = "statsmodels-0.13.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5cc4d3e866bfe0c4f804bca362d0e7e29d24b840aaba8d35a754387e16d2a119"},
+    {file = "statsmodels-0.13.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:072950d6f7820a6b0bd6a27b2d792a6d6f952a1d2f62f0dcf8dd808799475855"},
+    {file = "statsmodels-0.13.5-cp310-cp310-win_amd64.whl", hash = "sha256:159ae9962c61b31dcffe6356d72ae3d074bc597ad9273ec93ae653fe607b8516"},
+    {file = "statsmodels-0.13.5-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:9061c0d5ee4f3038b590afedd527a925e5de27195dc342381bac7675b2c5efe4"},
+    {file = "statsmodels-0.13.5-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:e1d89cba5fafc1bf8e75296fdfad0b619de2bfb5e6c132913991d207f3ead675"},
+    {file = "statsmodels-0.13.5-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:01bc16e7c66acb30cd3dda6004c43212c758223d1966131226024a5c99ec5a7e"},
+    {file = "statsmodels-0.13.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5d5cd9ab5de2c7489b890213cba2aec3d6468eaaec547041c2dfcb1e03411f7e"},
+    {file = "statsmodels-0.13.5-cp311-cp311-win_amd64.whl", hash = "sha256:857d5c0564a68a7ef77dc2252bb43c994c0699919b4e1f06a9852c2fbb588765"},
+    {file = "statsmodels-0.13.5-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:5a5348b2757ab31c5c31b498f25eff2ea3c42086bef3d3b88847c25a30bdab9c"},
+    {file = "statsmodels-0.13.5-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:9b21648e3a8e7514839ba000a48e495cdd8bb55f1b71c608cf314b05541e283b"},
+    {file = "statsmodels-0.13.5-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1b829eada6cec07990f5e6820a152af4871c601fd458f76a896fb79ae2114985"},
+    {file = "statsmodels-0.13.5-cp37-cp37m-win_amd64.whl", hash = "sha256:872b3a8186ef20f647c7ab5ace512a8fc050148f3c2f366460ab359eec3d9695"},
+    {file = "statsmodels-0.13.5-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:bc1abb81d24f56425febd5a22bb852a1b98e53b80c4a67f50938f9512f154141"},
+    {file = "statsmodels-0.13.5-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:a2c46f1b0811a9736db37badeb102c0903f33bec80145ced3aa54df61aee5c2b"},
+    {file = "statsmodels-0.13.5-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:947f79ba9662359f1cfa6e943851f17f72b06e55f4a7c7a2928ed3bc57ed6cb8"},
+    {file = "statsmodels-0.13.5-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:046251c939c51e7632bcc8c6d6f31b8ca0eaffdf726d2498463f8de3735c9a82"},
+    {file = "statsmodels-0.13.5-cp38-cp38-win_amd64.whl", hash = "sha256:84f720e8d611ef8f297e6d2ffa7248764e223ef7221a3fc136e47ae089609611"},
+    {file = "statsmodels-0.13.5-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:b0d1d24e4adf96ec3c64d9a027dcee2c5d5096bb0dad33b4d91034c0a3c40371"},
+    {file = "statsmodels-0.13.5-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:0f0e5c9c58fb6cba41db01504ec8dd018c96a95152266b7d5d67e0de98840474"},
+    {file = "statsmodels-0.13.5-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5b034aa4b9ad4f4d21abc4dd4841be0809a446db14c7aa5c8a65090aea9f1143"},
+    {file = "statsmodels-0.13.5-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:73f97565c29241e839ffcef74fa995afdfe781910ccc27c189e5890193085958"},
+    {file = "statsmodels-0.13.5-cp39-cp39-win_amd64.whl", hash = "sha256:2ff331e508f2d1a53d3a188305477f4cf05cd8c52beb6483885eb3d51c8be3ad"},
+    {file = "statsmodels-0.13.5.tar.gz", hash = "sha256:593526acae1c0fda0ea6c48439f67c3943094c542fe769f8b90fe9e6c6cc4871"},
+]
+
+[package.dependencies]
+numpy = [
+    {version = ">=1.17", markers = "python_version != \"3.10\" or platform_system != \"Windows\" or platform_python_implementation == \"PyPy\""},
+    {version = ">=1.22.3", markers = "python_version == \"3.10\" and platform_system == \"Windows\" and platform_python_implementation != \"PyPy\""},
+]
+packaging = ">=21.3"
+pandas = ">=0.25"
+patsy = ">=0.5.2"
+scipy = {version = ">=1.3", markers = "(python_version > \"3.9\" or platform_system != \"Windows\" or platform_machine != \"x86\") and python_version < \"3.12\""}
+
+[package.extras]
+build = ["cython (>=0.29.32)"]
+develop = ["Jinja2", "colorama", "cython (>=0.29.32)", "cython (>=0.29.32,<3.0.0)", "flake8", "isort", "joblib", "matplotlib (>=3)", "oldest-supported-numpy (>=2022.4.18)", "pytest (>=7.0.1,<7.1.0)", "pytest-randomly", "pytest-xdist", "pywinpty", "setuptools-scm[toml] (>=7.0.0,<7.1.0)"]
+docs = ["ipykernel", "jupyter-client", "matplotlib", "nbconvert", "nbformat", "numpydoc", "pandas-datareader", "sphinx"]
+
+[[package]]
 name = "tabulate"
 version = "0.9.0"
 description = "Pretty-print tabular data"
@@ -2862,6 +2896,22 @@ docs = ["myst-parser", "pydata-sphinx-theme", "sphinx"]
 test = ["argcomplete (>=2.0)", "pre-commit", "pytest", "pytest-mock"]
 
 [[package]]
+name = "typeguard"
+version = "2.13.3"
+description = "Run-time type checker for Python"
+category = "main"
+optional = false
+python-versions = ">=3.5.3"
+files = [
+    {file = "typeguard-2.13.3-py3-none-any.whl", hash = "sha256:5e3e3be01e887e7eafae5af63d1f36c849aaa94e3a0112097312aabfa16284f1"},
+    {file = "typeguard-2.13.3.tar.gz", hash = "sha256:00edaa8da3a133674796cf5ea87d9f4b4c367d77476e185e80251cc13dfbb8c4"},
+]
+
+[package.extras]
+doc = ["sphinx-autodoc-typehints (>=1.2.0)", "sphinx-rtd-theme"]
+test = ["mypy", "pytest", "typing-extensions"]
+
+[[package]]
 name = "typing-extensions"
 version = "4.4.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -2940,14 +2990,14 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
 name = "visions"
-version = "0.7.4"
+version = "0.7.5"
 description = "Visions"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "visions-0.7.4-py3-none-any.whl", hash = "sha256:16f007e70362b788478b95129bb044dc0718b7530205ebddd8a1ff34a281d28e"},
-    {file = "visions-0.7.4.tar.gz", hash = "sha256:4f66c1da369cdbced5e1e2d2c43104caa8cfb9c694006cea1592e1673cfc1153"},
+    {file = "visions-0.7.5-py3-none-any.whl", hash = "sha256:1e57219715255282a909cfb93d25d6e453535aa0c26640a0d6f03e40be6263d7"},
+    {file = "visions-0.7.5.tar.gz", hash = "sha256:49259f291f7737df81c4bc65e9436c43f701acb73a577393be75b26b738d5bd2"},
 ]
 
 [package.dependencies]
@@ -2964,7 +3014,7 @@ tangled-up-in-unicode = ">=0.0.4"
 all = ["Pillow", "attrs (>=19.3.0)", "imagehash", "matplotlib", "multimethod (>=1.4)", "networkx (>=2.4)", "numpy", "pandas (>=0.25.3)", "pydot", "pygraphviz", "shapely", "tangled-up-in-unicode (>=0.0.4)"]
 dev = ["IPython", "Sphinx-copybutton", "black (>=20.8b1)", "isort (>=5.0.9)", "mypy (>=0.770)", "nbsphinx", "recommonmark (>=0.6.0)", "setuptools (>=46.1.3)", "sphinx-autodoc-typehints (>=1.10.3)", "sphinx-rtd-theme (>=0.4.3)", "wheel (>=0.34.2)"]
 plotting = ["matplotlib", "pydot", "pygraphviz"]
-test = ["Pillow", "big-o (>=0.10.1)", "black (>=19.10b0)", "check-manifest (>=0.41)", "imagehash", "isort (>=5.0.9)", "matplotlib", "mypy (>=0.800)", "pandas", "pre-commit", "pyarrow (>=1.0.1)", "pydot", "pytest (>=5.2.0)", "pytest-spark (>=0.6.0)", "shapely", "twine (>=3.1.1)"]
+test = ["Pillow", "big-o (>=0.10.1)", "black (>=19.10b0)", "check-manifest (>=0.41)", "imagehash", "isort (>=5.0.9)", "matplotlib", "mypy (>=0.800)", "pandas", "pre-commit", "pyarrow (>=1.0.1)", "pydot", "pyspark", "pytest (>=5.2.0)", "pytest-spark (>=0.6.0)", "shapely", "twine (>=3.1.1)"]
 type-geometry = ["shapely"]
 type-image-path = ["Pillow", "imagehash"]
 
@@ -3086,27 +3136,15 @@ files = [
     {file = "wrapt-1.14.1.tar.gz", hash = "sha256:380a85cf89e0e69b7cfbe2ea9f765f004ff419f34194018a6827ac0e3edfed4d"},
 ]
 
-[[package]]
-name = "yapf"
-version = "0.32.0"
-description = "A formatter for Python code."
-category = "main"
-optional = true
-python-versions = "*"
-files = [
-    {file = "yapf-0.32.0-py2.py3-none-any.whl", hash = "sha256:8fea849025584e486fd06d6ba2bed717f396080fd3cc236ba10cb97c4c51cf32"},
-    {file = "yapf-0.32.0.tar.gz", hash = "sha256:a3f5085d37ef7e3e004c4ba9f9b3e40c54ff1901cd111f05145ae313a7c67d1b"},
-]
-
 [extras]
 admin = ["psutil"]
-all = ["opencv-python", "pillow", "docker", "networkx", "requests", "PyPDF2", "nbformat", "nbconvert", "yapf", "psutil"]
+all = ["opencv-python", "pillow", "docker", "networkx", "requests", "PyPDF2", "nbformat", "nbconvert", "black", "psutil"]
 cv = ["opencv-python", "pillow"]
 docker = ["docker", "networkx", "requests"]
-jupyter = ["nbformat", "nbconvert", "yapf"]
+jupyter = ["nbformat", "nbconvert", "black"]
 pdf = ["PyPDF2"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.10,<4.0"
-content-hash = "fb8abd1b0a725f4d788d3827f5ae9ed933ba8e26b96e8ecc985281df5c64cee9"
+python-versions = ">=3.10,<3.11"
+content-hash = "13476d464c503657cc77e35da6f5dc4e9e50f5643f09c7cb83245fc41e0bd915"

@@ -17,7 +17,7 @@ match_memory = "aiutil:memory.main"
 snb = "aiutil.notebook:search.main"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4.0"
+python = ">=3.10,<3.11"
 sqlparse = ">=0.4.1"
 pathspec = ">=0.8.1"
 dateparser = ">=0.7.1"
@@ -61,7 +61,7 @@ all = ["opencv-python", "pillow", "docker", "networkx", "requests", "PyPDF2", "n
 [tool.poetry.group.dev.dependencies]
 pylint = ">=2.7.0"
 flake8 = ">=3.8.4"
-pytype = { version = ">=2020.08.10", python = "<3.11" }
+pytype = {git = "https://github.com/google/pytype.git"}
 darglint = ">=1.5.8"
 pyspark = ">=3.0.1"
 
@@ -77,6 +77,13 @@ ignored-classes = "Namespace"
 
 [tool.pylint.messages_control]
 disable = "C0103,C0200,C0301,C0303,R0902,R0903,R0911,R0912,R0913,W0621,W0622,W0702,W0703,W1116"
+
+[tool.pytype]
+exclude = [
+    ".venv/",
+    "dist/",
+    "*/.ipynb_checkpoints/",
+]
 
 [build-system]
 requires = ["poetry>=1.0.0"]
