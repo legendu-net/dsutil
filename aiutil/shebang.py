@@ -37,7 +37,7 @@ def update_shebang(script_dir: Union[Path, str], shebang: str):
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
 
-    :param args: The arguments to parse. 
+    :param args: The arguments to parse.
         If None, the arguments from command line is parsed.
     :param namespace: An inital Namespace object.
     :return: A Namespace object containing parsed options.
@@ -48,7 +48,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "--script-dir",
         dest="script_dir",
         required=True,
-        help="The directory containing scripts whose shebang are to be updated."
+        help="The directory containing scripts whose shebang are to be updated.",
     )
     parser.add_argument(
         "-s",
@@ -56,14 +56,13 @@ def parse_args(args=None, namespace=None) -> Namespace:
         "--shebang",
         dest="shebang",
         required=True,
-        help="The new shebang to use."
+        help="The new shebang to use.",
     )
     return parser.parse_args(args=args, namespace=namespace)
 
 
 def main():
-    """Main function for the module.
-    """
+    """Main function for the module."""
     args = parse_args()
     update_shebang(args.script_dir, args.shebang)
 

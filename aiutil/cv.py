@@ -15,12 +15,12 @@ def video_to_image(
     file: str,
     step: int,
     bbox: Union[None, tuple[int, int, int, int]] = None,
-    output: str = "frame_{:0>7}.png"
+    output: str = "frame_{:0>7}.png",
 ):
     """Extract images from a video file.
 
     :param file: The path to video file.
-    :param bbox: A bounding box. 
+    :param bbox: A bounding box.
         If specified, crop images using the bounding box.
     :param output_dir: The directory to save extracted images.
     :param step: Keep 1 image every step frames.
@@ -41,8 +41,9 @@ def video_to_image(
 
 
 def resize_image(
-    paths: Union[str, Path, Iterable[Path]], desdir: Union[str, Path, None],
-    size: tuple[int, int]
+    paths: Union[str, Path, Iterable[Path]],
+    desdir: Union[str, Path, None],
+    size: tuple[int, int],
 ) -> None:
     """Resize images to a given size.
 
@@ -93,9 +94,11 @@ def is_approx_close(red: int, green: int, blue: int, threshold: float = 0.4) -> 
         to consider a ratio (of 2 channels) to be close to 1.
     :return: True if the RGB values are approximately close to each other.
     """
-    return _is_approx_close(red, green, threshold=threshold) and \
-        _is_approx_close(red, blue, threshold=threshold) and \
-        _is_approx_close(green, blue, threshold=threshold)
+    return (
+        _is_approx_close(red, green, threshold=threshold)
+        and _is_approx_close(red, blue, threshold=threshold)
+        and _is_approx_close(green, blue, threshold=threshold)
+    )
 
 
 def deshade_arr_1(arr: np.ndarray, threshold: float = 0.4) -> np.ndarray:
@@ -136,7 +139,7 @@ def deshade_arr_2(arr: np.ndarray, cutoff: float = 30) -> np.ndarray:
             r = arr[i, j, 0]
             g = arr[i, j, 1]
             b = arr[i, j, 2]
-            #if (r + g + b) / 3 >= cutoff and max(r, g, b) <= 150:
+            # if (r + g + b) / 3 >= cutoff and max(r, g, b) <= 150:
             if min(r, g, b) >= cutoff:
                 arr[i, j, :] = (255, 255, 255)
     return arr
@@ -217,7 +220,7 @@ def deshade_3(img, threshold=0.4, cutoff=30) -> Image.Image:
 def add_frames(
     arr: Union[np.ndarray, Image.Image],
     bboxes: list[tuple[int, int, int, int]],
-    rgb: tuple[int, int, int] = (255, 0, 0)
+    rgb: tuple[int, int, int] = (255, 0, 0),
 ) -> np.ndarray:
     """Add (highlighting) frames into an image.
 
@@ -244,7 +247,7 @@ def duplicate_image(
     path: Union[str, Path],
     copies: int,
     des_dir: Union[str, Path, None] = None,
-    noise_amount: float = 0.05
+    noise_amount: float = 0.05,
 ):
     """Duplicate an image with some noises added.
 
@@ -268,7 +271,7 @@ def duplicate_image(
 
 
 def structural_similarity(im1, im2) -> float:
-    """Extend skimage.metrics.structural_similarity 
+    """Extend skimage.metrics.structural_similarity
         to calculate the similarity of (any) two images.
 
     :param im1: A PIL image.
@@ -294,7 +297,9 @@ def calc_image_similarities(img: Union[Image.Image, str, Path], dir_: Union[str,
         dir_ = Path(dir_)
     paths = list(dir_.glob("*.png"))
     sims = [structural_similarity(img, Image.open(p)) for p in tqdm(paths)]
-    return pd.DataFrame({
-        "path": paths,
-        "similarity": sims,
-    })
+    return pd.DataFrame(
+        {
+            "path": paths,
+            "similarity": sims,
+        }
+    )

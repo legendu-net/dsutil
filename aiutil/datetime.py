@@ -3,18 +3,15 @@
 from typing import Iterable
 import datetime
 import pandas as pd
-#import pysnooper
+
+# import pysnooper
 DATE_FORMAT_DASH = "%Y-%m-%d"
 DATE_FORMAT_DIGIT = "%Y%m%d"
 TIME_FORMAT_DASH = "%Y-%m-%d %H:%M:%S"
 
 
 def range_str(
-    start,
-    stop,
-    *,
-    step=datetime.timedelta(days=1),
-    fmt: str = TIME_FORMAT_DASH
+    start, stop, *, step=datetime.timedelta(days=1), fmt: str = TIME_FORMAT_DASH
 ) -> Iterable[str]:
     """Generate datetime range as str.
 
@@ -47,7 +44,7 @@ def range(start, stop, step=datetime.timedelta(days=1)) -> Iterable[datetime.dat
 def last_weekday(weekday) -> datetime.date:
     """Get the date of latest occurrence of the specified weekday.
 
-    :param weekday: An integer (0 stands for Monday) 
+    :param weekday: An integer (0 stands for Monday)
         or the name (full or 3-letter abbreviation) of a weekday/weekend.
     :return: The date of specified last weekday.
     """
@@ -65,7 +62,7 @@ def last_weekday(weekday) -> datetime.date:
         "Saturday": 5,
         "Sat": 5,
         "Sunday": 6,
-        "Sun": 6
+        "Sun": 6,
     }
     if isinstance(weekday, str):
         weekday = mapping[weekday]

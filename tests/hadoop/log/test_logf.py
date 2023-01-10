@@ -11,8 +11,10 @@ def test_main():
     args = aiutil.hadoop.logf.parse_args(
         [
             "filter",
-            str(BASE_DIR / "application_1611634725250_1347938"), "-o",
-            str(output), "-d"
+            str(BASE_DIR / "application_1611634725250_1347938"),
+            "-o",
+            str(output),
+            "-d",
         ]
     )
     aiutil.hadoop.logf.main(args)

@@ -11,7 +11,7 @@ def dep(pkg: str, recursive: bool = False) -> set[str]:
 
     :param pkg: The Python package whose dependencies to parse.
     :param recursive: If true, pass dependencies recursively.
-    :return: A set of Python package names 
+    :return: A set of Python package names
         which are dependencies of the specified Python package.
     """
     if recursive:

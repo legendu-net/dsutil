@@ -111,8 +111,8 @@ def status(args):
 
 def parse_args(args=None, namespace=None) -> Namespace:
     """Parse command-line arguments.
-    
-    :param args: The arguments to parse. 
+
+    :param args: The arguments to parse.
         If None, the arguments from command-line are parsed.
     :param namespace: An inital Namespace object.
     :return: A namespace object containing parsed options.
@@ -146,7 +146,7 @@ def _option_filter(subparser) -> None:
         nargs="+",
         dest="keywords",
         default=LogFilter.KEYWORDS,
-        help="user-defined keywords to search for in the log file"
+        help="user-defined keywords to search for in the log file",
     )
     subparser.add_argument(
         "-i",
@@ -154,8 +154,7 @@ def _option_filter(subparser) -> None:
         nargs="+",
         dest="patterns",
         default=LogFilter.PATTERNS,
-        help=
-        "regular expression patterns (date/time and ip by default) to ignore in dedup of filtered lines."
+        help="regular expression patterns (date/time and ip by default) to ignore in dedup of filtered lines.",
     )
     subparser.add_argument(
         "-c",
@@ -163,15 +162,14 @@ def _option_filter(subparser) -> None:
         type=int,
         dest="context_size",
         default=3,
-        help=
-        "number of lines (3 by default) to print before and after the suspicious line."
+        help="number of lines (3 by default) to print before and after the suspicious line.",
     )
     subparser.add_argument(
         "-o",
         "--output",
         dest="output",
         default="",
-        help="path of the output file (containing filtered lines)."
+        help="path of the output file (containing filtered lines).",
     )
     subparser.add_argument(
         "-t",
@@ -179,14 +177,14 @@ def _option_filter(subparser) -> None:
         dest="threshold",
         type=float,
         default=0.7,
-        help="make pattern matching case-sensitive."
+        help="make pattern matching case-sensitive.",
     )
     subparser.add_argument(
         "-d",
         "--dump-by-keyword",
         dest="dump_by_keyword",
         action="store_true",
-        help="dump error lines by keywords."
+        help="dump error lines by keywords.",
     )
 
 
@@ -202,7 +200,7 @@ def _subparser_fetch(subparsers):
         "--user",
         dest="user",
         default=None,
-        help="the name of the Spark/Hive application owner."
+        help="the name of the Spark/Hive application owner.",
     )
     subparser_fetch.add_argument(
         "-m",
@@ -210,7 +208,7 @@ def _subparser_fetch(subparsers):
         dest="user",
         action="store_const",
         const="b_marketing_ep_infr",
-        help="Fetch log using the acount b_marketing_ep_infr."
+        help="Fetch log using the acount b_marketing_ep_infr.",
     )
     _option_filter(subparser_fetch)
     subparser_fetch.set_defaults(func=fetch)
@@ -228,8 +226,7 @@ def _subparser_filter(subparsers):
 
 
 def main(args: Optional[Namespace] = None):
-    """The main function for script usage.
-    """
+    """The main function for script usage."""
     if args is None:
         args = parse_args()
     args.func(args)

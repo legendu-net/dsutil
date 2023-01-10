@@ -33,7 +33,9 @@ def _format_cell(cell: dict, yapf_config: str) -> bool:
     except Exception as err:
         logger.debug(
             "Failed to format the cell with the following code:\n{}"
-            "\nThe following error message is thrown:\n{}", code, err
+            "\nThe following error message is thrown:\n{}",
+            code,
+            err,
         )
         return False
     # remove the trailing new line
@@ -73,8 +75,11 @@ def nbconvert_notebooks(root_dir: Union[str, Path], cache: bool = False) -> None
     exporter = HTMLExporter()
     for notebook in notebooks:
         html = notebook.with_suffix(".html")
-        if cache and html.is_file(
-        ) and html.stat().st_mtime >= notebook.stat().st_mtime:
+        if (
+            cache
+            and html.is_file()
+            and html.stat().st_mtime >= notebook.stat().st_mtime
+        ):
             continue
         code, _ = exporter.from_notebook_node(nbformat.read(notebook, as_version=4))
         html.write_text(code, encoding="utf-8")
@@ -88,7 +93,7 @@ def _format_notebook(path: Path, yapf_config: str) -> None:
         return
     logger.info('Formatting code in the notebook "{}".', path)
     notebook = nbformat.read(path, as_version=nbformat.NO_CONVERT)
-    #nbformat.validate(notebook)
+    # nbformat.validate(notebook)
     changed = False
     for cell in notebook.cells:
         changed |= _format_cell(cell, yapf_config=yapf_config)

@@ -4,9 +4,9 @@ from __future__ import annotations
 import requests
 
 
-class DockerHub():
-    """A class for manipulating Docker Hub.
-    """
+class DockerHub:
+    """A class for manipulating Docker Hub."""
+
     def __init__(self, user: str, password: str = "", token: str = ""):
         self.user = user
         self._token = self.token(password) if password else token
@@ -31,10 +31,7 @@ class DockerHub():
         """
         res = requests.post(
             url="https://hub.docker.com/v2/users/login/",
-            data={
-                "username": self.user,
-                "password": password
-            },
+            data={"username": self.user, "password": password},
             timeout=10,
         )
         self._token = res.json()["token"]
@@ -42,9 +39,9 @@ class DockerHub():
     def delete_tag(self, image: str, tag: str = "") -> str:
         """Delete a tag of the specified Docker image.
 
-        :param image: The name of a docker image (without tag). 
+        :param image: The name of a docker image (without tag).
         :param tag: The tag of the Docker image (to delete).
-        :return: The removed tag of the Docker image. 
+        :return: The removed tag of the Docker image.
             An empty string is returned if no tag is removed.
         """
         user = self.user
@@ -59,7 +56,7 @@ class DockerHub():
             url,
             headers={
                 "Content-Type": "application/json",
-                "Authorization": f"JWT {self._token}"
+                "Authorization": f"JWT {self._token}",
             },
             timeout=10,
         )
