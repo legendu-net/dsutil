@@ -22,8 +22,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip3 install -U git+https://github.com/dclong/xinstall@main
-        xinstall pt -ic
+        curl -sSL https://raw.githubusercontent.com/legendu-net/icon/main/install_icon.sh | sudo bash -
+        icon pt -ic
+        ~/.local/bin/poetry lock --no-update
         ~/.local/bin/poetry env use python3
         ~/.local/bin/poetry install -E all
     - name: Test with pytest

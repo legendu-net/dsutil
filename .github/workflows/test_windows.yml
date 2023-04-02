@@ -31,6 +31,7 @@ jobs:
         xinstall pt -ic --python python
         $env:Path += ";$env:Userprofile\.local\bin"
         $env:Path += ";$env:Userprofile\AppData\Roaming\Python\Scripts"
+        poetry lock --no-update
         poetry env use python
         poetry install --no-dev -E all
         #poetry run pip3 install .
