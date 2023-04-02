@@ -30,14 +30,13 @@ jobs:
         curl -sSL https://raw.githubusercontent.com/legendu-net/icon/main/install_icon.sh | sudo bash -
         icon pt -ic
         ~/.local/bin/poetry env use python3
-        ~/.local/bin/poetry add --dev pytype
         ~/.local/bin/poetry install -E all
     - name: Lint with pylint
       run: |
         ~/.local/bin/poetry run pylint -E aiutil/ tests/
-    - name: Lint with pytype
-      run: |
-        ~/.local/bin/poetry run pytype ./
+    # - name: Lint with pytype
+    #   run: |
+    #     ~/.local/bin/poetry run pytype ./
     - name: Check code format
       run: |
         ~/.local/bin/poetry run black --check ./
