@@ -3,7 +3,6 @@
 from __future__ import annotations
 from typing import Optional, Union, Iterable
 from pathlib import Path
-import sys
 import os
 import shutil
 import subprocess as sp

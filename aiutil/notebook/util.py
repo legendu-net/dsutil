@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 """Jupyter/Lab notebooks related utils.
 """
-import os
 from typing import Union
 from pathlib import Path
 import subprocess as sp
 import itertools as it
-import tempfile
 import nbformat
-from loguru import logger
 from nbconvert import HTMLExporter
 
 HOME = Path.home()
