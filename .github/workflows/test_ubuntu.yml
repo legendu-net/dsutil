@@ -10,22 +10,21 @@ jobs:
     strategy:
       matrix:
         os: 
-          - ubuntu-20.04
-          #- windows-latest
-          #- macOS-latest
+          - ubuntu-latest
         python-version: 
           - "3.10"
-
+          #- "3.11"
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip3 install -U git+https://github.com/dclong/xinstall@main
-        xinstall pt -ic
+        curl -sSL https://raw.githubusercontent.com/legendu-net/icon/main/install_icon.sh | sudo bash -
+        icon pt -ic
+        ~/.local/bin/poetry lock --no-update
         ~/.local/bin/poetry env use python3
         ~/.local/bin/poetry install -E all
     - name: Test with pytest

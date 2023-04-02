@@ -6,21 +6,21 @@ on:
 jobs:
   pre-release:
     name: Pre Release
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     permissions:
       issues: write
       pull-requests: write
       contents: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: "3.10"
       - name: Install Poetry
         run: |
-          pip3 install -U git+https://github.com/dclong/xinstall@main
-          xinstall pt -ic
+          curl -sSL https://raw.githubusercontent.com/legendu-net/icon/main/install_icon.sh | sudo bash -
+          icon pt -ic
       - name: Build Package
         run: |
           ~/.local/bin/poetry build

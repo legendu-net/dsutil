@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiutil"
-version = "0.77.1"
+version = "0.78.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 license = "MIT"
@@ -60,10 +60,8 @@ all = ["opencv-python", "pillow", "docker", "networkx", "requests", "PyPDF2", "n
 
 [tool.poetry.group.dev.dependencies]
 pylint = ">=2.7.0"
-flake8 = ">=3.8.4"
-pytype = {git = "https://github.com/google/pytype.git"}
+#pytype = {git = "https://github.com/google/pytype.git"}
 darglint = ">=1.5.8"
-pyspark = ">=3.0.1"
 
 [tool.pylint.master]
 ignore = ".venv,.ipynb_checkpoints"

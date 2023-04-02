@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+"""Search Jupyter/Lab notebooks.
+"""
 from typing import TypeAlias, Sequence
 import json
 from pathlib import Path
@@ -10,6 +12,7 @@ Criterion: TypeAlias = str | list[str] | dict[str, list[str]]
 
 
 def _reg_criterion(criterion: str | list[str] | dict[str, list[str]]):
+    """Convert different criterion specification into universal dict specification."""
     if isinstance(criterion, str):
         if criterion == "":
             criterion = []
@@ -21,33 +24,54 @@ def _reg_criterion(criterion: str | list[str] | dict[str, list[str]]):
 
 
 class Cell:
+    """Class representing a cell in a notebook."""
+
     def __init__(self, cell: dict):
+        """Initialize a cell.
+        :param cell: A cell in the dict representation.
+        """
         self._cell = cell
         self._source = self.source(0)
 
-    def source(self, indent: int = 0):
+    def source(self, indent: int = 0) -> str:
+        """Get the source code in the cell.
+        :param indent: The number of spaces to add before each line of code.
+        """
         return "".join(" " * indent + line for line in self._cell["source"])
 
-    def match_keyword(self, keyword: Criterion):
+    def match_keyword(self, keyword: Criterion) -> bool:
+        """Match source code of this cell against the specified keyword criterion.
+        :param keyword: A keyword criterion.
+        """
         kwd = _reg_criterion(keyword)
         return all(k in self._source for k in kwd["include"]) and not any(
             k in self._source for k in kwd["exclude"]
         )
 
     def match_type(self, type_: str) -> bool:
+        """Match this cell's type against the specified one.
+        :param type_: The type of cell to match.
+        If empty, it matches all types.
+        """
         if type_ == "":
             return True
         return self._cell["cell_type"] == type_
 
 
 class Notebook:
+    """A class representing a Jupyter/Lab notebook."""
+
     def __init__(self, path: str | Path):
+        """Initialize a notebook.
+        :param path: The path to a notebook.
+        """
         self.path = Path(path) if isinstance(path, str) else path
         self._notebook = self._read_notebook()
         self.lang = self._get_lang().lower()
         self._cells = [Cell(cell) for cell in self._notebook["cells"]]
 
     def _get_lang(self) -> str:
+        """Get the language of the notebook."""
         if "metadata" not in self._notebook:
             return "python"
         metadata = self._notebook["metadata"]
@@ -62,16 +86,21 @@ class Notebook:
         return "python"
 
     def _read_notebook(self) -> dict:
-        with self.path.open() as fin:
+        """Read the content of the notebook as a dict."""
+        with self.path.open(encoding="utf-8") as fin:
             return json.load(fin)
 
     def match_language(self, language: Criterion) -> bool:
+        """Match the language of the notebook against the specified language criterion.
+        :param language: A language criterion.
+        """
         lang = _reg_criterion(language)
         return all(self.lang == l.lower() for l in lang["include"]) and not any(
             self.lang == l.lower() for l in lang["exclude"]
         )
 
     def cells(self, keyword: Criterion, type_: str = "") -> list[Cell]:
+        """Get a list of cells in this notebook."""
         return [
             cell
             for cell in self._cells
@@ -85,6 +114,11 @@ class Notebook:
 def print_nb_cells(
     nb_cells: tuple[tuple[Notebook, Cell], ...], num_notebooks: int, num_cells: int
 ):
+    """Print cells of notebooks.
+    :param nb_cells: Notebook cells to print.
+    :param num_notebooks: The max number of notebooks to print.
+    :param num_cells: The max number of cells per notebook to print.
+    """
     n = len(nb_cells)
     print(f"Matched {n} notebooks")
     print(
@@ -98,7 +132,7 @@ def print_nb_cells(
             )
             print(cell.source(4))
         print(
-            f"========================================================================================\n\n"
+            "========================================================================================\n\n"
         )
 
 
@@ -108,11 +142,20 @@ def search_notebooks(
     type_: str = "",
     language: Criterion = "",
 ):
+    """Search notebooks using the specified criterions.
+    :param notebooks: A list of notebooks among which to search.
+    :param keyword: A keyword criterion.
+    :param type_: A type criterion.
+    :param language: A language criterion.
+    """
     notebooks = [nb for nb in notebooks if nb.match_language(language)]
     return tuple((nb, cells) for nb in notebooks if (cells := nb.cells(keyword, type_)))
 
 
 def list_languages(notebooks: list[Notebook]) -> list[tuple[str, int]]:
+    """List languages used in notebooks.
+    :param notebooks: A list of notebooks.
+    """
     counter = Counter(nb.lang for nb in notebooks)
     counter = list(counter.items())
     counter.sort(key=lambda t: -t[1])
@@ -120,6 +163,9 @@ def list_languages(notebooks: list[Notebook]) -> list[tuple[str, int]]:
 
 
 def find_notebooks(paths: Sequence[str]) -> list[Notebook]:
+    """Find all notebooks under the given paths.
+    :param paths: A list of paths.
+    """
     notebooks = set()
     for path in paths:
         path = Path(path)
@@ -157,7 +203,11 @@ def _search_notebooks_args(args):
 
 
 def parse_args(args=None, namespace=None) -> Namespace:
-    """Parse command-line arguments."""
+    """Parse command-line arguments.
+    :param args: The arguments to parse.
+        If None, the arguments from command-line are parsed.
+    :param namespace: An inital Namespace object.
+    """
     parser = ArgumentParser(description="Search for notebooks.")
     subparsers = parser.add_subparsers(dest="sub_cmd", help="Sub commands.")
     _subparse_search(subparsers)
