@@ -27,11 +27,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        pip3 install -U git+https://github.com/dclong/xinstall@main
-        xinstall --sudo pt -ic
+        curl -sSL https://raw.githubusercontent.com/legendu-net/icon/main/install_icon.sh | sudo bash -
+        icon pt -ic
         ~/.local/bin/poetry env use python3
-        cat pyproject.toml
         ~/.local/bin/poetry install -E all
+        pip3 install git+https://github.com/google/pytype.git
     - name: Lint with pylint
       run: |
         ~/.local/bin/poetry run pylint -E aiutil/ tests/
