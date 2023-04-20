@@ -28,7 +28,8 @@ This is a Python pacakage that contains misc utils for Data Science.
     
 ## Supported Operating Systems and Python Versions
 
-Python >= 3.10 on Linux, macOS and Windows.
+Python 3.10.x on Linux and macOS.
+It might work on Windows but is not tested on Windows.
 
 ## Installation
 
