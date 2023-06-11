@@ -5,7 +5,7 @@ from typing import Union
 from pathlib import Path
 from loguru import logger
 import pandas as pd
-from pandas_profiling import ProfileReport
+from ydata_profiling import ProfileReport
 
 
 def table_2w(
@@ -52,7 +52,7 @@ def read_csv(path: Union[str, Path], **kwargs) -> pd.DataFrame:
 def dump_profile(
     df: Union[pd.DataFrame, str, Path], title: str, output_dir: Union[str, Path]
 ):
-    """Run pandas profiling on a DataFrame and dump the report into files.
+    """Run ydata-profiling on a DataFrame and dump the report into files.
 
     :param df: A pandas DataFrame.
     :param title: The title of the generated report.

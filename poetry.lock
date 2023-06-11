@@ -1507,25 +1507,6 @@ pytz = ">=2020.1"
 test = ["hypothesis (>=5.5.3)", "pytest (>=6.0)", "pytest-xdist (>=1.31)"]
 
 [[package]]
-name = "pandas-profiling"
-version = "3.6.6"
-description = "Deprecated 'pandas-profiling' package, use 'ydata-profiling' instead"
-category = "main"
-optional = false
-python-versions = ">=3.7, <3.11"
-files = [
-    {file = "pandas-profiling-3.6.6.tar.gz", hash = "sha256:1ef14a9cfa647ff95e13fd0b589f74897c0b078ef8ebcd44760b4031dcbf52a2"},
-    {file = "pandas_profiling-3.6.6-py2.py3-none-any.whl", hash = "sha256:69297626426358672ccbb357abbfea7fa35a7feda4388dd6377bd521d15cfaf2"},
-]
-
-[package.dependencies]
-ydata-profiling = "*"
-
-[package.extras]
-notebook = ["ipywidgets (>=7.5.1)", "jupyter-client (>=5.3.4)", "jupyter-core (>=4.6.3)"]
-unicode = ["tangled-up-in-unicode (==0.2.0)"]
-
-[[package]]
 name = "pandocfilters"
 version = "1.5.0"
 description = "Utilities for writing pandoc filters in python"
@@ -3015,4 +2996,4 @@ pdf = ["PyPDF2"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.11"
-content-hash = "0ce3ead25ddfd3e4fdedc966974c23902883c225de2a082039dbc5d2b284ded0"
+content-hash = "5ff14d69ee6a107d47f70cfa42173f0e01ab059a08cde8deab911f9c42a40f64"
