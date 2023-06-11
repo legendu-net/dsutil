@@ -13,7 +13,7 @@ import pathspec
 from .filesystem import replace_patterns
 
 DIST = "dist"
-README = "readme.md"
+README = "README.md"
 TOML = "pyproject.toml"
 
 
@@ -52,7 +52,7 @@ def _project_version(proj_dir: Path) -> str:
 
 
 def _update_version_readme(ver: str, proj_dir: Path) -> None:
-    """Update the version information in readme.
+    """Update the version information in README.md.
 
     :param ver: The new version.
     :param proj_dir: The root directory of the Poetry project.
