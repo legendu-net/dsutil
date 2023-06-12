@@ -1,6 +1,6 @@
-# [aiutil](https://github.com/legendu-net/aiutil): Data Science Utils
+# AI/ML Utils  |  [@GitHub](https://github.com/legendu-net/aiutil)  |  [@PyPI](https://pypi.org/project/aiutil/)
 
-This is a Python pacakage that contains misc utils for Data Science.
+This is a Python pacakage that contains misc utils for AI/ML.
 
 1. Misc enhancement of Python's built-in functionalities.
     - string
