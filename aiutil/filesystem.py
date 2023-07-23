@@ -59,7 +59,7 @@ def link_if_exists(
         return False
 
 
-def count_path(paths: Iterable[str], ascending=False) -> pd.Series:
+def count_path(paths: Iterable[str], ascending: bool | None = False) -> pd.Series:
     """Count frequence of paths and their parent paths.
 
     :param paths: An iterable collection of paths.
@@ -70,8 +70,10 @@ def count_path(paths: Iterable[str], ascending=False) -> pd.Series:
     freq = {}
     for path in paths:
         _count_path_helper(path, freq)
-    freq = pd.Series(freq, name="count").sort_values(ascending=ascending)
-    return freq
+    freq = pd.Series(freq, name="count")
+    if ascending is None:
+        return freq
+    return freq.sort_values(ascending=ascending)
 
 
 def _count_path_helper(path: str, freq: dict) -> None:
