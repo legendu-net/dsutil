@@ -3,6 +3,7 @@
 """
 from __future__ import annotations
 from typing import Optional, Union, Iterable, Callable
+import itertools
 import os
 import sys
 import re
@@ -59,7 +60,11 @@ def link_if_exists(
         return False
 
 
-def count_path(paths: Iterable[str], ascending: bool | None = False) -> pd.Series:
+def count_path(
+    paths: Iterable[str],
+    weights: Iterable[int | float] | None = None,
+    ascending: bool | None = False,
+) -> pd.Series:
     """Count frequence of paths and their parent paths.
 
     :param paths: An iterable collection of paths.
@@ -67,21 +72,23 @@ def count_path(paths: Iterable[str], ascending: bool | None = False) -> pd.Serie
         vice versa.
     :return: A pandas Series with paths as index and frequencies of paths as value.
     """
+
+    def _count_path_helper(path: str, weight: int | float, freq: dict) -> None:
+        fields = path.rstrip("/").split("/")[:-1]
+        path = ""
+        for field in fields:
+            path = path + field + "/"
+            freq[path] = freq.get(path, 0) + weight
+
     freq = {}
-    for path in paths:
-        _count_path_helper(path, freq)
+    if weights is None:
+        weights = itertools.repeat(1)
+    for path, weight in zip(paths, weights):
+        _count_path_helper(path, weight, freq)
     freq = pd.Series(freq, name="count")
     if ascending is None:
         return freq
     return freq.sort_values(ascending=ascending)
-
-
-def _count_path_helper(path: str, freq: dict) -> None:
-    fields = path.rstrip("/").split("/")[:-1]
-    path = ""
-    for field in fields:
-        path = path + field + "/"
-        freq[path] = freq.get(path, 0) + 1
 
 
 def zip_subdirs(root: Union[str, Path]) -> None:

@@ -51,6 +51,7 @@ def to_frame(
         Otherwise, all lines are splitted by the specified regular expression.
     :return: A pandas DataFrame.
     """
+
     def _reg_skip(skip, n) -> set[int]:
         if isinstance(skip, int):
             skip = [skip]
