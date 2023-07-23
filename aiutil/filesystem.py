@@ -399,7 +399,7 @@ def replace_patterns(
     repl: Union[str, Iterable[str]],
     regex: bool = True,
 ) -> None:
-    """Update a text file using regular expression substitution.
+    """Update a text file by replacing patterns with specified substitutions.
 
     :param path: A Path object to the file to be updated.
     :param pattern: A (list of) patterns to replace.
