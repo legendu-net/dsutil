@@ -135,12 +135,9 @@ def add_tag_release(
     :param branch_release: The branch for releasing.
     :raises ValueError: If the tag to create already exists.
     """
-    def _get_tag(proj_dir):
-        return "v" + _project_version(proj_dir)
-
     if proj_dir is None:
         proj_dir = _project_dir()
-    tag = tag if tag else _get_tag(proj_dir)
+    tag = tag if tag else ("v" + _project_version(proj_dir))
     repo = dulwich.repo.Repo(proj_dir)
     if tag.encode() in dulwich.porcelain.tag_list(repo):
         raise ValueError(
