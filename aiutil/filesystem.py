@@ -584,7 +584,7 @@ def select(
             if field in columns:
                 index.append(idx)
                 columns_full.append(field)
-        with (open(output, "w", encoding="utf-8") if output else sys.stdout) as fout:
+        with open(output, "w", encoding="utf-8") if output else sys.stdout as fout:
             fout.write(delimiter.join(columns_full) + "\n")
             for line in fin:
                 fields = line.split(delimiter)
