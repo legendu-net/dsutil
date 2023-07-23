@@ -51,10 +51,15 @@ def to_frame(
         Otherwise, all lines are splitted by the specified regular expression.
     :return: A pandas DataFrame.
     """
+
+    def _reg_skip(skip, n) -> set[int]:
+        if isinstance(skip, int):
+            skip = [skip]
+        return set(idx % n for idx in skip)
+
     if not lines:
         lines = sp.check_output(cmd, shell=True).decode().strip().split("\n")
-    if isinstance(skip, int):
-        skip = [skip]
+    skip = _reg_skip(skip, len(lines))
     lines = [line for idx, line in enumerate(lines) if idx not in skip]
     if split_by_header:
         return _to_frame_title(split=split, lines=lines)
