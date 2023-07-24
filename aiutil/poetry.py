@@ -150,7 +150,7 @@ def add_tag_release(
     dulwich.porcelain.checkout_branch(repo=repo, target=branch_release)
     dulwich.porcelain.pull(repo=repo, refspecs=branch_release)
     dulwich.porcelain.tag_create(repo=repo, tag=tag)
-    dulwich.porcelain.push(repo=repo, refspecs=tag)
+    dulwich.porcelain.push(repo=repo, refspecs=[f"refs/tags/{tag}"])
     # switch back to the old branch
     dulwich.porcelain.checkout_branch(repo=repo, target=branch_old)
 

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiutil"
-version = "0.80.3"
+version = "0.80.4"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 license = "MIT"
@@ -48,6 +48,7 @@ nbconvert = { version = ">=5.6.1", optional = true }
 black = {extras = ["jupyter"], version = ">=23.7.0"}
 dulwich = ">=0.20.24"
 scikit-image = ">=0.18.3"
+paramiko = ">=3.2.0"
 
 [tool.poetry.extras]
 cv = ["opencv-python", "pillow"]
