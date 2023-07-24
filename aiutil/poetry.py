@@ -143,7 +143,7 @@ def add_tag_release(
         raise ValueError(
             f"The tag {tag} already exists! Please merge new changes to the {branch_release} branch first."
         )
-    branch_old = dulwich.porcelain.active_branch(repo=repo)
+    branch_old = dulwich.porcelain.active_branch(repo=repo).decode()
     # add tag to the release branch
     dulwich.porcelain.checkout_branch(repo=repo, target=branch_release)
     dulwich.porcelain.pull(repo=repo, refspecs=branch_release)
