@@ -10,11 +10,13 @@ import toml
 from loguru import logger
 import pathspec
 import dulwich
+from dulwich.contrib.paramiko_vendor import ParamikoSSHVendor
 from .filesystem import replace_patterns
 
 DIST = "dist"
 README = "README.md"
 TOML = "pyproject.toml"
+dulwich.client.get_ssh_vendor = ParamikoSSHVendor
 
 
 def _project_dir() -> Path:
