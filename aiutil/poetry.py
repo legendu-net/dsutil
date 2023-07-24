@@ -150,7 +150,9 @@ def add_tag_release(
     dulwich.porcelain.checkout_branch(repo=repo, target=branch_release)
     dulwich.porcelain.pull(repo=repo, refspecs=branch_release)
     dulwich.porcelain.tag_create(repo=repo, tag=tag, annotated=True)
-    dulwich.porcelain.push(repo=repo, refspecs=[f"refs/tags/{tag}"])
+    remote = dulwich.porcelain.get_branch_remote(repo=repo).decode()
+    sp.run(f"git push {remote} {tag}", shell=True, check=True)
+    # dulwich.porcelain.push(repo=repo, refspecs=[f"refs/tags/{tag}"])
     # switch back to the old branch
     dulwich.porcelain.checkout_branch(repo=repo, target=branch_old)
 
