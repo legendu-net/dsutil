@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiutil"
-version = "0.80.1"
+version = "0.80.2"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 license = "MIT"
