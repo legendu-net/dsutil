@@ -2,4 +2,4 @@
 """
 from . import poetry
 
-__version__ = "0.80.5"
+__version__ = "0.80.6"
