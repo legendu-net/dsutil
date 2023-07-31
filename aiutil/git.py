@@ -14,23 +14,23 @@ class Repo:
     def remote(self) -> str:
         """Run the "git remote" command."""
         proc = sp.run(
-            ["git", "-c", self._root, "remote"], check=True, capture_output=True
+            ["git", "-C", self._root, "remote"], check=True, capture_output=True
         )
         return proc.stdout.strip().decode()
 
     def pull(self, branch: str) -> None:
         """Run the "git pull" command."""
-        sp.run(["git", "-c", self._root, "pull", self._remote, branch], check=True)
+        sp.run(["git", "-C", self._root, "pull", self._remote, branch], check=True)
 
     def push(self, branch: str = "") -> None:
         """Run the "git push" command."""
         if not branch:
             branch = self.active_branch()
-        sp.run(["git", "-c", self._root, "push", self._remote, branch], check=True)
+        sp.run(["git", "-C", self._root, "push", self._remote, branch], check=True)
 
     def _branch(self) -> list[str]:
         proc = sp.run(
-            ["git", "-c", self._root, "branch"], check=True, capture_output=True
+            ["git", "-C", self._root, "branch"], check=True, capture_output=True
         )
         return proc.stdout.strip().decode().split("\n")
 
@@ -45,15 +45,15 @@ class Repo:
 
     def add(self, pattern: str = "."):
         """Run the "git add" command."""
-        sp.run(["git", "-c", self._root, "add", pattern], check=True)
+        sp.run(["git", "-C", self._root, "add", pattern], check=True)
 
     def commit(self, message: str):
         """Run the "git commit" command."""
-        sp.run(["git", "-c", self._root, "commit", "-m", message], check=True)
+        sp.run(["git", "-C", self._root, "commit", "-m", message], check=True)
 
     def status(self):
         """Run the "git status" command."""
-        sp.run(["git", "-c", self._root, "status"], check=True)
+        sp.run(["git", "-C", self._root, "status"], check=True)
 
     def tag(self, tag="") -> sp.CompletedProcess | list[str]:
         """Run the "git tag" command."""
