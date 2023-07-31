@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiutil"
-version = "0.80.6"
+version = "0.81.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 license = "MIT"
@@ -31,6 +31,9 @@ PyYAML = ">=5.3.1"
 python-magic = ">=0.4.0"
 tqdm = ">=4.59.0"
 pytest = ">=3.0"
+dulwich = ">=0.20.24"
+scikit-image = ">=0.18.3"
+paramiko = ">=3.2.0"
 # admin
 psutil = { version = ">=5.7.3", optional = true}
 # cv
@@ -45,10 +48,7 @@ PyPDF2 = { version = ">=1.26.0", optional = true }
 # jupyter
 nbformat = { version = ">=5.0.7", optional = true }
 nbconvert = { version = ">=5.6.1", optional = true }
-black = {extras = ["jupyter"], version = ">=23.7.0"}
-dulwich = ">=0.20.24"
-scikit-image = ">=0.18.3"
-paramiko = ">=3.2.0"
+black = {extras = ["jupyter"], version = ">=23.7.0", optional = true}
 
 [tool.poetry.extras]
 cv = ["opencv-python", "pillow"]
@@ -60,6 +60,7 @@ all = ["opencv-python", "pillow", "docker", "networkx", "requests", "PyPDF2", "n
 
 [tool.poetry.group.dev.dependencies]
 pylint = ">=2.7.0"
+black = {extras = ["jupyter"], version = ">=23.7.0"}
 #pytype = {git = "https://github.com/google/pytype.git"}
 darglint = ">=1.5.8"
 
