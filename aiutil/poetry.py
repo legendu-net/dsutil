@@ -9,14 +9,12 @@ import subprocess as sp
 import toml
 from loguru import logger
 import pathspec
-import dulwich
-from dulwich.contrib.paramiko_vendor import ParamikoSSHVendor
 from .filesystem import replace_patterns
+from . import git
 
 DIST = "dist"
 README = "README.md"
 TOML = "pyproject.toml"
-dulwich.client.get_ssh_vendor = ParamikoSSHVendor
 
 
 def _project_dir() -> Path:
@@ -30,9 +28,7 @@ def _project_dir() -> Path:
         if (path / TOML).is_file():
             return path
         path = path.parent
-    raise RuntimeError(
-        f"The current work directory {Path.cwd()} is not a (subdirectory of a) Python Poetry project."
-    )
+    return Path()
 
 
 def _project_name(proj_dir: Path) -> str:
@@ -118,10 +114,10 @@ def version(
     if ver:
         _update_version(ver=ver, proj_dir=proj_dir)
         if commit:
-            repo = dulwich.repo.Repo(proj_dir)
-            dulwich.porcelain.add(repo=repo)
-            dulwich.porcelain.commit(repo=repo, message="bump up version")
-            dulwich.porcelain.push(repo=repo)
+            repo = git.Repo(root=proj_dir)
+            repo.add()
+            repo.commit(message="bump up version")
+            repo.push()
     else:
         print(_project_version(proj_dir))
 
@@ -137,25 +133,23 @@ def add_tag_release(
     :param branch_release: The branch for releasing.
     :raises ValueError: If the tag to create already exists.
     """
+    if proj_dir is None:
+        proj_dir = _project_dir()
     if not tag:
-        if proj_dir is None:
-            proj_dir = _project_dir()
         tag = "v" + _project_version(proj_dir)
-    repo = dulwich.repo.Repo(proj_dir)
-    if tag.encode() in dulwich.porcelain.tag_list(repo):
+    repo = git.Repo(proj_dir)
+    if tag.encode() in repo.tag():
         raise ValueError(
             f"The tag {tag} already exists! Please merge new changes to the {branch_release} branch first."
         )
-    branch_old = dulwich.porcelain.active_branch(repo=repo).decode()
+    branch_old = repo.active_branch()
     # add tag to the release branch
-    dulwich.porcelain.checkout_branch(repo=repo, target=branch_release)
-    dulwich.porcelain.pull(repo=repo, refspecs=branch_release)
-    dulwich.porcelain.tag_create(repo=repo, tag=tag, annotated=True)
-    remote = dulwich.porcelain.get_branch_remote(repo=repo).decode()
-    sp.run(f"git push {remote} {tag}", shell=True, check=True)
-    # dulwich.porcelain.push(repo=repo, refspecs=[f"refs/tags/{tag}"])
+    repo.checkout(branch=branch_release)
+    repo.pull(branch=branch_release)
+    repo.tag(tag=tag)
+    repo.push(branch=tag)
     # switch back to the old branch
-    dulwich.porcelain.checkout_branch(repo=repo, target=branch_old)
+    repo.checkout(branch=branch_old)
 
 
 def format_code(
@@ -184,11 +178,11 @@ def format_code(
     logger.info("Formatting code using black ...")
     sp.run(cmd, shell=True, check=False, stdout=sp.PIPE)
     if commit:
-        repo = dulwich.repo.Repo(proj_dir)
-        dulwich.porcelain.add(repo=repo)
-        dulwich.porcelain.commit(repo=repo, message="format code")
-        dulwich.porcelain.push(repo=repo)
-        print(dulwich.porcelain.status())
+        repo = git.Repo(proj_dir)
+        repo.add()
+        repo.commit(message="format code")
+        repo.push()
+        repo.status()
 
 
 def _lint_code(proj_dir: Union[Path, None], linter: Union[str, list[str]]):
