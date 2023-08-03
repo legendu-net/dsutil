@@ -1,6 +1,5 @@
 """This module makes it easy to work with poetry to managing your Python project.
 """
-from __future__ import annotations
 from typing import Optional, Union, Iterable
 from pathlib import Path
 import os

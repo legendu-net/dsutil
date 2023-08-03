@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Filesystem related util functions.
 """
-from __future__ import annotations
 from typing import Optional, Union, Iterable, Callable
 import itertools
 import os

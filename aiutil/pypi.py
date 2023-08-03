@@ -1,6 +1,5 @@
 """PYPI related utils.
 """
-from __future__ import annotations
 from typing import Set
 import re
 import requests

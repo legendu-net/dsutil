@@ -5,7 +5,6 @@ the password is encrypted and saved into a profile that is readable/writable onl
 If an user authenticate without specifying password,
 the saved password is used so that users do not have to type in password to authenticate every time.
 """
-from __future__ import annotations
 from typing import Union, Any
 import os
 from pathlib import Path

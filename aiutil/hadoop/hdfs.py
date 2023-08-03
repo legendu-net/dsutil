@@ -1,6 +1,5 @@
 """Wrapping HDFS commands.
 """
-from __future__ import annotations
 from typing import Union
 from pathlib import Path
 import subprocess as sp

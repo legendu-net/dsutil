@@ -1,6 +1,5 @@
 """Pandas DataFrame related utils.
 """
-from __future__ import annotations
 from typing import Union
 from pathlib import Path
 from loguru import logger

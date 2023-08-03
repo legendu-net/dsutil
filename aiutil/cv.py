@@ -1,6 +1,5 @@
 """Computer vision related utils.
 """
-from __future__ import annotations
 from typing import Union, Iterable
 from pathlib import Path
 from tqdm import tqdm, trange

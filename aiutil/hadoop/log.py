@@ -1,6 +1,5 @@
 """Module for log filtering.
 """
-from __future__ import annotations
 from typing import Union, Optional, Sequence, TextIO
 from pathlib import Path
 import sys

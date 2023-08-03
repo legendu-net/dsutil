@@ -1,6 +1,5 @@
 """Hash code related utils.
 """
-from __future__ import annotations
 import hashlib
 from typing import Union
 from pathlib import Path
