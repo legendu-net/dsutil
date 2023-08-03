@@ -1,6 +1,5 @@
 """Shell command related utils.
 """
-from __future__ import annotations
 from typing import Union, Sequence
 from pathlib import Path
 import re
