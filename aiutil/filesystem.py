@@ -66,8 +66,7 @@ def count_path(
     """Count frequence of paths and their parent paths.
 
     :param paths: An iterable collection of paths.
-    :param ascending: If true, sort paths according to their frequencies in ascending order,
-        vice versa.
+    :param weights: Weights of paths.
     :return: A pandas Series with paths as index and frequencies of paths as value.
     """
 
