@@ -1,6 +1,5 @@
 """Shell command related utils.
 """
-from __future__ import annotations
 from typing import Union, Sequence
 from pathlib import Path
 import re
@@ -8,7 +7,7 @@ import subprocess as sp
 import pandas as pd
 
 
-def ls(path: Union[Path, str]):
+def ls(path: Union[Path, str]) -> pd.DataFrame:
     """List files in the given path.
     This function is similar to the shell command `ls`.
 

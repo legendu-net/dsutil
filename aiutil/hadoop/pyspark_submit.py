@@ -2,7 +2,6 @@
 # encoding: utf-8
 """A module makes it easy to run Scala/Python Spark job.
 """
-from __future__ import annotations
 from typing import Union, Callable, Any, Iterable
 import os
 import sys

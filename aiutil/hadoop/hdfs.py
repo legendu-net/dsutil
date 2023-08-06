@@ -1,6 +1,5 @@
 """Wrapping HDFS commands.
 """
-from __future__ import annotations
 from typing import Union
 from pathlib import Path
 import subprocess as sp
@@ -36,9 +35,12 @@ class Hdfs:
             "mtime",
             "path",
         ]
-        flag_dir_only = "-d" if dir_only else ""
-        flag_recursive = "-R" if recursive else ""
-        cmd = f"{self._bin} dfs -ls {flag_dir_only} {flag_recursive} {path}"
+        cmd = f"{self._bin} dfs -ls "
+        if dir_only:
+            cmd += "-d "
+        if recursive:
+            cmd += "-R "
+        cmd += path
         logger.info("Running command: {}. Might take a while.", cmd)
         frame = to_frame(cmd, split=r" +", skip=() if dir_only else [0], header=cols)
         frame.bytes = frame.bytes.astype(int)

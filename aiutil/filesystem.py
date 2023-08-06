@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Filesystem related util functions.
 """
-from __future__ import annotations
 from typing import Optional, Union, Iterable, Callable
 import itertools
 import os
@@ -63,7 +62,6 @@ def link_if_exists(
 def count_path(
     paths: Iterable[str],
     weights: Iterable[int | float] | None = None,
-    ascending: bool | None = False,
 ) -> pd.Series:
     """Count frequence of paths and their parent paths.
 
@@ -85,10 +83,7 @@ def count_path(
         weights = itertools.repeat(1)
     for path, weight in zip(paths, weights):
         _count_path_helper(path, weight, freq)
-    freq = pd.Series(freq, name="count")
-    if ascending is None:
-        return freq
-    return freq.sort_values(ascending=ascending)
+    return pd.Series(freq, name="count")
 
 
 def zip_subdirs(root: Union[str, Path]) -> None:

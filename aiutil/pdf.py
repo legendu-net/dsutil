@@ -1,6 +1,5 @@
 """Manipulating PDFs.
 """
-from __future__ import annotations
 from typing import Union, Iterable
 from PyPDF2 import PdfFileWriter, PdfFileReader
 
