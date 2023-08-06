@@ -337,7 +337,7 @@ def _find_ess_empty(
 
 
 def is_ess_empty(
-    path: Path, ignore: Callable = _ignore, ess_empty: Optional[dict[Path, bool]] = None
+    path: Path, ignore: Callable = _ignore, ess_empty: dict[Path, bool] | None = None
 ):
     """Check if a directory is essentially empty.
 
@@ -451,7 +451,7 @@ def _get_files(dir_: Path, exts: list[str]) -> Iterable[Path]:
 
 
 def has_header(
-    files: str | Path, list[str | Path], num_files_checking: int = 5
+    files: str | Path | list[str | Path], num_files_checking: int = 5
 ) -> bool:
     """Check whether the files have headers.
 
@@ -481,7 +481,7 @@ def has_header(
 
 
 def _merge_with_headers(
-    files: str | Path, list[str | Path], output: str | Path = ""
+    files: str | Path | list[str | Path], output: str | Path = ""
 ) -> None:
     """Merge files with headers. Keep only one header.
 
@@ -501,7 +501,7 @@ def _merge_with_headers(
 
 
 def _merge_without_header(
-    files: str | Path, list[str | Path], output: str | Path = ""
+    files: str | Path | list[str | Path], output: str | Path = ""
 ) -> None:
     """Merge files without header.
 
@@ -518,7 +518,7 @@ def _merge_without_header(
 
 
 def merge(
-    files: str | Path, list[str | Path],
+    files: str | Path | list[str | Path],
     output: str = "",
     num_files_checking: int = 5,
 ) -> None:
