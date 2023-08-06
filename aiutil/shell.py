@@ -80,7 +80,7 @@ def _to_frame_space(
         if header is None, then default header is used for the data frame.
     :return: A pandas DataFrame.
     """
-    data = [re.split(split, line.strip()) for line in lines if line.strip() != ""]
+    data = [re.split(split, line.strip()) for line in lines if line.strip()]
     if isinstance(header, int):
         columns = [re.sub(r"\s+", "_", col.lower()) for col in data[header]]
         data = (row for idx, row in enumerate(data) if idx != header)
