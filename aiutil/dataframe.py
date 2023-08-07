@@ -47,9 +47,7 @@ def read_csv(path: str | Path, **kwargs) -> pd.DataFrame:
     return pd.concat(pd.read_csv(csv, **kwargs) for csv in path.glob("*.csv"))
 
 
-def dump_profile(
-    df: pd.DataFrame | str | Path, title: str, output_dir: str | Path
-):
+def dump_profile(df: pd.DataFrame | str | Path, title: str, output_dir: str | Path):
     """Run ydata-profiling on a DataFrame and dump the report into files.
 
     :param df: A pandas DataFrame.

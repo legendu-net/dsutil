@@ -274,9 +274,7 @@ def build_package(
     sp.run(f"cd '{proj_dir}' && poetry build", shell=True, check=True)
 
 
-def clean(
-    proj_dir: Optional[Path] = None, ignore: str | Path | None = None
-) -> None:
+def clean(proj_dir: Optional[Path] = None, ignore: str | Path | None = None) -> None:
     """Remove non-essential files from the current project.
 
     :param proj_dir: The root directory of the Poetry project.
