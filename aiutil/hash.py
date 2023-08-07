@@ -1,12 +1,11 @@
 """Hash code related utils.
 """
 import hashlib
-from typing import Union
 from pathlib import Path
 from loguru import logger
 
 
-def rmd5(path: Union[str, Path], output: Union[str, Path] = "") -> str:
+def rmd5(path: str | Path, output: str | Path = "") -> str:
     """Calculate md5sums recursively for the given path.
 
     :param path: The path of a file or directory.

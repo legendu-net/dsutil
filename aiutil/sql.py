@@ -1,12 +1,11 @@
 """SQL related utils.
 """
-from typing import Union
 from pathlib import Path
 import subprocess as sp
 import sqlparse
 
 
-def format(path: Union[Path, str]):
+def format(path: Path | str):
     """Format a SQL file.
 
     :param path: The path to a SQL file.

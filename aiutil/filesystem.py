@@ -256,7 +256,7 @@ def find_data_tables_sql(sql: str, filter_: Callable | None = None) -> set[str]:
     return set(table for table in tables if filter_(table))
 
 
-def is_empty(dir_: str | Path, filter_: None | Callable = lambda _: True) -> bool:
+def is_empty(dir_: str | Path, filter_: Callable | None = lambda _: True) -> bool:
     """Check whether a directory is empty.
 
     :param dir_: The directory to check.

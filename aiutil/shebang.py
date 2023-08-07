@@ -1,6 +1,5 @@
 """Update shebang of Python scripts in a directory.
 """
-from typing import Union
 from pathlib import Path
 from argparse import ArgumentParser, Namespace
 from magic import Magic
@@ -16,7 +15,7 @@ def _update_shebang(path: Path, shebang: str):
         fout.writelines(lines)
 
 
-def update_shebang(script_dir: Union[Path, str], shebang: str):
+def update_shebang(script_dir: Path | str, shebang: str):
     """Update the Shebang of scripts in the given script dir.
 
     :param script_dir: A directory containing scripts whose shebang are to be updated.

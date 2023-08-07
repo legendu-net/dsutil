@@ -1,10 +1,10 @@
 """Manipulating PDFs.
 """
-from typing import Union, Iterable
+from typing import Iterable
 from PyPDF2 import PdfFileWriter, PdfFileReader
 
 
-def extract_pages(file: str, subfiles: dict[str, Union[int, Iterable[int]]]) -> None:
+def extract_pages(file: str, subfiles: dict[str, int | Iterable[int]]) -> None:
     """Extract pages from a PDF file and write into sub PDF file.
 
     :param file: The raw PDF file to extract pages from.
@@ -27,7 +27,7 @@ def extract_pages(file: str, subfiles: dict[str, Union[int, Iterable[int]]]) -> 
 
 
 def _extract_pages(
-    reader: PdfFileReader, indexes: Union[int, Iterable[int]], output: str
+    reader: PdfFileReader, indexes: int | Iterable[int], output: str
 ) -> None:
     """A helper function for extract_pages.
 

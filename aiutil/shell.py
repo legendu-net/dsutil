@@ -1,13 +1,13 @@
 """Shell command related utils.
 """
-from typing import Union, Sequence
+from typing import Sequence
 from pathlib import Path
 import re
 import subprocess as sp
 import pandas as pd
 
 
-def ls(path: Union[Path, str]) -> pd.DataFrame:
+def ls(path: Path | str) -> pd.DataFrame:
     """List files in the given path.
     This function is similar to the shell command `ls`.
 
@@ -27,8 +27,8 @@ def ls(path: Union[Path, str]) -> pd.DataFrame:
 def to_frame(
     cmd="",
     split: str = r"  +",
-    header: Union[int, list[str], None] = None,
-    skip: Union[int, Sequence[int]] = (),
+    header: int | list[str] | None = None,
+    skip: int | Sequence[int] = (),
     lines: Sequence[str] = (),
     split_by_header: bool = False,
 ) -> pd.DataFrame:
@@ -68,7 +68,7 @@ def to_frame(
 def _to_frame_space(
     lines: list[str],
     split: str = r"  +",
-    header: Union[int, list[str], None] = None,
+    header: int | list[str] | None = None,
 ) -> pd.DataFrame:
     """Convert the result of a shell command to a DataFrame.
 

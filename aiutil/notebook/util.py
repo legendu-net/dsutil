@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Jupyter/Lab notebooks related utils.
 """
-from typing import Union
 from pathlib import Path
 import subprocess as sp
 import itertools as it
@@ -11,7 +10,7 @@ from nbconvert import HTMLExporter
 HOME = Path.home()
 
 
-def nbconvert_notebooks(root_dir: Union[str, Path], cache: bool = False) -> None:
+def nbconvert_notebooks(root_dir: str | Path, cache: bool = False) -> None:
     """Convert all notebooks under a directory and its subdirectories using nbconvert.
 
     :param root_dir: The directory containing notebooks to convert.

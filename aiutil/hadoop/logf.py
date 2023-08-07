@@ -1,6 +1,5 @@
 """Script for fetch and filtering Spark application logs.
 """
-from typing import Optional
 from pathlib import Path
 import re
 from argparse import ArgumentParser, Namespace
@@ -225,7 +224,7 @@ def _subparser_filter(subparsers):
     subparser_filter.set_defaults(func=filter_)
 
 
-def main(args: Optional[Namespace] = None):
+def main(args: Namespace | None = None):
     """The main function for script usage."""
     if args is None:
         args = parse_args()
