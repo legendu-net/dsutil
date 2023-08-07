@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Filesystem related util functions.
 """
-from typing import Optional, Union, Iterable, Callable
+from typing import Iterable, Callable
 import itertools
 import os
 import sys
@@ -20,7 +20,7 @@ import dulwich.porcelain
 HOME = Path.home()
 
 
-def copy_if_exists(src: str, dst: Union[str, Path] = HOME) -> bool:
+def copy_if_exists(src: str, dst: str | Path = HOME) -> bool:
     """Copy a file.
     No exception is thrown if the source file does not exist.
 
@@ -38,7 +38,7 @@ def copy_if_exists(src: str, dst: Union[str, Path] = HOME) -> bool:
 
 
 def link_if_exists(
-    src: str, dst: Union[str, Path] = HOME, target_is_directory: bool = True
+    src: str, dst: str | Path = HOME, target_is_directory: bool = True
 ) -> bool:
     """Make a symbolic link of a file.
     No exception is thrown if the source file does not exist.
@@ -66,8 +66,7 @@ def count_path(
     """Count frequence of paths and their parent paths.
 
     :param paths: An iterable collection of paths.
-    :param ascending: If true, sort paths according to their frequencies in ascending order,
-        vice versa.
+    :param weights: Weights of paths.
     :return: A pandas Series with paths as index and frequencies of paths as value.
     """
 
@@ -86,7 +85,7 @@ def count_path(
     return pd.Series(freq, name="count")
 
 
-def zip_subdirs(root: Union[str, Path]) -> None:
+def zip_subdirs(root: str | Path) -> None:
     """Compress subdirectories into zip files.
 
     :param root: The root directory whose subdirs are to be zipped.
@@ -100,7 +99,7 @@ def zip_subdirs(root: Union[str, Path]) -> None:
             sp.run(f"zip -qr {file} {path} &", shell=True, check=True)
 
 
-def flatten_dir(dir_: Union[str, Path]) -> None:
+def flatten_dir(dir_: str | Path) -> None:
     """Flatten a directory,
     i.e., move files in immediate subdirectories into the current directory.
 
@@ -123,7 +122,7 @@ def _flatten_dir(dir_: Path) -> None:
         path.rename(path.parent.parent / path.name)
 
 
-def split_dir(dir_: Union[str, Path], batch_size: int, wildcard: str = "*") -> None:
+def split_dir(dir_: str | Path, batch_size: int, wildcard: str = "*") -> None:
     """Split files in a directory into sub-directories.
     This function is for the convenience of splitting a directory
     with a large number of files into smaller directories
@@ -157,7 +156,7 @@ def _split_dir_1(
         path.rename(desdir / path.name)
 
 
-def find_images(root_dir: Union[str, Path, list[str], list[Path]]) -> list[Path]:
+def find_images(root_dir: str | Path | list[str] | list[Path]) -> list[Path]:
     """Find all PNG images in a (sequence) of dir(s) or its/their subdirs.
 
     :param root_dir: A (list) of dir(s).
@@ -174,7 +173,7 @@ def find_images(root_dir: Union[str, Path, list[str], list[Path]]) -> list[Path]
 
 
 def find_data_tables(
-    root: Union[str, Path],
+    root: str | Path,
     filter_: Callable = lambda _: True,
     extensions: Iterable[str] = (),
     patterns: Iterable[str] = (),
@@ -241,7 +240,7 @@ def _find_data_tables_file(file, filter_, patterns) -> set[str]:
     return set(table for table in tables if filter_(table))
 
 
-def find_data_tables_sql(sql: str, filter_: Union[Callable, None] = None) -> set[str]:
+def find_data_tables_sql(sql: str, filter_: Callable | None = None) -> set[str]:
     """Find keywords which are likely data table names in a SQL string.
 
     :param sql: A SQL query.
@@ -257,9 +256,7 @@ def find_data_tables_sql(sql: str, filter_: Union[Callable, None] = None) -> set
     return set(table for table in tables if filter_(table))
 
 
-def is_empty(
-    dir_: Union[str, Path], filter_: Union[None, Callable] = lambda _: True
-) -> bool:
+def is_empty(dir_: str | Path, filter_: None | Callable = lambda _: True) -> bool:
     """Check whether a directory is empty.
 
     :param dir_: The directory to check.
@@ -288,7 +285,7 @@ def _ignore(path: Path) -> bool:
     return False
 
 
-def remove_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> list[Path]:
+def remove_ess_empty(path: str | Path, ignore: Callable = _ignore) -> list[Path]:
     """Remove essentially empty directories under a path.
 
     :param path: The path to the directory to check.
@@ -307,7 +304,7 @@ def remove_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> list
     return fail
 
 
-def find_ess_empty(path: Union[str, Path], ignore: Callable = _ignore) -> list[Path]:
+def find_ess_empty(path: str | Path, ignore: Callable = _ignore) -> list[Path]:
     """Find essentially empty sub directories under a directory.
 
     :param path: The path to the directory to check.
@@ -338,7 +335,7 @@ def _find_ess_empty(
 
 
 def is_ess_empty(
-    path: Path, ignore: Callable = _ignore, ess_empty: Optional[dict[Path, bool]] = None
+    path: Path, ignore: Callable = _ignore, ess_empty: dict[Path, bool] | None = None
 ):
     """Check if a directory is essentially empty.
 
@@ -377,7 +374,7 @@ def is_ess_empty(
 
 def append_lines(
     path: Path,
-    lines: Union[str, Iterable[str]],
+    lines: str | Iterable[str],
     exist_skip: bool = True,
 ) -> None:
     """Update a text file using regular expression substitution.
@@ -399,8 +396,8 @@ def append_lines(
 
 def replace_patterns(
     path: Path,
-    pattern: Union[str, Iterable[str]],
-    repl: Union[str, Iterable[str]],
+    pattern: str | Iterable[str],
+    repl: str | Iterable[str],
     regex: bool = True,
 ) -> None:
     """Update a text file by replacing patterns with specified substitutions.
@@ -428,7 +425,7 @@ def replace_patterns(
     path.write_text(text, encoding="utf-8")
 
 
-def get_files(dir_: Union[str, Path], exts: Union[str, list[str]]) -> Iterable[Path]:
+def get_files(dir_: str | Path, exts: str | list[str]) -> Iterable[Path]:
     """Get files with the specified file extensions.
 
     :param dir_: The path to a directory.
@@ -452,7 +449,7 @@ def _get_files(dir_: Path, exts: list[str]) -> Iterable[Path]:
 
 
 def has_header(
-    files: Union[str, Path, list[Union[str, Path]]], num_files_checking: int = 5
+    files: str | Path | list[str | Path], num_files_checking: int = 5
 ) -> bool:
     """Check whether the files have headers.
 
@@ -482,7 +479,7 @@ def has_header(
 
 
 def _merge_with_headers(
-    files: Union[str, Path, list[Union[str, Path]]], output: Union[str, Path] = ""
+    files: str | Path | list[str | Path], output: str | Path = ""
 ) -> None:
     """Merge files with headers. Keep only one header.
 
@@ -502,7 +499,7 @@ def _merge_with_headers(
 
 
 def _merge_without_header(
-    files: Union[str, Path, list[Union[str, Path]]], output: Union[str, Path] = ""
+    files: str | Path | list[str | Path], output: str | Path = ""
 ) -> None:
     """Merge files without header.
 
@@ -519,7 +516,7 @@ def _merge_without_header(
 
 
 def merge(
-    files: Union[str, Path, list[Union[str, Path]]],
+    files: str | Path | list[str | Path],
     output: str = "",
     num_files_checking: int = 5,
 ) -> None:
@@ -543,7 +540,7 @@ def merge(
     _merge_without_header(files, output)
 
 
-def dedup_header(file: Union[str, Path], output: Union[str, Path] = "") -> None:
+def dedup_header(file: str | Path, output: str | Path = "") -> None:
     """Dedup headers in a file (due to the hadoop getmerge command).
     Only the header on the first line is kept and headers (identical line to the first line)
     on other lines are removed.
@@ -563,8 +560,8 @@ def dedup_header(file: Union[str, Path], output: Union[str, Path] = "") -> None:
 
 
 def select(
-    path: Union[str, Path],
-    columns: Union[str, list[str]],
+    path: str | Path,
+    columns: str | list[str],
     delimiter: str,
     output: str = "",
 ):
@@ -595,7 +592,7 @@ def select(
                 fout.write(delimiter.join([fields[idx] for idx in index]) + "\n")
 
 
-def prune_json(input: Union[str, Path], output: Union[str, Path] = ""):
+def prune_json(input: str | Path, output: str | Path = ""):
     """Prune fields (value_counts) from a JSON file.
 
     :param input: The path to a JSON file to be pruned.
@@ -626,7 +623,7 @@ def prune_json(input: Union[str, Path], output: Union[str, Path] = ""):
     logger.info("The pruned JSON file is written to {}.", output)
 
 
-def _filter_num(path: Union[str, Path], pattern: str, num_lines: int):
+def _filter_num(path: str | Path, pattern: str, num_lines: int):
     if isinstance(path, str):
         path = Path(path)
     results = []
@@ -648,7 +645,7 @@ def _filter_num(path: Union[str, Path], pattern: str, num_lines: int):
     return results
 
 
-def _filter_sp(path: Union[str, Path], pattern: str, sub_pattern: str):
+def _filter_sp(path: str | Path, pattern: str, sub_pattern: str):
     if isinstance(path, str):
         path = Path(path)
     results = []
@@ -672,7 +669,7 @@ def _filter_sp(path: Union[str, Path], pattern: str, sub_pattern: str):
 
 
 def filter(
-    path: Union[str, Path], pattern: str, sub_pattern: str = "", num_lines: int = 0
+    path: str | Path, pattern: str, sub_pattern: str = "", num_lines: int = 0
 ) -> list[list[str]]:
     """Filter lines from a file.
     A main regex pattern is used to identify main rows.
