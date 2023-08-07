@@ -99,7 +99,7 @@ def _update_version(ver: str, proj_dir: Path) -> None:
 def version(
     ver: str = "",
     commit: bool = False,
-    proj_dir: Optional[Path] = None,
+    proj_dir: Path | None = None,
 ) -> None:
     """List or update the version of the package.
 
@@ -153,7 +153,7 @@ def add_tag_release(
 
 def format_code(
     commit: bool = False,
-    proj_dir: Optional[Path] = None,
+    proj_dir: Path | None = None,
     files: Iterable[Path | str] = (),
 ) -> None:
     """Format code.
@@ -274,7 +274,7 @@ def build_package(
     sp.run(f"cd '{proj_dir}' && poetry build", shell=True, check=True)
 
 
-def clean(proj_dir: Optional[Path] = None, ignore: str | Path | None = None) -> None:
+def clean(proj_dir: Path | None = None, ignore: str | Path | None = None) -> None:
     """Remove non-essential files from the current project.
 
     :param proj_dir: The root directory of the Poetry project.

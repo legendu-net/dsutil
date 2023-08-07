@@ -474,7 +474,7 @@ class LogFilter:
         return 10, line, "https://www.legendu.net/misc/tag/spark-issue.html"
 
     def _dedup_log_1(
-        self, kwd: str, lines: dict[str, int], dir_: Optional[Path]
+        self, kwd: str, lines: dict[str, int], dir_: Path | None
     ) -> list[str]:
         deduper = LogDeduper(self._threshold)
         lines = sorted(lines.items())
