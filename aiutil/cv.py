@@ -1,6 +1,6 @@
 """Computer vision related utils.
 """
-from typing import Union, Iterable
+from typing import Iterable
 from pathlib import Path
 from tqdm import tqdm, trange
 import numpy as np
@@ -13,7 +13,7 @@ import cv2
 def video_to_image(
     file: str,
     step: int,
-    bbox: Union[None, tuple[int, int, int, int]] = None,
+    bbox: tuple[int, int, int, int] | None = None,
     output: str = "frame_{:0>7}.png",
 ):
     """Extract images from a video file.
@@ -40,8 +40,8 @@ def video_to_image(
 
 
 def resize_image(
-    paths: Union[str, Path, Iterable[Path]],
-    desdir: Union[str, Path, None],
+    paths: str | Path | Iterable[Path],
+    desdir: str | Path | None,
     size: tuple[int, int],
 ) -> None:
     """Resize images to a given size.
@@ -217,7 +217,7 @@ def deshade_3(img, threshold=0.4, cutoff=30) -> Image.Image:
 
 
 def add_frames(
-    arr: Union[np.ndarray, Image.Image],
+    arr: np.ndarray | Image.Image,
     bboxes: list[tuple[int, int, int, int]],
     rgb: tuple[int, int, int] = (255, 0, 0),
 ) -> np.ndarray:
@@ -243,9 +243,9 @@ def add_frames(
 
 
 def duplicate_image(
-    path: Union[str, Path],
+    path: str | Path,
     copies: int,
-    des_dir: Union[str, Path, None] = None,
+    des_dir: str | Path | None = None,
     noise_amount: float = 0.05,
 ):
     """Duplicate an image with some noises added.
@@ -284,7 +284,7 @@ def structural_similarity(im1, im2) -> float:
     )
 
 
-def calc_image_similarities(img: Union[Image.Image, str, Path], dir_: Union[str, Path]):
+def calc_image_similarities(img: Image.Image | str | Path, dir_: str | Path):
     """Calculate the similarities between an image and all images in a directory.
 
     :param img: A PIL image or the path to an image file.

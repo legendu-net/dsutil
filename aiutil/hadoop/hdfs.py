@@ -1,6 +1,5 @@
 """Wrapping HDFS commands.
 """
-from typing import Union
 from pathlib import Path
 import subprocess as sp
 import pandas as pd
@@ -119,7 +118,7 @@ class Hdfs:
         return int(sp.check_output(cmd, shell=True))
 
     def get(
-        self, hdfs_path: str, local_dir: Union[str, Path] = "", is_file: bool = False
+        self, hdfs_path: str, local_dir: str | Path = "", is_file: bool = False
     ) -> None:
         """Download data from HDFS into a local directory.
 
@@ -161,7 +160,7 @@ class Hdfs:
 
     def put(
         self,
-        local_path: Union[str, Path],
+        local_path: str | Path,
         hdfs_path: str,
         create_hdfs_path: bool = False,
     ) -> None:

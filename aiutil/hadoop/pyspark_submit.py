@@ -2,7 +2,7 @@
 # encoding: utf-8
 """A module makes it easy to run Scala/Python Spark job.
 """
-from typing import Union, Callable, Any, Iterable
+from typing import Callable, Any, Iterable
 import os
 import sys
 import itertools as it
@@ -23,7 +23,7 @@ import aiutil.filesystem as fs
 class SparkSubmit:
     """A class for submitting Spark jobs."""
 
-    def __init__(self, email: Union[dict, None] = None, level: str = "INFO"):
+    def __init__(self, email: dict | None = None, level: str = "INFO"):
         """Initialize a SparkSubmit instance.
 
         :param email: A dict object containing email information ("from", "to" and "host").
@@ -121,7 +121,7 @@ class SparkSubmit:
         return False
 
     @staticmethod
-    def _filter(line: str, time_begin, log_filter: Union[Callable, None] = None) -> str:
+    def _filter(line: str, time_begin, log_filter: Callable | None = None) -> str:
         if not line:
             return ""
         if log_filter is None or log_filter(line):
@@ -130,7 +130,7 @@ class SparkSubmit:
             return line
         return ""
 
-    def submit(self, cmd: str, attachments: Union[None, list[str]] = None) -> bool:
+    def submit(self, cmd: str, attachments: list[str] | None = None) -> bool:
         """Submit a Spark job.
 
         :param cmd: The Python script command to run.

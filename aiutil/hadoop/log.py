@@ -1,6 +1,6 @@
 """Module for log filtering.
 """
-from typing import Union, Optional, Sequence, TextIO
+from typing import Sequence, TextIO
 from pathlib import Path
 import sys
 import re
@@ -76,11 +76,11 @@ class LogFilter:
 
     def __init__(
         self,
-        log_file: Union[str, Path],
+        log_file: str | Path,
         context_size: int = 5,
         keywords: Sequence[str] = KEYWORDS,
         patterns: Sequence[tuple[str, str]] = PATTERNS,
-        output: Union[str, Path] = "",
+        output: str | Path = "",
         threshold: float = 0.7,
         dump_by_keyword: bool = False,
     ):
@@ -97,7 +97,7 @@ class LogFilter:
         self._threshold: float = threshold
         self._dump_by_keyword: bool = dump_by_keyword
 
-    def _get_output(self, output: Union[str, Path]) -> Path:
+    def _get_output(self, output: str | Path) -> Path:
         """Get a valid output file.
 
         :param output: The path to the output file.

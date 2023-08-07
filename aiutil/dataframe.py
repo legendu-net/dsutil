@@ -1,6 +1,5 @@
 """Pandas DataFrame related utils.
 """
-from typing import Union
 from pathlib import Path
 from loguru import logger
 import pandas as pd
@@ -8,8 +7,8 @@ from ydata_profiling import ProfileReport
 
 
 def table_2w(
-    frame: Union[pd.DataFrame, pd.Series],
-    columns: Union[str, list[str], None],
+    frame: [pd.DataFrame | pd.Series],
+    columns: str | list[str] | None,
     na_as=None,
 ) -> pd.DataFrame:
     """Create 2-way table from columns of a DataFrame.
@@ -34,7 +33,7 @@ def table_2w(
     raise TypeError('"frame" must be pandas.Series or pandas.DataFrame.')
 
 
-def read_csv(path: Union[str, Path], **kwargs) -> pd.DataFrame:
+def read_csv(path: str | Path, **kwargs) -> pd.DataFrame:
     """Read many CSV files into a DataFrame at once.
 
     :param path: A path to a CSV file or to a directory containing CSV files.
@@ -49,7 +48,7 @@ def read_csv(path: Union[str, Path], **kwargs) -> pd.DataFrame:
 
 
 def dump_profile(
-    df: Union[pd.DataFrame, str, Path], title: str, output_dir: Union[str, Path]
+    df: pd.DataFrame | str | Path, title: str, output_dir: str | Path
 ):
     """Run ydata-profiling on a DataFrame and dump the report into files.
 

@@ -5,7 +5,7 @@ the password is encrypted and saved into a profile that is readable/writable onl
 If an user authenticate without specifying password,
 the saved password is used so that users do not have to type in password to authenticate every time.
 """
-from typing import Union, Any
+from typing import Any
 import os
 from pathlib import Path
 import socket
@@ -157,7 +157,7 @@ def parse_args(args=None, namespace=None) -> Namespace:
     return parser.parse_args(args, namespace)
 
 
-def _read_config(config: Union[Path, str]) -> dict[str, Any]:
+def _read_config(config: Path | str) -> dict[str, Any]:
     if isinstance(config, str):
         config = Path(config)
     if not config.is_file():

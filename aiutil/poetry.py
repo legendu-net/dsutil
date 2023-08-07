@@ -1,6 +1,6 @@
 """This module makes it easy to work with poetry to managing your Python project.
 """
-from typing import Optional, Union, Iterable
+from typing import Iterable
 from pathlib import Path
 import os
 import shutil
@@ -122,7 +122,7 @@ def version(
 
 
 def add_tag_release(
-    proj_dir: Union[str, Path, None] = None, tag: str = "", branch_release: str = "main"
+    proj_dir: str | Path | None = None, tag: str = "", branch_release: str = "main"
 ) -> None:
     """Add a tag to the latest commit on the release branch for releasing.
     The tag is decided based on the current version of the project.
@@ -154,7 +154,7 @@ def add_tag_release(
 def format_code(
     commit: bool = False,
     proj_dir: Optional[Path] = None,
-    files: Iterable[Union[Path, str]] = (),
+    files: Iterable[Path | str] = (),
 ) -> None:
     """Format code.
 
@@ -184,7 +184,7 @@ def format_code(
         repo.status()
 
 
-def _lint_code(proj_dir: Union[Path, None], linter: Union[str, list[str]]):
+def _lint_code(proj_dir: Path | None, linter: str | list[str]):
     funcs = {
         "pylint": _lint_code_pylint,
         "flake8": _lint_code_flake8,
@@ -197,7 +197,7 @@ def _lint_code(proj_dir: Union[Path, None], linter: Union[str, list[str]]):
         funcs[lint](proj_dir)
 
 
-def _lint_code_pytype(proj_dir: Union[Path, None]):
+def _lint_code_pytype(proj_dir: Path | None):
     logger.info("Linting code using pytype ...")
     if not proj_dir:
         proj_dir = _project_dir()
@@ -211,7 +211,7 @@ def _lint_code_pytype(proj_dir: Union[Path, None]):
         logger.error("Please fix errors: {}", cmd)
 
 
-def _lint_code_pylint(proj_dir: Union[Path, None]):
+def _lint_code_pylint(proj_dir: Path | None):
     logger.info("Linting code using pylint ...")
     if not proj_dir:
         proj_dir = _project_dir()
@@ -223,7 +223,7 @@ def _lint_code_pylint(proj_dir: Union[Path, None]):
         logger.error("Please fix errors: {}", cmd)
 
 
-def _lint_code_flake8(proj_dir: Union[Path, None]):
+def _lint_code_flake8(proj_dir: Path | None):
     logger.info("Linting code using flake8 ...")
     if not proj_dir:
         proj_dir = _project_dir()
@@ -235,7 +235,7 @@ def _lint_code_flake8(proj_dir: Union[Path, None]):
         logger.error("Please fix errors: {}", cmd)
 
 
-def _lint_code_darglint(proj_dir: Union[Path, None]):
+def _lint_code_darglint(proj_dir: Path | None):
     logger.info("Linting docstring using darglint ...")
     if not proj_dir:
         proj_dir = _project_dir()
@@ -248,8 +248,8 @@ def _lint_code_darglint(proj_dir: Union[Path, None]):
 
 
 def build_package(
-    proj_dir: Union[Path, None] = None,
-    linter: Union[str, Iterable[str]] = ("pylint", "pytype"),
+    proj_dir: Path | None = None,
+    linter: str | Iterable[str] = ("pylint", "pytype"),
     test: bool = True,
 ) -> None:
     """Build the package using poetry.
@@ -275,7 +275,7 @@ def build_package(
 
 
 def clean(
-    proj_dir: Optional[Path] = None, ignore: Union[str, Path, None] = None
+    proj_dir: Optional[Path] = None, ignore: str | Path | None = None
 ) -> None:
     """Remove non-essential files from the current project.
 
