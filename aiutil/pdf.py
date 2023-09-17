@@ -1,7 +1,7 @@
 """Manipulating PDFs.
 """
 from typing import Iterable
-from PyPDF2 import PdfFileWriter, PdfFileReader
+from pypdf import PdfWriter, PdfReader
 
 
 def extract_pages(file: str, subfiles: dict[str, int | Iterable[int]]) -> None:
@@ -21,13 +21,13 @@ def extract_pages(file: str, subfiles: dict[str, int | Iterable[int]]) -> None:
         extract_pages("raw.pdf", {"first.pdf": range(5), "second.pdf": [5, 7], "third.pdf": 6})
     """
     with open(file, "rb") as fin:
-        reader = PdfFileReader(fin)
+        reader = PdfReader(fin)
         for subfile, indexes in subfiles.items():
             _extract_pages(reader, indexes, subfile)
 
 
 def _extract_pages(
-    reader: PdfFileReader, indexes: int | Iterable[int], output: str
+    reader: PdfReader, indexes: int | Iterable[int], output: str
 ) -> None:
     """A helper function for extract_pages.
 
@@ -35,10 +35,10 @@ def _extract_pages(
     :param indexes: Index (0-based) of pages to extract.
     :param output: The path of the sub PDF file to write the extracted pages to.
     """
-    writer = PdfFileWriter()
+    writer = PdfWriter()
     if isinstance(indexes, int):
         indexes = [indexes]
     for index in indexes:
-        writer.addPage(reader.getPage(index))
+        writer.add_page(reader.pages[index])
     with open(output, "wb") as fout:
         writer.write(fout)

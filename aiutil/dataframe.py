@@ -7,7 +7,7 @@ from ydata_profiling import ProfileReport
 
 
 def table_2w(
-    frame: [pd.DataFrame | pd.Series],
+    frame: pd.DataFrame | pd.Series,
     columns: str | list[str] | None,
     na_as=None,
 ) -> pd.DataFrame:
