@@ -1,5 +1,6 @@
 """Miscellaneous utils.
 """
+
 from typing import Any, Sized, Callable
 import time
 

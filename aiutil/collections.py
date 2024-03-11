@@ -1,5 +1,6 @@
 """Collections related utills.
 """
+
 from typing import Callable, Any
 
 

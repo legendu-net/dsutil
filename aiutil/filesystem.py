@@ -549,9 +549,9 @@ def dedup_header(file: str | Path, output: str | Path = "") -> None:
     :param output: The path of the output file.
         If empty, then output to the standard output.
     """
-    with open(file, "rb") as fin, open(
-        output, "wb"
-    ) if output else sys.stdout.buffer as fout:
+    with open(file, "rb") as fin, (
+        open(output, "wb") if output else sys.stdout.buffer
+    ) as fout:
         header = fin.readline()
         fout.write(header)
         for line in fin:

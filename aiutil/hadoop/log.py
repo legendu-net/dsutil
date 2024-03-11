@@ -1,5 +1,6 @@
 """Module for log filtering.
 """
+
 from typing import Sequence, TextIO
 from pathlib import Path
 import sys
