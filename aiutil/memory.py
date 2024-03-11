@@ -1,5 +1,6 @@
 """Memory related utils.
 """
+
 import getpass
 import sys
 import math

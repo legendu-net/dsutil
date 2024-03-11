@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aiutil"
-version = "0.82.0"
+version = "0.83.0"
 description = "A utils Python package for data scientists."
 authors = ["Benjamin Du <longendu@yahoo.com>"]
 license = "MIT"
@@ -17,13 +17,13 @@ match_memory = "aiutil:memory.main"
 snb = "aiutil.notebook:search.main"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.12"
+python = ">=3.10,<3.13"
 sqlparse = ">=0.4.1"
 pathspec = ">=0.8.1"
 dateparser = ">=0.7.1"
 numba = ">=0.53.0rc1.post1"
 pandas = ">=1.2.0"
-ydata-profiling = ">=4.2.0"
+# ydata-profiling = ">=4.2.0"
 loguru = ">=0.3.2"
 toml = ">=0.10.0"
 notifiers = ">=1.2.1"

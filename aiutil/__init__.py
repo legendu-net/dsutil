@@ -1,5 +1,6 @@
 """A utils Python package for data scientists.
 """
+
 from . import poetry
 
-__version__ = "0.82.0"
+__version__ = "0.83.0"

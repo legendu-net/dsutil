@@ -1,5 +1,6 @@
 """Manipulating PDFs.
 """
+
 from typing import Iterable
 from pypdf import PdfWriter, PdfReader
 

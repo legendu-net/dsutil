@@ -1,5 +1,6 @@
 """Shell command related utils.
 """
+
 from typing import Sequence
 from pathlib import Path
 import re

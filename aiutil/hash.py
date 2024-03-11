@@ -1,5 +1,6 @@
 """Hash code related utils.
 """
+
 import hashlib
 from pathlib import Path
 from loguru import logger
