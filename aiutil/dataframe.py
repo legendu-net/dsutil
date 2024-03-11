@@ -2,9 +2,7 @@
 """
 
 from pathlib import Path
-from loguru import logger
 import pandas as pd
-from ydata_profiling import ProfileReport
 
 
 def table_2w(
